@@ -56,8 +56,8 @@ foreach ($osNames as $osName) {
 # install basic system tools
 RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')
     . $genPackageInstallCommand(['bash', 'git', 'make']) . ' \
-    && git config --global url."https://github.com/".insteadOf "git@github.com:" \
-    && git config --global url."https://github.com".insteadOf "ssh://git@github.com"
+    && git config --system url."https://github.com/".insteadOf "git@github.com:" \
+    && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/

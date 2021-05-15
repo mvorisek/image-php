@@ -5,8 +5,8 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
     && apt-get -y update \
     && apt-get -y install bash git make \
     && apt-get -y autoremove && apt-get clean \
-    && git config --global url."https://github.com/".insteadOf "git@github.com:" \
-    && git config --global url."https://github.com".insteadOf "ssh://git@github.com"
+    && git config --system url."https://github.com/".insteadOf "git@github.com:" \
+    && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/

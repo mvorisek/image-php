@@ -4,8 +4,8 @@ FROM php:7.3-alpine as base
 RUN apk update \
     && apk add bash git make \
     && rm -rf /var/cache/apk/* \
-    && git config --global url."https://github.com/".insteadOf "git@github.com:" \
-    && git config --global url."https://github.com".insteadOf "ssh://git@github.com"
+    && git config --system url."https://github.com/".insteadOf "git@github.com:" \
+    && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
