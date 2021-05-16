@@ -55,7 +55,7 @@ foreach ($osNames as $osName) {
 
 # install basic system tools
 RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')
-    . $genPackageInstallCommand(array_merge(['bash', 'git', 'make'], ['alpine' => [], 'debian' => ['apt-utils', 'apt-transport-https', 'gnupg']][$osName])) . ' \
+    . $genPackageInstallCommand(array_merge(['bash', 'git', 'make'], ['alpine' => [], 'debian' => ['apt-utils', 'apt-transport-https', 'gnupg', 'netcat']][$osName])) . ' \
     && git config --system url."https://github.com/".insteadOf "git@github.com:" \
     && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
 
