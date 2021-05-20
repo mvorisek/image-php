@@ -97,8 +97,9 @@ RUN composer diagnose
 
 FROM base as npm
 
-# install npm
-RUN ' . $genPackageInstallCommand(['npm']) . '
+# install Node JS with npm
+RUN ' . $genPackageInstallCommand(['nodejs', 'npm'])
+    . ($osName === 'debian' ? ' && npm install --global npm@latest' : '') . '
 
 
 FROM npm as selenium

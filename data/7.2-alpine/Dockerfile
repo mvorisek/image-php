@@ -42,9 +42,9 @@ RUN composer diagnose
 
 FROM base as npm
 
-# install npm
+# install Node JS with npm
 RUN apk update \
-    && apk add npm \
+    && apk add nodejs npm \
     && rm -rf /var/cache/apk/*
 
 

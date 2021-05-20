@@ -43,10 +43,10 @@ RUN composer diagnose
 
 FROM base as npm
 
-# install npm
+# install Node JS with npm
 RUN apt-get -y update \
-    && apt-get -y install npm \
-    && apt-get -y autoremove && apt-get clean
+    && apt-get -y install nodejs npm \
+    && apt-get -y autoremove && apt-get clean && npm install --global npm@latest
 
 
 FROM npm as selenium
