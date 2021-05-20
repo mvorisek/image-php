@@ -2,7 +2,7 @@ FROM php:7.3-alpine as base
 
 # install basic system tools
 RUN apk update \
-    && apk add bash git make \
+    && apk add bash git make gnupg coreutils \
     && rm -rf /var/cache/apk/* \
     && git config --system url."https://github.com/".insteadOf "git@github.com:" \
     && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
