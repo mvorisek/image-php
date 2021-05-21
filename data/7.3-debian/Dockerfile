@@ -41,7 +41,7 @@ RUN php test.php && rm test.php
 RUN composer diagnose
 
 
-FROM base as npm
+FROM base as node
 
 # install Node JS with npm
 RUN apt-get -y update \
@@ -49,7 +49,7 @@ RUN apt-get -y update \
     && apt-get -y autoremove && apt-get clean && npm install --global npm@latest
 
 
-FROM npm as selenium
+FROM node as selenium
 
 # install Selenium
 RUN apt-get -y update \

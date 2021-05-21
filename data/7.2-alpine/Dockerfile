@@ -40,7 +40,7 @@ RUN php test.php && rm test.php
 RUN composer diagnose
 
 
-FROM base as npm
+FROM base as node
 
 # install Node JS with npm
 RUN apk update \
@@ -48,7 +48,7 @@ RUN apk update \
     && rm -rf /var/cache/apk/*
 
 
-FROM npm as selenium
+FROM node as selenium
 
 # install Selenium
 RUN apk update \

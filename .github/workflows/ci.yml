@@ -57,14 +57,14 @@ jobs:
           docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker images --no-trunc --format='{{.ID}}' | head -1)
           && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker images --no-trunc --format='{{.ID}}' | head -1) | cut -f1
 
-      - name: 'Target "npm - Build Dockerfile'
+      - name: 'Target "node - Build Dockerfile'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           sed -i 's~^[ \t]*~~' data/${{ matrix.imageName }}/Dockerfile
-          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "npm" -t ci-target:npm ./
-          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "npm" -t ci-target:npm ./)
+          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node" -t ci-target:node ./
+          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node" -t ci-target:node ./)
 
-      - name: 'Target "npm" - Display layer sizes'
+      - name: 'Target "node" - Display layer sizes'
         run: >-
           docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker images --no-trunc --format='{{.ID}}' | head -1)
           && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker images --no-trunc --format='{{.ID}}' | head -1) | cut -f1
@@ -94,16 +94,16 @@ jobs:
           if [ "${{ matrix.imageName }}" == "7.2-alpine" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.2" && docker push "$REGISTRY_IMAGE_NAME:7.2"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.2-alpine" && docker push "$REGISTRY_IMAGE_NAME:7.2-alpine"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.2-npm" && docker push "$REGISTRY_IMAGE_NAME:7.2-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.2-alpine-npm" && docker push "$REGISTRY_IMAGE_NAME:7.2-alpine-npm"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.2-node" && docker push "$REGISTRY_IMAGE_NAME:7.2-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.2-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:7.2-alpine-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.2-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.2-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.2-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.2-alpine-selenium"
           ; fi
           && if [ "${{ matrix.imageName }}" == "7.3-alpine" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.3" && docker push "$REGISTRY_IMAGE_NAME:7.3"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.3-alpine" && docker push "$REGISTRY_IMAGE_NAME:7.3-alpine"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.3-npm" && docker push "$REGISTRY_IMAGE_NAME:7.3-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.3-alpine-npm" && docker push "$REGISTRY_IMAGE_NAME:7.3-alpine-npm"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.3-node" && docker push "$REGISTRY_IMAGE_NAME:7.3-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.3-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:7.3-alpine-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.3-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.3-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.3-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.3-alpine-selenium"
           ; fi
@@ -112,10 +112,10 @@ jobs:
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.4-alpine" && docker push "$REGISTRY_IMAGE_NAME:7.4-alpine"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.x" && docker push "$REGISTRY_IMAGE_NAME:7.x"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.x-alpine" && docker push "$REGISTRY_IMAGE_NAME:7.x-alpine"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.4-npm" && docker push "$REGISTRY_IMAGE_NAME:7.4-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.4-alpine-npm" && docker push "$REGISTRY_IMAGE_NAME:7.4-alpine-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.x-npm" && docker push "$REGISTRY_IMAGE_NAME:7.x-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.x-alpine-npm" && docker push "$REGISTRY_IMAGE_NAME:7.x-alpine-npm"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.4-node" && docker push "$REGISTRY_IMAGE_NAME:7.4-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.4-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:7.4-alpine-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.x-node" && docker push "$REGISTRY_IMAGE_NAME:7.x-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.x-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:7.x-alpine-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.4-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.4-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.4-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.4-alpine-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.x-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.x-selenium"
@@ -128,12 +128,12 @@ jobs:
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.x-alpine" && docker push "$REGISTRY_IMAGE_NAME:8.x-alpine"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:latest" && docker push "$REGISTRY_IMAGE_NAME:latest"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:latest-alpine" && docker push "$REGISTRY_IMAGE_NAME:latest-alpine"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:8.0-npm" && docker push "$REGISTRY_IMAGE_NAME:8.0-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:8.0-alpine-npm" && docker push "$REGISTRY_IMAGE_NAME:8.0-alpine-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:8.x-npm" && docker push "$REGISTRY_IMAGE_NAME:8.x-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:8.x-alpine-npm" && docker push "$REGISTRY_IMAGE_NAME:8.x-alpine-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:latest-npm" && docker push "$REGISTRY_IMAGE_NAME:latest-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:latest-alpine-npm" && docker push "$REGISTRY_IMAGE_NAME:latest-alpine-npm"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:8.0-node" && docker push "$REGISTRY_IMAGE_NAME:8.0-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:8.0-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:8.0-alpine-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:8.x-node" && docker push "$REGISTRY_IMAGE_NAME:8.x-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:8.x-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:8.x-alpine-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:latest-node" && docker push "$REGISTRY_IMAGE_NAME:latest-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:latest-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:latest-alpine-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.0-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.0-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.0-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.0-alpine-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.x-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.x-selenium"
@@ -143,19 +143,19 @@ jobs:
           ; fi
           && if [ "${{ matrix.imageName }}" == "7.2-debian" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.2-debian" && docker push "$REGISTRY_IMAGE_NAME:7.2-debian"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.2-debian-npm" && docker push "$REGISTRY_IMAGE_NAME:7.2-debian-npm"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.2-debian-node" && docker push "$REGISTRY_IMAGE_NAME:7.2-debian-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.2-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.2-debian-selenium"
           ; fi
           && if [ "${{ matrix.imageName }}" == "7.3-debian" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.3-debian" && docker push "$REGISTRY_IMAGE_NAME:7.3-debian"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.3-debian-npm" && docker push "$REGISTRY_IMAGE_NAME:7.3-debian-npm"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.3-debian-node" && docker push "$REGISTRY_IMAGE_NAME:7.3-debian-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.3-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.3-debian-selenium"
           ; fi
           && if [ "${{ matrix.imageName }}" == "7.4-debian" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.4-debian" && docker push "$REGISTRY_IMAGE_NAME:7.4-debian"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.x-debian" && docker push "$REGISTRY_IMAGE_NAME:7.x-debian"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.4-debian-npm" && docker push "$REGISTRY_IMAGE_NAME:7.4-debian-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:7.x-debian-npm" && docker push "$REGISTRY_IMAGE_NAME:7.x-debian-npm"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.4-debian-node" && docker push "$REGISTRY_IMAGE_NAME:7.4-debian-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.x-debian-node" && docker push "$REGISTRY_IMAGE_NAME:7.x-debian-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.4-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.4-debian-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.x-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.x-debian-selenium"
           ; fi
@@ -163,9 +163,9 @@ jobs:
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.0-debian" && docker push "$REGISTRY_IMAGE_NAME:8.0-debian"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.x-debian" && docker push "$REGISTRY_IMAGE_NAME:8.x-debian"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:latest-debian" && docker push "$REGISTRY_IMAGE_NAME:latest-debian"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:8.0-debian-npm" && docker push "$REGISTRY_IMAGE_NAME:8.0-debian-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:8.x-debian-npm" && docker push "$REGISTRY_IMAGE_NAME:8.x-debian-npm"
-          && docker tag "ci-target:npm" "$REGISTRY_IMAGE_NAME:latest-debian-npm" && docker push "$REGISTRY_IMAGE_NAME:latest-debian-npm"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:8.0-debian-node" && docker push "$REGISTRY_IMAGE_NAME:8.0-debian-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:8.x-debian-node" && docker push "$REGISTRY_IMAGE_NAME:8.x-debian-node"
+          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:latest-debian-node" && docker push "$REGISTRY_IMAGE_NAME:latest-debian-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.0-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.0-debian-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.x-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.x-debian-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:latest-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:latest-debian-selenium"

@@ -2,7 +2,7 @@
 
 $phpVersions = ['7.2', '7.3', '7.4', '8.0'];
 $osNames = ['alpine', 'debian'];
-$targetNames = ['base', 'npm', 'selenium'];
+$targetNames = ['base', 'node', 'selenium'];
 
 $aliasesPhpVersions = [
     '7.4' => ['7.x'],
@@ -95,14 +95,14 @@ RUN php test.php && rm test.php
 RUN composer diagnose
 
 
-FROM base as npm
+FROM base as node
 
 # install Node JS with npm
 RUN ' . $genPackageInstallCommand(['nodejs', 'npm'])
     . ($osName === 'debian' ? ' && npm install --global npm@latest' : '') . '
 
 
-FROM npm as selenium
+FROM node as selenium
 
 # install Selenium
 RUN ' . $genPackageInstallCommand(['alpine' => ['openjdk11-jre-headless', 'xvfb', 'ttf-freefont'], 'debian' => ['openjdk-11-jre-headless', 'xvfb', 'fonts-freefont-ttf']][$osName]) . ' \

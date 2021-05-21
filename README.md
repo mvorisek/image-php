@@ -12,14 +12,14 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `7.3-debian`
 - `7.4-debian` `7.x-debian`
 - `8.0-debian` `8.x-debian` `latest-debian`
-- `7.2-npm` `7.2-alpine-npm`
-- `7.3-npm` `7.3-alpine-npm`
-- `7.4-npm` `7.4-alpine-npm` `7.x-npm` `7.x-alpine-npm`
-- `8.0-npm` `8.0-alpine-npm` `8.x-npm` `8.x-alpine-npm` `latest-npm` `latest-alpine-npm`
-- `7.2-debian-npm`
-- `7.3-debian-npm`
-- `7.4-debian-npm` `7.x-debian-npm`
-- `8.0-debian-npm` `8.x-debian-npm` `latest-debian-npm`
+- `7.2-node` `7.2-alpine-node`
+- `7.3-node` `7.3-alpine-node`
+- `7.4-node` `7.4-alpine-node` `7.x-node` `7.x-alpine-node`
+- `8.0-node` `8.0-alpine-node` `8.x-node` `8.x-alpine-node` `latest-node` `latest-alpine-node`
+- `7.2-debian-node`
+- `7.3-debian-node`
+- `7.4-debian-node` `7.x-debian-node`
+- `8.0-debian-node` `8.x-debian-node` `latest-debian-node`
 - `7.2-selenium` `7.2-alpine-selenium`
 - `7.3-selenium` `7.3-alpine-selenium`
 - `7.4-selenium` `7.4-alpine-selenium` `7.x-selenium` `7.x-alpine-selenium`
