@@ -1,4 +1,4 @@
-FROM php:7.3-alpine3.13 as base
+FROM php:8.1-rc-alpine3.13 as base
 
 # install basic system tools
 RUN apk update \
@@ -23,7 +23,7 @@ RUN install-php-extensions bcmath \
     pdo_mysql \
     pdo_oci \
     pdo_pgsql \
-    pdo_sqlsrv \
+     \
     redis \
     sockets \
     tidy \

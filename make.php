@@ -1,6 +1,6 @@
 <?php
 
-$phpVersions = ['7.2', '7.3', '7.4', '8.0'];
+$phpVersions = ['7.2', '7.3', '7.4', '8.0', '8.1'];
 $osNames = ['alpine', 'debian'];
 $targetNames = ['base', 'node', 'selenium'];
 
@@ -51,7 +51,7 @@ foreach ($osNames as $osName) {
             return 'apt-get -y update' . $and . 'apt-get -y install ' . implode(' ', $packages) . $and . 'apt-get -y autoremove && apt-get clean';
         };
 
-        $dockerFile = 'FROM php:' . $phpVersion . '-' . ['alpine' => 'alpine', 'debian' => 'buster'][$osName] . ' as base
+        $dockerFile = 'FROM php:' . $phpVersion . ($phpVersion === '8.1' ? '-rc' : '') . '-' . ['alpine' => 'alpine' . ($phpVersion === '7.2' ? '': '3.13' /* fix Alpine 3.14 apk libressl issue, remove once resolved, see https://gitlab.alpinelinux.org/alpine/aports/-/issues/12763#note_163217 */), 'debian' => 'buster'][$osName] . ' as base
 
 # install basic system tools
 RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')
@@ -78,7 +78,7 @@ RUN install-php-extensions bcmath \
     pdo_mysql \
     pdo_oci \
     pdo_pgsql \
-    pdo_sqlsrv \
+    ' . ($phpVersion === '8.1' ? '' : 'pdo_sqlsrv') . ' \
     redis \
     sockets \
     tidy \
@@ -144,7 +144,6 @@ on:
 jobs:
   unit:
     name: Templating
-    if: github.event_name != \'push\' || github.ref == \'refs/heads/master\' || github.ref == \'refs/heads/develop\'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/mvorisek/image-php

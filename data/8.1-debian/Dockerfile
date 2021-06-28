@@ -1,9 +1,10 @@
-FROM php:7.3-alpine3.13 as base
+FROM php:8.1-rc-buster as base
 
 # install basic system tools
-RUN apk update \
-    && apk add bash git make unzip gnupg coreutils \
-    && rm -rf /var/cache/apk/* \
+RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
+    && apt-get -y update \
+    && apt-get -y install bash git make unzip gnupg apt-utils apt-transport-https netcat \
+    && apt-get -y autoremove && apt-get clean \
     && git config --system url."https://github.com/".insteadOf "git@github.com:" \
     && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
 
@@ -23,7 +24,7 @@ RUN install-php-extensions bcmath \
     pdo_mysql \
     pdo_oci \
     pdo_pgsql \
-    pdo_sqlsrv \
+     \
     redis \
     sockets \
     tidy \
@@ -43,28 +44,28 @@ RUN composer diagnose
 FROM base as node
 
 # install Node JS with npm
-RUN apk update \
-    && apk add nodejs npm \
-    && rm -rf /var/cache/apk/*
+RUN apt-get -y update \
+    && apt-get -y install nodejs npm \
+    && apt-get -y autoremove && apt-get clean && npm install --global npm@latest
 
 
 FROM node as selenium
 
 # install Selenium
-RUN apk update \
-    && apk add openjdk11-jre-headless xvfb ttf-freefont \
-    && rm -rf /var/cache/apk/* \
+RUN apt-get -y update \
+    && apt-get -y install openjdk-11-jre-headless xvfb fonts-freefont-ttf \
+    && apt-get -y autoremove && apt-get clean \
     && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar
 
 # install Chrome
-RUN apk update \
-    && apk add chromium chromium-chromedriver \
-    && rm -rf /var/cache/apk/*
+RUN apt-get -y update \
+    && apt-get -y install chromium chromium-driver \
+    && apt-get -y autoremove && apt-get clean
 
 # install Firefox
-RUN apk update \
-    && apk add firefox \
-    && rm -rf /var/cache/apk/* \
+RUN apt-get -y update \
+    && apt-get -y install firefox-esr \
+    && apt-get -y autoremove && apt-get clean \
     && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
