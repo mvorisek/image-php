@@ -23,7 +23,7 @@ RUN install-php-extensions bcmath \
     pdo_mysql \
     pdo_oci \
     pdo_pgsql \
-     \
+    pdo_sqlsrv \
     redis \
     sockets \
     tidy \
