@@ -1,4 +1,4 @@
-FROM php:7.3-alpine3.13 as base
+FROM php:7.3-alpine as base
 
 # install basic system tools
 RUN apk update \

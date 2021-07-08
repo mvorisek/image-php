@@ -51,7 +51,7 @@ foreach ($osNames as $osName) {
             return 'apt-get -y update' . $and . 'apt-get -y install ' . implode(' ', $packages) . $and . 'apt-get -y autoremove && apt-get clean';
         };
 
-        $dockerFile = 'FROM php:' . $phpVersion . ($phpVersion === '8.1' ? '-rc' : '') . '-' . ['alpine' => 'alpine' . ($phpVersion === '7.2' ? '': '3.13' /* fix Alpine 3.14 apk libressl issue, remove once resolved, see https://gitlab.alpinelinux.org/alpine/aports/-/issues/12763#note_163217 */), 'debian' => 'buster'][$osName] . ' as base
+        $dockerFile = 'FROM php:' . $phpVersion . ($phpVersion === '8.1' ? '-rc' : '') . '-' . ['alpine' => 'alpine', 'debian' => 'buster'][$osName] . ' as base
 
 # install basic system tools
 RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')
