@@ -1,4 +1,4 @@
-FROM php:7.3-buster as base
+FROM php:7.3-bullseye as base
 
 # install basic system tools
 RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \

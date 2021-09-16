@@ -1,4 +1,4 @@
-FROM php:8.1-rc-buster as base
+FROM php:8.1-rc-bullseye as base
 
 # install basic system tools
 RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
