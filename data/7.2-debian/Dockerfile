@@ -3,7 +3,7 @@ FROM php:7.2-buster as base
 # install basic system tools
 RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
     && apt-get -y update \
-    && apt-get -y install bash git make unzip gnupg apt-utils apt-transport-https netcat \
+    && apt-get -y install bash git make unzip gnupg ca-certificates apt-utils apt-transport-https netcat \
     && apt-get -y autoremove && apt-get clean \
     && git config --system url."https://github.com/".insteadOf "git@github.com:" \
     && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
