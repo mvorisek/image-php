@@ -67,7 +67,7 @@ RUN apt-get -y update \
 
 # install Chrome
 RUN apt-get -y update \
-    && apt-get -y install chromium chromium-driver \
+    && apt-get -y install chromium chromium-driver libnss3-tools \
     && apt-get -y autoremove && apt-get clean
 
 # install Firefox

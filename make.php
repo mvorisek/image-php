@@ -122,7 +122,7 @@ RUN ' . $genPackageInstallCommand(['alpine' => ['openjdk11-jre-headless', 'xvfb'
     && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar
 
 # install Chrome
-RUN ' . $genPackageInstallCommand(['alpine' => ['chromium', 'chromium-chromedriver'], 'debian' => ['chromium', 'chromium-driver']][$osName]) . '
+RUN ' . $genPackageInstallCommand(['alpine' => ['chromium', 'chromium-chromedriver', 'nss-tools'], 'debian' => ['chromium', 'chromium-driver', 'libnss3-tools']][$osName]) . '
 
 # install Firefox
 RUN ' . $genPackageInstallCommand(['alpine' => ['firefox'], 'debian' => ['firefox-esr']][$osName]) . ' \

@@ -58,7 +58,7 @@ RUN apk update \
 
 # install Chrome
 RUN apk update \
-    && apk add chromium chromium-chromedriver \
+    && apk add chromium chromium-chromedriver nss-tools \
     && rm -rf /var/cache/apk/*
 
 # install Firefox
