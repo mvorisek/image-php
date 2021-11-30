@@ -1,4 +1,4 @@
-FROM php:8.1-rc-alpine as base
+FROM php:8.1-alpine as base
 
 # install basic system tools
 RUN apk update \
