@@ -27,6 +27,7 @@ RUN install-php-extensions bcmath \
     imap \
     intl \
     mysqli \
+    oci8 \
     opcache \
     pcntl \
     pdo_mysql \

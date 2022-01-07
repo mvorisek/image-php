@@ -86,6 +86,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
     imap \
     intl \
     mysqli \
+    oci8 \
     opcache \
     pcntl \
     pdo_mysql \
