@@ -1,6 +1,6 @@
 <?php
 
-$phpVersions = ['7.2', '7.3', '7.4', '8.0', '8.1'];
+$phpVersions = ['7.3', '7.4', '8.0', '8.1'];
 $osNames = ['alpine', 'debian'];
 $targetNames = ['base', 'node', 'selenium'];
 
@@ -50,7 +50,7 @@ foreach ($osNames as $osName) {
             return 'apt-get -y update' . $and . 'apt-get -y install ' . implode(' ', $packages) . $and . 'apt-get -y autoremove && apt-get clean';
         };
 
-        $dockerFile = 'FROM php:' . $phpVersion . ($phpVersion === '8.2' ? '-rc' : '') . '-' . ['alpine' => 'alpine', 'debian' => $phpVersion === '7.2' ? 'buster' : 'bullseye'][$osName] . ' as base
+        $dockerFile = 'FROM php:' . $phpVersion . ($phpVersion === '8.2' ? '-rc' : '') . '-' . ['alpine' => 'alpine', 'debian' => 'bullseye'][$osName] . ' as base
 
 # install basic system tools
 RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')

@@ -32,12 +32,10 @@ jobs:
       fail-fast: false
       matrix:
         imageName:
-          - "7.2-alpine"
           - "7.3-alpine"
           - "7.4-alpine"
           - "8.0-alpine"
           - "8.1-alpine"
-          - "7.2-debian"
           - "7.3-debian"
           - "7.4-debian"
           - "8.0-debian"
@@ -92,15 +90,7 @@ jobs:
       - name: 'Push tags to registry'
         if: github.ref == 'refs/heads/master'
         run: >-
-          if [ "${{ matrix.imageName }}" == "7.2-alpine" ]; then
-          docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.2" && docker push "$REGISTRY_IMAGE_NAME:7.2"
-          && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.2-alpine" && docker push "$REGISTRY_IMAGE_NAME:7.2-alpine"
-          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.2-node" && docker push "$REGISTRY_IMAGE_NAME:7.2-node"
-          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.2-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:7.2-alpine-node"
-          && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.2-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.2-selenium"
-          && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.2-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.2-alpine-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "7.3-alpine" ]; then
+          if [ "${{ matrix.imageName }}" == "7.3-alpine" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.3" && docker push "$REGISTRY_IMAGE_NAME:7.3"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.3-alpine" && docker push "$REGISTRY_IMAGE_NAME:7.3-alpine"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.3-node" && docker push "$REGISTRY_IMAGE_NAME:7.3-node"
@@ -137,11 +127,6 @@ jobs:
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:8.1-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:8.1-alpine-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.1-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.1-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.1-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.1-alpine-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "7.2-debian" ]; then
-          docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.2-debian" && docker push "$REGISTRY_IMAGE_NAME:7.2-debian"
-          && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.2-debian-node" && docker push "$REGISTRY_IMAGE_NAME:7.2-debian-node"
-          && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.2-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.2-debian-selenium"
           ; fi
           && if [ "${{ matrix.imageName }}" == "7.3-debian" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:7.3-debian" && docker push "$REGISTRY_IMAGE_NAME:7.3-debian"
