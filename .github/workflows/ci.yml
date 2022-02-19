@@ -51,6 +51,13 @@ jobs:
           && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base" -t ci-target:base ./
           || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base" -t ci-target:base ./)
 
+      - name: 'Target "base_test - Build Dockerfile'
+        # try to build twice to suppress random network issues with Github Actions
+        run: >-
+          sed -i 's~^[ \t]*~~' data/${{ matrix.imageName }}/Dockerfile
+          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base_test" -t ci-target:base_test ./
+          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base_test" -t ci-target:base_test ./)
+
       - name: 'Target "base" - Display layer sizes'
         run: >-
           docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker images --no-trunc --format='{{.ID}}' | head -1)
@@ -63,6 +70,13 @@ jobs:
           && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node" -t ci-target:node ./
           || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node" -t ci-target:node ./)
 
+      - name: 'Target "node_test - Build Dockerfile'
+        # try to build twice to suppress random network issues with Github Actions
+        run: >-
+          sed -i 's~^[ \t]*~~' data/${{ matrix.imageName }}/Dockerfile
+          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node_test" -t ci-target:node_test ./
+          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node_test" -t ci-target:node_test ./)
+
       - name: 'Target "node" - Display layer sizes'
         run: >-
           docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker images --no-trunc --format='{{.ID}}' | head -1)
@@ -74,6 +88,13 @@ jobs:
           sed -i 's~^[ \t]*~~' data/${{ matrix.imageName }}/Dockerfile
           && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium" -t ci-target:selenium ./
           || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium" -t ci-target:selenium ./)
+
+      - name: 'Target "selenium_test - Build Dockerfile'
+        # try to build twice to suppress random network issues with Github Actions
+        run: >-
+          sed -i 's~^[ \t]*~~' data/${{ matrix.imageName }}/Dockerfile
+          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium_test" -t ci-target:selenium_test ./
+          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium_test" -t ci-target:selenium_test ./)
 
       - name: 'Target "selenium" - Display layer sizes'
         run: >-

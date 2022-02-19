@@ -89,7 +89,7 @@ RUN install-php-extensions bcmath \
 # install Composer
 RUN install-php-extensions @composer
 
-# run basic tests
+FROM base as base_test
 COPY test.php ./
 RUN php test.php && rm test.php
 RUN composer diagnose
@@ -100,6 +100,9 @@ FROM base as node
 # install Node JS with npm
 RUN ' . $genPackageInstallCommand(['nodejs', 'npm'])
     . ($osName === 'debian' ? ' && npm install --global npm@latest' : '') . '
+
+FROM node as node_test
+RUN npm version
 
 
 FROM node as selenium
@@ -116,6 +119,10 @@ RUN ' . $genPackageInstallCommand(['alpine' => ['firefox'], 'debian' => ['firefo
     && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
+
+FROM selenium as selenium_test
+RUN ' . ($osName === 'alpine' ? 'chromium-browser' : 'chromium') . ' --version
+RUN firefox --version
 ';
 
         $dataDir = __DIR__ . '/data';
@@ -174,12 +181,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 ' . implode("\n", array_map(function ($targetName) {
+    return implode("\n", array_map(function ($targetName) {
     return '
       - name: \'Target "' . $targetName . ' - Build Dockerfile\'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           sed -i \'s~^[ \t]*~~\' data/${{ matrix.imageName }}/Dockerfile
-          && (' . implode("\n" . '          || ', array_fill(0, 2, 'docker build -f data/${{ matrix.imageName }}/Dockerfile --target "' . $targetName . '" -t ci-target:' . $targetName . ' ./')) . ')
+          && (' . implode("\n" . '          || ', array_fill(0, 2, 'docker build -f data/${{ matrix.imageName }}/Dockerfile --target "' . $targetName . '" -t ci-target:' . $targetName . ' ./')) . ')';
+}, [$targetName, $targetName . '_test'])) .'
 
       - name: \'Target "' . $targetName . '" - Display layer sizes\'
         run: >-
