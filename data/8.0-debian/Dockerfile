@@ -10,7 +10,7 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions bcmath \
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions bcmath \
     exif \
     gd \
     gmp \

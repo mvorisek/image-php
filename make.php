@@ -63,7 +63,7 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions bcmath \
+RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://github.com/mlocati/docker-php-extension-installer/issues/514, remove once the php images are based on Debian 12 */ . ' install-php-extensions bcmath \
     exif \
     gd \
     gmp \
