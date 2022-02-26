@@ -63,33 +63,36 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://github.com/mlocati/docker-php-extension-installer/issues/514, remove once the php images are based on Debian 12 */ . ' install-php-extensions bcmath \
-    exif \
-    gd \
-    gmp \
-    igbinary \
-    imagick \
-    imap \
-    intl \
-    mysqli \
-    oci8 \
-    opcache \
-    pcntl \
-    pdo_mysql \
-    pdo_oci \
-    pdo_pgsql \
-    pdo_sqlsrv \
-    redis \
-    sockets \
-    tidy \
-    xdebug \
-    xsl \
-    zip
+RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://github.com/mlocati/docker-php-extension-installer/issues/514, remove once the php images are based on Debian 12 */ . ' install-php-extensions \
+    ' . implode(' \\' . "\n" . '    ', [
+    'bcmath',
+    'exif',
+    'gd',
+    'gmp',
+    'igbinary',
+    'imagick',
+    'imap',
+    'intl',
+    'mysqli',
+    'oci8',
+    'opcache',
+    'pcntl',
+    'pdo_mysql',
+    'pdo_oci',
+    'pdo_pgsql',
+    'pdo_sqlsrv',
+    'redis',
+    'sockets',
+    'tidy',
+    'xdebug',
+    'xsl',
+    'zip',
+]) . '
 
 # install Composer
 RUN install-php-extensions @composer
 
-FROM base as base_test
+FROM base as base__test
 COPY test.php ./
 RUN php test.php && rm test.php
 RUN composer diagnose
@@ -101,7 +104,7 @@ FROM base as node
 RUN ' . $genPackageInstallCommand(['nodejs', 'npm'])
     . ($osName === 'debian' ? ' && npm install --global npm@latest' : '') . '
 
-FROM node as node_test
+FROM node as node__test
 RUN npm version
 
 
@@ -120,7 +123,7 @@ RUN ' . $genPackageInstallCommand(['alpine' => ['firefox'], 'debian' => ['firefo
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 
-FROM selenium as selenium_test
+FROM selenium as selenium__test
 RUN ' . ($osName === 'alpine' ? 'chromium-browser' : 'chromium') . ' --version
 RUN firefox --version
 ';
@@ -183,17 +186,17 @@ jobs:
 ' . implode("\n", array_map(function ($targetName) {
     return implode("\n", array_map(function ($targetName) {
     return '
-      - name: \'Target "' . $targetName . ' - Build Dockerfile\'
+      - name: \'Target "' . (substr($targetName, -6) === '__test' ? substr($targetName, 0, -6) . '" - test' : $targetName . '" - build') . '\'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           sed -i \'s~^[ \t]*~~\' data/${{ matrix.imageName }}/Dockerfile
-          && (' . implode("\n" . '          || ', array_fill(0, 2, 'docker build -f data/${{ matrix.imageName }}/Dockerfile --target "' . $targetName . '" -t ci-target:' . $targetName . ' ./')) . ')';
-}, [$targetName, $targetName . '_test'])) .'
+          && (' . implode("\n" . '          || ', array_fill(0, 2, 'docker build -f data/${{ matrix.imageName }}/Dockerfile --target "' . $targetName . '" -t "ci-target:' . $targetName . '" ./')) . ')';
+}, [$targetName, $targetName . '__test'])) .'
 
-      - name: \'Target "' . $targetName . '" - Display layer sizes\'
+      - name: \'Target "' . $targetName . '" - display layer sizes\'
         run: >-
-          docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker images --no-trunc --format=\'{{.ID}}\' | head -1)
-          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker images --no-trunc --format=\'{{.ID}}\' | head -1) | cut -f1';
+          docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker inspect --format="{{.Id}}" "ci-target:' . $targetName . '")
+          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker inspect --format="{{.Id}}" "ci-target:' . $targetName . '") | cut -f1';
 }, $targetNames)) .'
 
       - name: Login to registry

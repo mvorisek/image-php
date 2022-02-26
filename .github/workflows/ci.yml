@@ -44,62 +44,62 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: 'Target "base - Build Dockerfile'
+      - name: 'Target "base" - build'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           sed -i 's~^[ \t]*~~' data/${{ matrix.imageName }}/Dockerfile
-          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base" -t ci-target:base ./
-          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base" -t ci-target:base ./)
+          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base" -t "ci-target:base" ./
+          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base" -t "ci-target:base" ./)
 
-      - name: 'Target "base_test - Build Dockerfile'
+      - name: 'Target "base" - test'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           sed -i 's~^[ \t]*~~' data/${{ matrix.imageName }}/Dockerfile
-          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base_test" -t ci-target:base_test ./
-          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base_test" -t ci-target:base_test ./)
+          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base__test" -t "ci-target:base__test" ./
+          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "base__test" -t "ci-target:base__test" ./)
 
-      - name: 'Target "base" - Display layer sizes'
+      - name: 'Target "base" - display layer sizes'
         run: >-
-          docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker images --no-trunc --format='{{.ID}}' | head -1)
-          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker images --no-trunc --format='{{.ID}}' | head -1) | cut -f1
+          docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker inspect --format="{{.Id}}" "ci-target:base")
+          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker inspect --format="{{.Id}}" "ci-target:base") | cut -f1
 
-      - name: 'Target "node - Build Dockerfile'
+      - name: 'Target "node" - build'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           sed -i 's~^[ \t]*~~' data/${{ matrix.imageName }}/Dockerfile
-          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node" -t ci-target:node ./
-          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node" -t ci-target:node ./)
+          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node" -t "ci-target:node" ./
+          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node" -t "ci-target:node" ./)
 
-      - name: 'Target "node_test - Build Dockerfile'
+      - name: 'Target "node" - test'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           sed -i 's~^[ \t]*~~' data/${{ matrix.imageName }}/Dockerfile
-          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node_test" -t ci-target:node_test ./
-          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node_test" -t ci-target:node_test ./)
+          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node__test" -t "ci-target:node__test" ./
+          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "node__test" -t "ci-target:node__test" ./)
 
-      - name: 'Target "node" - Display layer sizes'
+      - name: 'Target "node" - display layer sizes'
         run: >-
-          docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker images --no-trunc --format='{{.ID}}' | head -1)
-          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker images --no-trunc --format='{{.ID}}' | head -1) | cut -f1
+          docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker inspect --format="{{.Id}}" "ci-target:node")
+          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker inspect --format="{{.Id}}" "ci-target:node") | cut -f1
 
-      - name: 'Target "selenium - Build Dockerfile'
+      - name: 'Target "selenium" - build'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           sed -i 's~^[ \t]*~~' data/${{ matrix.imageName }}/Dockerfile
-          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium" -t ci-target:selenium ./
-          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium" -t ci-target:selenium ./)
+          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium" -t "ci-target:selenium" ./
+          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium" -t "ci-target:selenium" ./)
 
-      - name: 'Target "selenium_test - Build Dockerfile'
+      - name: 'Target "selenium" - test'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           sed -i 's~^[ \t]*~~' data/${{ matrix.imageName }}/Dockerfile
-          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium_test" -t ci-target:selenium_test ./
-          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium_test" -t ci-target:selenium_test ./)
+          && (docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium__test" -t "ci-target:selenium__test" ./
+          || docker build -f data/${{ matrix.imageName }}/Dockerfile --target "selenium__test" -t "ci-target:selenium__test" ./)
 
-      - name: 'Target "selenium" - Display layer sizes'
+      - name: 'Target "selenium" - display layer sizes'
         run: >-
-          docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker images --no-trunc --format='{{.ID}}' | head -1)
-          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker images --no-trunc --format='{{.ID}}' | head -1) | cut -f1
+          docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker inspect --format="{{.Id}}" "ci-target:selenium")
+          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker inspect --format="{{.Id}}" "ci-target:selenium") | cut -f1
 
       - name: Login to registry
         uses: docker/login-action@v1

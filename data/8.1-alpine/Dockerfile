@@ -9,7 +9,8 @@ RUN apk update \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions bcmath \
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions \
+    bcmath \
     exif \
     gd \
     gmp \
@@ -35,7 +36,7 @@ RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions bcmath \
 # install Composer
 RUN install-php-extensions @composer
 
-FROM base as base_test
+FROM base as base__test
 COPY test.php ./
 RUN php test.php && rm test.php
 RUN composer diagnose
@@ -48,7 +49,7 @@ RUN apk update \
     && apk add nodejs npm \
     && rm -rf /var/cache/apk/*
 
-FROM node as node_test
+FROM node as node__test
 RUN npm version
 
 
@@ -73,6 +74,6 @@ RUN apk update \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 
-FROM selenium as selenium_test
+FROM selenium as selenium__test
 RUN chromium-browser --version
 RUN firefox --version
