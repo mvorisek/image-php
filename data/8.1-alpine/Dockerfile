@@ -2,6 +2,7 @@ FROM php:8.1-alpine as base
 
 # install basic system tools
 RUN apk update \
+    && apk upgrade \
     && apk add bash git make unzip gnupg ca-certificates coreutils \
     && rm -rf /var/cache/apk/* \
     && git config --system url."https://github.com/".insteadOf "git@github.com:" \
@@ -31,7 +32,8 @@ RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions \
     tidy \
     xdebug \
     xsl \
-    zip
+    zip \
+    && rm /usr/bin/gs
 
 # install Composer
 RUN install-php-extensions @composer

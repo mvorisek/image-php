@@ -41,13 +41,24 @@ $imageNames = [];
 foreach ($osNames as $osName) {
     foreach ($phpVersions as $phpVersion) {
         $genPackageInstallCommand = function (array $packages) use ($osName) {
+            $packagesBeforeDiff = $packages;
+            $packages = array_diff($packages, ['*upgrade*']);
+            $upgrade = $packages !== $packagesBeforeDiff;
+            unset($packagesBeforeDiff);
+
             $and = ' \\' . "\n" . '    && ';
 
             if ($osName === 'alpine') {
-                return 'apk update' . $and . 'apk add ' . implode(' ', $packages) . $and . 'rm -rf /var/cache/apk/*';
+                return 'apk update'
+                    . ($upgrade ? $and . 'apk upgrade' : '')
+                    . $and . 'apk add ' . implode(' ', $packages)
+                    . $and . 'rm -rf /var/cache/apk/*';
             }
 
-            return 'apt-get -y update' . $and . 'apt-get -y install ' . implode(' ', $packages) . $and . 'apt-get -y autoremove && apt-get clean';
+            return 'apt-get -y update'
+                . ($upgrade ? $and . 'apt-get -y upgrade' : '')
+                . $and . 'apt-get -y install ' . implode(' ', $packages)
+                . $and . 'apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/*';
         };
 
         $dockerFile = 'FROM php:' . $phpVersion . ($phpVersion === '8.2' ? '-rc' : '') . '-' . ['alpine' => 'alpine', 'debian' => 'bullseye'][$osName] . ' as base
@@ -55,7 +66,7 @@ foreach ($osNames as $osName) {
 # install basic system tools
 RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')
     . $genPackageInstallCommand(array_merge(
-        ['bash', 'git', 'make', 'unzip', 'gnupg', 'ca-certificates'],
+        ['*upgrade*', 'bash', 'git', 'make', 'unzip', 'gnupg', 'ca-certificates'],
         ['alpine' => ['coreutils'], 'debian' => ['apt-utils', 'apt-transport-https', 'netcat']][$osName]
     )) . ' \
     && git config --system url."https://github.com/".insteadOf "git@github.com:" \
@@ -87,7 +98,8 @@ RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://gi
     'xdebug',
     'xsl',
     'zip',
-]) . '
+]) . (/* reduce total size by 23 MB, remove once https://github.com/mlocati/docker-php-extension-installer/issues/519 is fixed */ $osName === 'alpine' ? ' \
+    && rm /usr/bin/gs' : '') . '
 
 # install Composer
 RUN install-php-extensions @composer
@@ -184,6 +196,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 ' . implode("\n", array_map(function ($targetName) {
+    $imageHashCmd = '$(docker inspect --format="{{.Id}}" "ci-target:' . $targetName . '")';
     return implode("\n", array_map(function ($targetName) {
     return '
       - name: \'Target "' . (substr($targetName, -6) === '__test' ? substr($targetName, 0, -6) . '" - test' : $targetName . '" - build') . '\'
@@ -195,8 +208,8 @@ jobs:
 
       - name: \'Target "' . $targetName . '" - display layer sizes\'
         run: >-
-          docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker inspect --format="{{.Id}}" "ci-target:' . $targetName . '")
-          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker inspect --format="{{.Id}}" "ci-target:' . $targetName . '") | cut -f1';
+          docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" ' . $imageHashCmd . '
+          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep ' . $imageHashCmd . ' | cut -f1';
 }, $targetNames)) .'
 
       - name: Login to registry
