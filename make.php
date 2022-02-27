@@ -98,15 +98,19 @@ RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://gi
     'xdebug',
     'xsl',
     'zip',
-]) . (/* reduce total size by 23 MB, remove once https://github.com/mlocati/docker-php-extension-installer/issues/519 is fixed */ $osName === 'alpine' ? ' \
-    && rm /usr/bin/gs' : '') . '
+]) . ($osName === 'alpine' ? ' \
+    # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://github.com/mlocati/docker-php-extension-installer/issues/519 is fixed
+    && rm /usr/bin/gs' : '') . ' \
+    # pack Oracle Instant Client libs, reduce image size by 85 MB
+    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -rf /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
+    && echo -e \'#!/bin/sh\nif [ ! -d /usr/lib/oracle/*/client64 ]; then\n    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz\nfi\' > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
 
 # install Composer
 RUN install-php-extensions @composer
 
 FROM base as base__test
 COPY test.php ./
-RUN php test.php && rm test.php
+RUN /usr/lib/oracle/setup.sh && php test.php
 RUN composer diagnose
 
 
