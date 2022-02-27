@@ -10,29 +10,28 @@ RUN apk update \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions \
-    bcmath \
-    exif \
-    gd \
-    gmp \
-    igbinary \
-    imagick \
-    imap \
-    intl \
-    mysqli \
-    oci8 \
-    opcache \
-    pcntl \
-    pdo_mysql \
-    pdo_oci \
-    pdo_pgsql \
-    pdo_sqlsrv \
-    redis \
-    sockets \
-    tidy \
-    xdebug \
-    xsl \
-    zip \
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions bcmath
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions exif
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions gd
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions gmp
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions igbinary
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions imagick
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions imap
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions intl
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions mysqli
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions oci8
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions opcache
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions pcntl
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions pdo_mysql
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions pdo_oci
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions pdo_pgsql
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions pdo_sqlsrv
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions redis
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions sockets
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions tidy
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions xdebug
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions xsl
+RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions zip \
     && rm /usr/bin/gs
 
 # install Composer

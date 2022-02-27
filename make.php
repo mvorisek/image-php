@@ -74,8 +74,9 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://github.com/mlocati/docker-php-extension-installer/issues/514, remove once the php images are based on Debian 12 */ . ' install-php-extensions \
-    ' . implode(' \\' . "\n" . '    ', [
+' . implode("\n", array_map(function (string $ext) {
+    return 'RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://github.com/mlocati/docker-php-extension-installer/issues/514, remove once the php images are based on Debian 12 */ . ' install-php-extensions ' . $ext;
+}, [
     'bcmath',
     'exif',
     'gd',
@@ -98,7 +99,7 @@ RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://gi
     'xdebug',
     'xsl',
     'zip',
-]) . (/* reduce total size by 23 MB, remove once https://github.com/mlocati/docker-php-extension-installer/issues/519 is fixed */ $osName === 'alpine' ? ' \
+])) . (/* reduce total size by 23 MB, remove once https://github.com/mlocati/docker-php-extension-installer/issues/519 is fixed */ $osName === 'alpine' ? ' \
     && rm /usr/bin/gs' : '') . '
 
 # install Composer
@@ -209,7 +210,8 @@ jobs:
       - name: \'Target "' . $targetName . '" - display layer sizes\'
         run: >-
           docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" ' . $imageHashCmd . '
-          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep ' . $imageHashCmd . ' | cut -f1';
+          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep ' . $imageHashCmd . ' | cut -f1
+          && php analyse-layers.php "ci-target:' . $targetName . '"' . (['base' => '', 'selenium' => ' "ci-target:node"'][$targetName] ?? ' "ci-target:base"');
 }, $targetNames)) .'
 
       - name: Login to registry
