@@ -1,5 +1,6 @@
 <?php
 
+$loadedExts = get_loaded_extensions();
 $missingExts = array_diff([
     'bcmath',
     'curl',
@@ -30,15 +31,15 @@ $missingExts = array_diff([
     'xsl',
     'Zend OPcache',
     'zip',
-], get_loaded_extensions());
+], $loadedExts);
 
 if (count($missingExts) > 0) {
-    echo 'ERROR - missing php extensions: ' . implode(', ', $missingExts) . "\n";
+    echo 'TEST FAILED - missing php extensions: ' . implode(', ', $missingExts) . "\n";
     exit(1);
 }
 
 $xdebugConfPath = '/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini';
-if (!file_exists($xdebugConfPath)) {
-    echo 'ERROR - missing xdebug configuration: ' . $xdebugConfPath . "\n";
+if (!file_exists($xdebugConfPath) && in_array('xdebug', $loadedExts, true)) {
+    echo 'TEST FAILED - missing xdebug configuration: ' . $xdebugConfPath . "\n";
     exit(1);
 }

@@ -37,14 +37,14 @@ RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions \
     && rm /usr/bin/gs \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
     && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -rf /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
-    && echo -e '#!/bin/sh\nif [ ! -d /usr/lib/oracle/*/client64 ]; then\n    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz\nfi' > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
+    && { echo '#!/bin/sh'; echo 'if [ ! -d /usr/lib/oracle/*/client64 ]; then'; echo '    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz'; echo 'fi'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
 
 # install Composer
 RUN install-php-extensions @composer
 
 FROM base as base__test
 COPY test.php ./
-RUN /usr/lib/oracle/setup.sh && php test.php
+RUN (/usr/lib/oracle/setup.sh || true) && php test.php
 RUN composer diagnose
 
 
