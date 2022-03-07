@@ -1,4 +1,4 @@
-FROM ci-target:base as basic
+FROM php:7.4-zts-alpine as basic
 
 # install basic system tools
 RUN apk update \

@@ -1,8 +1,12 @@
 <?php
 
-$phpVersions = ['7.3', '7.4', '8.0', '8.1'];
+$phpVersionsFromSource = [
+    '8.0' => ['repo' => 'https://github.com/php/php-src.git', 'branch' => 'PHP-8.0', 'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']],
+    '8.1' => ['repo' => 'https://github.com/php/php-src.git', 'branch' => 'PHP-8.1', 'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']],
+];
+$phpVersions = ['7.3', '7.4', ...array_keys($phpVersionsFromSource)];
 $osNames = ['alpine', 'debian'];
-$targetNames = ['base', 'node', 'selenium'];
+$targetNames = ['basic', 'node', 'selenium'];
 
 $aliasesPhpVersions = [
     '8.0' => ['latest'],
@@ -10,10 +14,10 @@ $aliasesPhpVersions = [
 $defaultOs = 'alpine';
 
 $createFullName = function (string $imageName, string $targetName): string {
-    return $imageName . ($targetName === 'base' ? '' : '-' . $targetName);
+    return $imageName . ($targetName === 'basic' ? '' : '-' . $targetName);
 };
 
-$genImageTags = function(string $imageName) use ($aliasesPhpVersions, $defaultOs): array {
+$genImageTags = function (string $imageName) use ($aliasesPhpVersions, $defaultOs): array {
     $tags = [$imageName];
     foreach ($aliasesPhpVersions as $phpVersion => $aliases) {
         foreach ($aliases as $alias) {
@@ -37,35 +41,40 @@ $genImageTags = function(string $imageName) use ($aliasesPhpVersions, $defaultOs
     return $tags;
 };
 
+$genPackageInstallCommand = function ($osName, array $packages) {
+    $packagesBeforeDiff = $packages;
+    $packages = array_diff($packages, ['*upgrade*']);
+    $upgrade = $packages !== $packagesBeforeDiff;
+    unset($packagesBeforeDiff);
+
+    $and = ' \\' . "\n" . '    && ';
+
+    if ($osName === 'alpine') {
+        return 'apk update'
+            . ($upgrade ? $and . 'apk upgrade' : '')
+            . $and . 'apk add ' . implode(' ', $packages)
+            . $and . 'rm -rf /var/cache/apk/*';
+    }
+
+    return 'apt-get -y update'
+        . ($upgrade ? $and . 'apt-get -y upgrade' : '')
+        . $and . 'apt-get -y install ' . implode(' ', $packages)
+        . $and . 'apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/*';
+};
+
 $imageNames = [];
+$phpVersionByImageName = [];
+$isTsByImageName = [];
+$osNameByImageName = [];
 foreach ($osNames as $osName) {
     foreach ($phpVersions as $phpVersion) {
-        $genPackageInstallCommand = function (array $packages) use ($osName) {
-            $packagesBeforeDiff = $packages;
-            $packages = array_diff($packages, ['*upgrade*']);
-            $upgrade = $packages !== $packagesBeforeDiff;
-            unset($packagesBeforeDiff);
-
-            $and = ' \\' . "\n" . '    && ';
-
-            if ($osName === 'alpine') {
-                return 'apk update'
-                    . ($upgrade ? $and . 'apk upgrade' : '')
-                    . $and . 'apk add ' . implode(' ', $packages)
-                    . $and . 'rm -rf /var/cache/apk/*';
-            }
-
-            return 'apt-get -y update'
-                . ($upgrade ? $and . 'apt-get -y upgrade' : '')
-                . $and . 'apt-get -y install ' . implode(' ', $packages)
-                . $and . 'apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/*';
-        };
-
-        $dockerFile = 'FROM php:' . $phpVersion . ($phpVersion === '8.2' ? '-rc' : '') . '-' . ['alpine' => 'alpine', 'debian' => 'bullseye'][$osName] . ' as base
+        foreach ([false, true] as $isTs) {
+            $dockerFile = 'FROM ' . (isset($phpVersionsFromSource[$phpVersion]) ? 'ci-target:base' : 'php:' . $phpVersion . ($phpVersion === '8.2' ? '-rc' : '') . ($isTs ? '-zts' : '')
+                . '-' . ['alpine' => 'alpine', 'debian' => 'bullseye'][$osName]) . ' as basic
 
 # install basic system tools
 RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')
-    . $genPackageInstallCommand(array_merge(
+    . $genPackageInstallCommand($osName, array_merge(
         ['*upgrade*', 'bash', 'git', 'make', 'unzip', 'gnupg', 'ca-certificates'],
         ['alpine' => ['coreutils'], 'debian' => ['apt-utils', 'apt-transport-https', 'netcat']][$osName]
     )) . ' \
@@ -108,16 +117,17 @@ RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://gi
 # install Composer
 RUN install-php-extensions @composer
 
-FROM base as base__test
+FROM basic as basic__test
+RUN php --version
 COPY test.php ./
 RUN (/usr/lib/oracle/setup.sh || true) && php test.php
 RUN composer diagnose
 
 
-FROM base as node
+FROM basic as node
 
 # install Node JS with npm
-RUN ' . $genPackageInstallCommand(['nodejs', 'npm'])
+RUN ' . $genPackageInstallCommand($osName, ['nodejs', 'npm'])
     . ($osName === 'debian' ? ' && npm install --global npm@latest' : '') . '
 
 FROM node as node__test
@@ -127,14 +137,14 @@ RUN npm version
 FROM node as selenium
 
 # install Selenium
-RUN ' . $genPackageInstallCommand(['alpine' => ['openjdk11-jre-headless', 'xvfb', 'ttf-freefont'], 'debian' => ['openjdk-11-jre-headless', 'xvfb', 'fonts-freefont-ttf']][$osName]) . ' \
+RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['openjdk11-jre-headless', 'xvfb', 'ttf-freefont'], 'debian' => ['openjdk-11-jre-headless', 'xvfb', 'fonts-freefont-ttf']][$osName]) . ' \
     && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar
 
 # install Chrome
-RUN ' . $genPackageInstallCommand(['alpine' => ['chromium', 'chromium-chromedriver', 'nss-tools'], 'debian' => ['chromium', 'chromium-driver', 'libnss3-tools']][$osName]) . '
+RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['chromium', 'chromium-chromedriver', 'nss-tools'], 'debian' => ['chromium', 'chromium-driver', 'libnss3-tools']][$osName]) . '
 
 # install Firefox
-RUN ' . $genPackageInstallCommand(['alpine' => ['firefox'], 'debian' => ['firefox-esr']][$osName]) . ' \
+RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['firefox'], 'debian' => ['firefox-esr']][$osName]) . ' \
     && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
@@ -144,20 +154,62 @@ RUN ' . ($osName === 'alpine' ? 'chromium-browser' : 'chromium') . ' --version
 RUN firefox --version
 ';
 
-        $dataDir = __DIR__ . '/data';
-        $imageName = $phpVersion . '-' . $osName;
-        $imageNames[] = $imageName;
+            $dataDir = __DIR__ . '/data';
+            $imageName = $phpVersion . ($isTs ? '-zts' : '') . '-' . $osName;
+            $imageNames[] = $imageName;
+            $phpVersionByImageName[$imageName] = $phpVersion;
+            $isTsByImageName[$imageName] = $isTs;
+            $osNameByImageName[$imageName] = $osName;
 
-        if (!is_dir($dataDir)) {
-            mkdir($dataDir);
+            if (!is_dir($dataDir)) {
+                mkdir($dataDir);
+            }
+            if (!is_dir($dataDir . '/' . $imageName)) {
+                mkdir($dataDir . '/' . $imageName);
+            }
+            file_put_contents($dataDir . '/' . $imageName . '/Dockerfile', $dockerFile);
         }
-        if (!is_dir($dataDir . '/' . $imageName)) {
-            mkdir($dataDir . '/' . $imageName);
-        }
-        file_put_contents($dataDir . '/' . $imageName . '/Dockerfile', $dockerFile);
     }
 }
 
+$genRuntimeConditionalCode = function ($imageNames, \Closure $gen) use ($phpVersionByImageName, $isTsByImageName, $osNameByImageName): string {
+    $imageNamesByCode = [];
+    foreach ($imageNames as $imageName) {
+        $code = $gen(
+            $imageName,
+            $phpVersionByImageName[$imageName],
+            $isTsByImageName[$imageName],
+            $osNameByImageName[$imageName]
+        );
+
+        if ($code !== null) {
+            $imageNamesByCode[$code][] = $imageName;
+        }
+    }
+
+    $res = null;
+    foreach ($imageNamesByCode as $code => $imageNames) {
+        if ($res === null) {
+            $res = '';
+        } else {
+            $res .= "\n" . '          && ';
+        }
+
+        $res .= 'if ' . implode(' || ', array_map(function ($imageName) {
+            return '[ "${{ matrix.imageName }}" == "' . $imageName . '" ]';
+        }, $imageNames)) . '; then
+          ' . $code . '
+          ; fi';
+    }
+
+    return $res;
+};
+
+$genRuntimeConditionalCodeFromSourceOnly = function ($imageNames, \Closure $gen) use ($genRuntimeConditionalCode, $phpVersionsFromSource, $phpVersionByImageName): string {
+    return $genRuntimeConditionalCode(array_filter($imageNames, function ($imageName) use ($phpVersionsFromSource, $phpVersionByImageName) {
+        return isset($phpVersionsFromSource[$phpVersionByImageName[$imageName]]) ? $imageName : null;
+    }), $gen);
+};
 
 $ciFile = 'name: CI
 
@@ -193,12 +245,45 @@ jobs:
       fail-fast: false
       matrix:
         imageName:
-'. implode("\n", array_map(function ($imageName) {
+' . implode("\n", array_map(function ($imageName) {
     return '          - "' . $imageName . '"';
 }, $imageNames)) . '
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: \'Target "base" - build from php-src\'
+        if: ' . implode(' || ', array_map(function ($imageName) {
+            return 'matrix.imageName == \'' . $imageName . '\'';
+        }, array_filter($imageNames, function ($imageName) use ($phpVersionsFromSource, $phpVersionByImageName) {
+            return isset($phpVersionsFromSource[$phpVersionByImageName[$imageName]]) ? $imageName : null;
+        }))) . '
+        # try to build twice to suppress random network issues with Github Actions
+        run: >-
+          git clone https://github.com/docker-library/php.git dlphp
+          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
+    return 'cd dlphp/' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '/' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '/';
+}) . '
+          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
+    return 'git clone --depth 1 \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' -b \'' . $phpVersionsFromSource[$phpVersion]['branch'] . '\' php';
+}) . '
+          && (cd php && git checkout -B master)
+          && (cd php && git apply -v ../../../../../fix-zts-gh8180.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix ZST support for Alpine")' . /* remove once https://github.com/php/php-src/pull/8180 is merged & released */ '
+          && sudo apt-get -y update && sudo apt-get -y install bison re2c
+          && (cd php && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz)
+          && sed -E \'s~^(ENV (GPG_KEYS|PHP_SHA256|PHP_ASC_URL)[ =]).*~~\' -i Dockerfile
+          && sed -E \'s~^(ENV PHP_VERSION[ =]).*~\\1CUSTOM~\' -i Dockerfile
+          && sed -E \'s~^(ENV PHP_URL[ =]).*~COPY php/php.tar.xz /usr/src/~\' -i Dockerfile
+          && sed -E \'s~-n "\$(PHP_SHA256|PHP_ASC_URL)"~-n ""~\' -i Dockerfile
+          && sed -E \'s~curl -fsSL -o php.tar.xz .*; ~~\' -i Dockerfile
+          && sed -E \'s~--enable-maintainer-zts~--enable-zts~\' -i Dockerfile' . /* remove once https://github.com/docker-library/php/pull/1076 is merged & released */ '
+          && git diff
+          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
+    $forkImageTag = 'php:' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '-' . ($isTs ? 'zts' : 'cli') . '-' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName];
+
+    return 'docker pull "' . $forkImageTag . '"
+          && (' . implode("\n" . '          || ', array_fill(0, 2, 'docker build --cache-from "' . $forkImageTag . '" -t "ci-target:base" ./')) . ')';
+}) . '
 ' . implode("\n", array_map(function ($targetName) {
     $imageHashCmd = '$(docker inspect --format="{{.Id}}" "ci-target:' . $targetName . '")';
     return implode("\n", array_map(function ($targetName) {
@@ -208,13 +293,13 @@ jobs:
         run: >-
           sed -i \'s~^[ \t]*~~\' data/${{ matrix.imageName }}/Dockerfile
           && (' . implode("\n" . '          || ', array_fill(0, 2, 'docker build -f data/${{ matrix.imageName }}/Dockerfile --target "' . $targetName . '" -t "ci-target:' . $targetName . '" ./')) . ')';
-}, [$targetName, $targetName . '__test'])) .'
+}, [$targetName, $targetName . '__test'])) . '
 
       - name: \'Target "' . $targetName . '" - display layer sizes\'
         run: >-
           docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" ' . $imageHashCmd . '
           && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep ' . $imageHashCmd . ' | cut -f1';
-}, $targetNames)) .'
+}, $targetNames)) . '
 
       - name: Login to registry
         uses: docker/login-action@v1
@@ -226,15 +311,13 @@ jobs:
       - name: \'Push tags to registry\'
         if: github.ref == \'refs/heads/master\'
         run: >-
-          ' . implode("\n" . '          && ', array_map(function ($imageName) use ($targetNames, $genImageTags, $createFullName) {
-    return 'if [ "${{ matrix.imageName }}" == "' . $imageName . '" ]; then
-          ' . implode("\n" . '          && ', array_merge(...array_map(function ($targetName) use ($genImageTags, $createFullName, $imageName) {
+          ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion) use ($phpVersionsFromSource, $targetNames, $genImageTags, $createFullName) {
+    return implode("\n" . '          && ', array_merge(...array_map(function ($targetName) use ($genImageTags, $createFullName, $imageName) {
         return array_map(function ($imageTag) use ($targetName) {
             return 'docker tag "ci-target:' . $targetName . '" "$REGISTRY_IMAGE_NAME:' . $imageTag . '" && docker push "$REGISTRY_IMAGE_NAME:' . $imageTag . '"';
         }, $genImageTags($createFullName($imageName, $targetName)));
-    }, $targetNames))) . '
-          ; fi';
-}, $imageNames)) . '
+    }, [...(isset($phpVersionsFromSource[$phpVersion]) ? ['base'] : []), ...$targetNames])));
+}) . '
 ';
 file_put_contents(__DIR__ . '/.github/workflows/ci.yml', $ciFile);
 
@@ -258,7 +341,7 @@ This repository builds `' . $registryImageName . '` image and publishes the foll
             return $createFullName($imageName, $targetName);
         }, $imageNames);
     }, $targetNames)
-))).'
+))) . '
 
 ## Running Locally
 

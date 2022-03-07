@@ -1,4 +1,4 @@
-FROM php:7.4-alpine as base
+FROM php:7.4-alpine as basic
 
 # install basic system tools
 RUN apk update \
@@ -42,13 +42,14 @@ RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions \
 # install Composer
 RUN install-php-extensions @composer
 
-FROM base as base__test
+FROM basic as basic__test
+RUN php --version
 COPY test.php ./
 RUN (/usr/lib/oracle/setup.sh || true) && php test.php
 RUN composer diagnose
 
 
-FROM base as node
+FROM basic as node
 
 # install Node JS with npm
 RUN apk update \
