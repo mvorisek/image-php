@@ -59,24 +59,19 @@ jobs:
           git clone https://github.com/docker-library/php.git dlphp
           && if [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ]; then
           cd dlphp/7.4/alpine3.15/cli/
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ]; then
           cd dlphp/7.4/alpine3.15/zts/
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ]; then
           cd dlphp/7.4/bullseye/cli/
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
           cd dlphp/7.4/bullseye/zts/
           ; fi
           && if [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ]; then
           git clone --depth 1 'https://github.com/php/php-src.git' -b 'PHP-8.0' php
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
           git clone --depth 1 'https://github.com/php/php-src.git' -b 'PHP-8.1' php
           ; fi
           && (cd php && git checkout -B master)
-          && (cd php && git apply -v ../../../../../fix-zts-gh8180.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix ZST support for Alpine")
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && (cd php && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz)
           && sed -E 's~^(ENV (GPG_KEYS|PHP_SHA256|PHP_ASC_URL)[ =]).*~~' -i Dockerfile
@@ -90,18 +85,15 @@ jobs:
           docker pull "php:7.4-cli-alpine3.15"
           && (docker build --cache-from "php:7.4-cli-alpine3.15" -t "ci-target:base" ./
           || docker build --cache-from "php:7.4-cli-alpine3.15" -t "ci-target:base" ./)
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ]; then
           docker pull "php:7.4-zts-alpine3.15"
           && (docker build --cache-from "php:7.4-zts-alpine3.15" -t "ci-target:base" ./
           || docker build --cache-from "php:7.4-zts-alpine3.15" -t "ci-target:base" ./)
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ]; then
           docker pull "php:7.4-cli-bullseye"
           && (docker build --cache-from "php:7.4-cli-bullseye" -t "ci-target:base" ./
           || docker build --cache-from "php:7.4-cli-bullseye" -t "ci-target:base" ./)
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
           docker pull "php:7.4-zts-bullseye"
           && (docker build --cache-from "php:7.4-zts-bullseye" -t "ci-target:base" ./
           || docker build --cache-from "php:7.4-zts-bullseye" -t "ci-target:base" ./)
@@ -181,32 +173,28 @@ jobs:
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.3-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:7.3-alpine-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.3-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.3-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.3-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.3-alpine-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ]; then
           docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:7.3-zts" && docker push "$REGISTRY_IMAGE_NAME:7.3-zts"
           && docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:7.3-zts-alpine" && docker push "$REGISTRY_IMAGE_NAME:7.3-zts-alpine"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.3-zts-node" && docker push "$REGISTRY_IMAGE_NAME:7.3-zts-node"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.3-zts-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:7.3-zts-alpine-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.3-zts-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.3-zts-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.3-zts-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.3-zts-alpine-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "7.4-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-alpine" ]; then
           docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:7.4" && docker push "$REGISTRY_IMAGE_NAME:7.4"
           && docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:7.4-alpine" && docker push "$REGISTRY_IMAGE_NAME:7.4-alpine"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.4-node" && docker push "$REGISTRY_IMAGE_NAME:7.4-node"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.4-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:7.4-alpine-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.4-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.4-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.4-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.4-alpine-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ]; then
           docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:7.4-zts" && docker push "$REGISTRY_IMAGE_NAME:7.4-zts"
           && docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:7.4-zts-alpine" && docker push "$REGISTRY_IMAGE_NAME:7.4-zts-alpine"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.4-zts-node" && docker push "$REGISTRY_IMAGE_NAME:7.4-zts-node"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.4-zts-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:7.4-zts-alpine-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.4-zts-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.4-zts-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.4-zts-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.4-zts-alpine-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.0-alpine" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.0-base" && docker push "$REGISTRY_IMAGE_NAME:8.0-base"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.0-alpine-base" && docker push "$REGISTRY_IMAGE_NAME:8.0-alpine-base"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:latest-base" && docker push "$REGISTRY_IMAGE_NAME:latest-base"
@@ -223,8 +211,7 @@ jobs:
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.0-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.0-alpine-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:latest-selenium" && docker push "$REGISTRY_IMAGE_NAME:latest-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:latest-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:latest-alpine-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.0-zts-base" && docker push "$REGISTRY_IMAGE_NAME:8.0-zts-base"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.0-zts-alpine-base" && docker push "$REGISTRY_IMAGE_NAME:8.0-zts-alpine-base"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:latest-zts-base" && docker push "$REGISTRY_IMAGE_NAME:latest-zts-base"
@@ -241,8 +228,7 @@ jobs:
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.0-zts-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.0-zts-alpine-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:latest-zts-selenium" && docker push "$REGISTRY_IMAGE_NAME:latest-zts-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:latest-zts-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:latest-zts-alpine-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.1-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.1-alpine" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.1-base" && docker push "$REGISTRY_IMAGE_NAME:8.1-base"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.1-alpine-base" && docker push "$REGISTRY_IMAGE_NAME:8.1-alpine-base"
           && docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:8.1" && docker push "$REGISTRY_IMAGE_NAME:8.1"
@@ -251,8 +237,7 @@ jobs:
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:8.1-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:8.1-alpine-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.1-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.1-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.1-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.1-alpine-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.1-zts-base" && docker push "$REGISTRY_IMAGE_NAME:8.1-zts-base"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.1-zts-alpine-base" && docker push "$REGISTRY_IMAGE_NAME:8.1-zts-alpine-base"
           && docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:8.1-zts" && docker push "$REGISTRY_IMAGE_NAME:8.1-zts"
@@ -261,28 +246,23 @@ jobs:
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:8.1-zts-alpine-node" && docker push "$REGISTRY_IMAGE_NAME:8.1-zts-alpine-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.1-zts-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.1-zts-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.1-zts-alpine-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.1-zts-alpine-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "7.3-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.3-debian" ]; then
           docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:7.3-debian" && docker push "$REGISTRY_IMAGE_NAME:7.3-debian"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.3-debian-node" && docker push "$REGISTRY_IMAGE_NAME:7.3-debian-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.3-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.3-debian-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "7.3-zts-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.3-zts-debian" ]; then
           docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:7.3-zts-debian" && docker push "$REGISTRY_IMAGE_NAME:7.3-zts-debian"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.3-zts-debian-node" && docker push "$REGISTRY_IMAGE_NAME:7.3-zts-debian-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.3-zts-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.3-zts-debian-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "7.4-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-debian" ]; then
           docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:7.4-debian" && docker push "$REGISTRY_IMAGE_NAME:7.4-debian"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.4-debian-node" && docker push "$REGISTRY_IMAGE_NAME:7.4-debian-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.4-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.4-debian-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "7.4-zts-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-zts-debian" ]; then
           docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:7.4-zts-debian" && docker push "$REGISTRY_IMAGE_NAME:7.4-zts-debian"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:7.4-zts-debian-node" && docker push "$REGISTRY_IMAGE_NAME:7.4-zts-debian-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:7.4-zts-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:7.4-zts-debian-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.0-debian" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.0-debian-base" && docker push "$REGISTRY_IMAGE_NAME:8.0-debian-base"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:latest-debian-base" && docker push "$REGISTRY_IMAGE_NAME:latest-debian-base"
           && docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:8.0-debian" && docker push "$REGISTRY_IMAGE_NAME:8.0-debian"
@@ -291,8 +271,7 @@ jobs:
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:latest-debian-node" && docker push "$REGISTRY_IMAGE_NAME:latest-debian-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.0-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.0-debian-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:latest-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:latest-debian-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-zts-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.0-zts-debian" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.0-zts-debian-base" && docker push "$REGISTRY_IMAGE_NAME:8.0-zts-debian-base"
           && docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:latest-zts-debian-base" && docker push "$REGISTRY_IMAGE_NAME:latest-zts-debian-base"
           && docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:8.0-zts-debian" && docker push "$REGISTRY_IMAGE_NAME:8.0-zts-debian"
@@ -301,14 +280,12 @@ jobs:
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:latest-zts-debian-node" && docker push "$REGISTRY_IMAGE_NAME:latest-zts-debian-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.0-zts-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.0-zts-debian-selenium"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:latest-zts-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:latest-zts-debian-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.1-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.1-debian" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.1-debian-base" && docker push "$REGISTRY_IMAGE_NAME:8.1-debian-base"
           && docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:8.1-debian" && docker push "$REGISTRY_IMAGE_NAME:8.1-debian"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:8.1-debian-node" && docker push "$REGISTRY_IMAGE_NAME:8.1-debian-node"
           && docker tag "ci-target:selenium" "$REGISTRY_IMAGE_NAME:8.1-debian-selenium" && docker push "$REGISTRY_IMAGE_NAME:8.1-debian-selenium"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
           docker tag "ci-target:base" "$REGISTRY_IMAGE_NAME:8.1-zts-debian-base" && docker push "$REGISTRY_IMAGE_NAME:8.1-zts-debian-base"
           && docker tag "ci-target:basic" "$REGISTRY_IMAGE_NAME:8.1-zts-debian" && docker push "$REGISTRY_IMAGE_NAME:8.1-zts-debian"
           && docker tag "ci-target:node" "$REGISTRY_IMAGE_NAME:8.1-zts-debian-node" && docker push "$REGISTRY_IMAGE_NAME:8.1-zts-debian-node"

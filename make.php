@@ -187,22 +187,11 @@ $genRuntimeConditionalCode = function ($imageNames, \Closure $gen) use ($phpVers
         }
     }
 
-    $res = null;
-    foreach ($imageNamesByCode as $code => $imageNames) {
-        if ($res === null) {
-            $res = '';
-        } else {
-            $res .= "\n" . '          && ';
-        }
-
-        $res .= 'if ' . implode(' || ', array_map(function ($imageName) {
+    return implode("\n" . '          ; el', array_map(function ($code) use ($imageNamesByCode) {
+        return 'if ' . implode(' || ', array_map(function ($imageName) {
             return '[ "${{ matrix.imageName }}" == "' . $imageName . '" ]';
-        }, $imageNames)) . '; then
-          ' . $code . '
-          ; fi';
-    }
-
-    return $res;
+        }, $imageNamesByCode[$code])) . '; then' . "\n" . '          '. $code;
+    }, array_keys($imageNamesByCode))) . "\n" . '          ; fi';
 };
 
 $genRuntimeConditionalCodeFromSourceOnly = function ($imageNames, \Closure $gen) use ($genRuntimeConditionalCode, $phpVersionsFromSource, $phpVersionByImageName): string {
@@ -268,7 +257,6 @@ jobs:
     return 'git clone --depth 1 \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' -b \'' . $phpVersionsFromSource[$phpVersion]['branch'] . '\' php';
 }) . '
           && (cd php && git checkout -B master)
-          && (cd php && git apply -v ../../../../../fix-zts-gh8180.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix ZST support for Alpine")' . /* remove once https://github.com/php/php-src/pull/8180 is merged & released */ '
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && (cd php && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz)
           && sed -E \'s~^(ENV (GPG_KEYS|PHP_SHA256|PHP_ASC_URL)[ =]).*~~\' -i Dockerfile
