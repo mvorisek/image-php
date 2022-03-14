@@ -135,7 +135,7 @@ FROM basic as basic__test
 RUN php --version
 COPY test.php ./
 RUN (/usr/lib/oracle/setup.sh || true) && php test.php
-RUN test -f /usr/local/lib/libphp.so
+RUN test -f /usr/local/lib/libphp' . (in_array($phpVersion, ['7.3', '7.4'], true) ? '7' : '') . '.so
 RUN composer diagnose
 
 
