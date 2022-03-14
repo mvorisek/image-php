@@ -191,7 +191,7 @@ $genRuntimeConditionalCode = function ($imageNames, \Closure $gen) use ($phpVers
         return 'if ' . implode(' || ', array_map(function ($imageName) {
             return '[ "${{ matrix.imageName }}" == "' . $imageName . '" ]';
         }, $imageNamesByCode[$code])) . '; then' . "\n" . '          '. $code;
-    }, array_keys($imageNamesByCode))) . "\n" . '          ; fi';
+    }, array_keys($imageNamesByCode))) . (count($imageNamesByCode) === 0 ? 'true' : "\n" . '          ; fi');
 };
 
 $genRuntimeConditionalCodeFromSourceOnly = function ($imageNames, \Closure $gen) use ($genRuntimeConditionalCode, $phpVersionsFromSource, $phpVersionByImageName): string {
@@ -242,11 +242,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: \'Target "base" - build from php-src\'
-        if: ' . implode(' || ', array_map(function ($imageName) {
+        if: ' . (implode(' || ', array_map(function ($imageName) {
             return 'matrix.imageName == \'' . $imageName . '\'';
         }, array_filter($imageNames, function ($imageName) use ($phpVersionsFromSource, $phpVersionByImageName) {
             return isset($phpVersionsFromSource[$phpVersionByImageName[$imageName]]) ? $imageName : null;
-        }))) . '
+        }))) ?: 'false') . '
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           git clone https://github.com/docker-library/php.git dlphp
@@ -299,10 +299,11 @@ jobs:
       - name: \'Push tags to registry\'
         if: github.ref == \'refs/heads/master\'
         run: >-
-          ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion) use ($phpVersionsFromSource, $targetNames, $genImageTags, $createFullName) {
+          dtp() { docker tag "ci-target:$1" "$REGISTRY_IMAGE_NAME:$2" && docker push "$REGISTRY_IMAGE_NAME:$2"; }
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion) use ($phpVersionsFromSource, $targetNames, $genImageTags, $createFullName) {
     return implode("\n" . '          && ', array_merge(...array_map(function ($targetName) use ($genImageTags, $createFullName, $imageName) {
         return array_map(function ($imageTag) use ($targetName) {
-            return 'docker tag "ci-target:' . $targetName . '" "$REGISTRY_IMAGE_NAME:' . $imageTag . '" && docker push "$REGISTRY_IMAGE_NAME:' . $imageTag . '"';
+            return 'dtp "' . $targetName . '" "' . $imageTag . '"';
         }, $genImageTags($createFullName($imageName, $targetName)));
     }, [...(isset($phpVersionsFromSource[$phpVersion]) ? ['base'] : []), ...$targetNames])));
 }) . '
