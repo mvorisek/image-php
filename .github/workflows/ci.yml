@@ -98,6 +98,9 @@ jobs:
           && sed -E 's~^(ENV PHP_URL[ =]).*~COPY php/php.tar.xz /usr/src/~' -i Dockerfile
           && sed -E 's~-n "\$(PHP_SHA256|PHP_ASC_URL)"~-n ""~' -i Dockerfile
           && sed -E 's~curl -fsSL -o php.tar.xz .*; ~~' -i Dockerfile
+          && if [ "${{ matrix.imageName }}" == "7.3-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ]; then
+          sed -E 's~(--with-curl.*)( \\)~\1 --enable-embed\2~' -i Dockerfile
+          ; fi
           && if [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
           sed -E 's~--enable-maintainer-zts~--enable-zts~' -i Dockerfile
           ; fi

@@ -135,6 +135,7 @@ FROM basic as basic__test
 RUN php --version
 COPY test.php ./
 RUN (/usr/lib/oracle/setup.sh || true) && php test.php
+RUN test -f /usr/local/lib/libphp.so
 RUN composer diagnose
 
 
@@ -285,6 +286,9 @@ jobs:
           && sed -E \'s~^(ENV PHP_URL[ =]).*~COPY php/php.tar.xz /usr/src/~\' -i Dockerfile
           && sed -E \'s~-n "\$(PHP_SHA256|PHP_ASC_URL)"~-n ""~\' -i Dockerfile
           && sed -E \'s~curl -fsSL -o php.tar.xz .*; ~~\' -i Dockerfile
+          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    return $osName === 'debian' ? null : 'sed -E \'s~(--with-curl.*)( \\\\)~\\1 --enable-embed\\2~\' -i Dockerfile';
+}) . '
           && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     // remove once https://github.com/docker-library/php/pull/1076 is released
     return in_array($phpVersion, ['7.3', '7.4'], true) ? null : 'sed -E \'s~--enable-maintainer-zts~--enable-zts~\' -i Dockerfile';

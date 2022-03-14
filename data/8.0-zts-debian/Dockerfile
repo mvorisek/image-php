@@ -45,6 +45,7 @@ FROM basic as basic__test
 RUN php --version
 COPY test.php ./
 RUN (/usr/lib/oracle/setup.sh || true) && php test.php
+RUN test -f /usr/local/lib/libphp.so
 RUN composer diagnose
 
 
