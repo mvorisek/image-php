@@ -1,4 +1,4 @@
-FROM php:7.3-bullseye as basic
+FROM ci-target:base as basic
 
 # install basic system tools
 RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \

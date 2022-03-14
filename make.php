@@ -1,10 +1,24 @@
 <?php
 
 $phpVersionsFromSource = [
-    '8.0' => ['repo' => 'https://github.com/php/php-src.git', 'branch' => 'PHP-8.0', 'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']],
-    '8.1' => ['repo' => 'https://github.com/php/php-src.git', 'branch' => 'PHP-8.1', 'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']],
+    '7.3' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.3\.[0-9]+',
+        'forkPhpVersion' => '7.3', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+    ],
+    '7.4' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.4\.[0-9]+',
+        'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+    ],
+    '8.0' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/PHP-8\.0' /* use tags once PHP 8.0.18 is released */,
+        'forkPhpVersion' => '7.4' /* use 8.0 once https://github.com/docker-library/php/pull/1076 is released */, 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+    ],
+    '8.1' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/PHP-8\.1' /* use tags once PHP 8.1.5 is released */,
+        'forkPhpVersion' => '7.4' /* use 8.1 once https://github.com/docker-library/php/pull/1076 is released */, 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+    ],
 ];
-$phpVersions = ['7.3', '7.4', ...array_keys($phpVersionsFromSource)];
+$phpVersions = [...array_keys($phpVersionsFromSource)];
 $osNames = ['alpine', 'debian'];
 $targetNames = ['basic', 'node', 'selenium'];
 
@@ -254,17 +268,27 @@ jobs:
     return 'cd dlphp/' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '/' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '/';
 }) . '
           && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return 'git clone --depth 1 \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' -b \'' . $phpVersionsFromSource[$phpVersion]['branch'] . '\' php';
+    return 'export PHPSRC_BRANCH="$(git ls-remote \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' | grep -iE \'\s' . $phpVersionsFromSource[$phpVersion]['branchRegex'] . '$\' | sort -k2 -V | tee /dev/stderr | awk \'END{print $NF}\' | sed -E \'s~^refs/[^/]+/~~\')"';
+}) . '
+          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
+    return 'git clone --depth 1 \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' -b "$PHPSRC_BRANCH" php';
 }) . '
           && (cd php && git checkout -B master)
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
-          && (cd php && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz)
+          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
+    return in_array($phpVersion, ['7.3'], true)
+        ? '(cd php && git tag php-1.0 && ./makedist 1.0 > /dev/null && mv php-1.0.tar.xz php.tar.xz)'
+        : '(cd php && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz)';
+}) . '
           && sed -E \'s~^(ENV (GPG_KEYS|PHP_SHA256|PHP_ASC_URL)[ =]).*~~\' -i Dockerfile
           && sed -E \'s~^(ENV PHP_VERSION[ =]).*~\\1CUSTOM~\' -i Dockerfile
           && sed -E \'s~^(ENV PHP_URL[ =]).*~COPY php/php.tar.xz /usr/src/~\' -i Dockerfile
           && sed -E \'s~-n "\$(PHP_SHA256|PHP_ASC_URL)"~-n ""~\' -i Dockerfile
           && sed -E \'s~curl -fsSL -o php.tar.xz .*; ~~\' -i Dockerfile
-          && sed -E \'s~--enable-maintainer-zts~--enable-zts~\' -i Dockerfile' . /* remove once https://github.com/docker-library/php/pull/1076 is merged & released */ '
+          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    // remove once https://github.com/docker-library/php/pull/1076 is released
+    return in_array($phpVersion, ['7.3', '7.4'], true) ? null : 'sed -E \'s~--enable-maintainer-zts~--enable-zts~\' -i Dockerfile';
+}) . '
           && git diff
           && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
     $forkImageTag = 'php:' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '-' . ($isTs ? 'zts' : 'cli') . '-' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName];
