@@ -278,6 +278,7 @@ jobs:
     return 'git clone --depth 1 \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' -b "$PHPSRC_BRANCH" php';
 }) . '
           && (cd php && git checkout -B master)
+          && (cd php && git apply -v ../../../../../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci NCLOB read")' . /* remove once https://github.com/php/php-src/pull/8018 is merged & released */ '
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
     return in_array($phpVersion, ['7.3'], true)
