@@ -57,6 +57,9 @@ jobs:
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           git clone https://github.com/docker-library/php.git dlphp
+          && if [ "${{ matrix.imageName }}" == "7.3-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-debian" ] || [ "${{ matrix.imageName }}" == "7.3-zts-debian" ]; then
+          (cd dlphp && git reset --hard 35d0a69)
+          ; fi
           && if [ "${{ matrix.imageName }}" == "7.3-alpine" ]; then
           cd dlphp/7.3/alpine3.15/cli/
           ; elif [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ]; then

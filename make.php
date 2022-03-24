@@ -266,6 +266,9 @@ jobs:
         run: >-
           git clone https://github.com/docker-library/php.git dlphp
           && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
+            return ['7.3' => '(cd dlphp && git reset --hard 35d0a69)'][$phpVersionsFromSource[$phpVersion]['forkPhpVersion']] ?? null;
+}) . '
+          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
     return 'cd dlphp/' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '/' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '/';
 }) . '
           && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
