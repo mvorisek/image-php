@@ -1,6 +1,10 @@
 <?php
 
 $phpVersionsFromSource = [
+    '7.2' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.2\.[0-9]+',
+        'forkPhpVersion' => '7.2', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+    ],
     '7.3' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.3\.[0-9]+',
         'forkPhpVersion' => '7.3', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
@@ -18,7 +22,6 @@ $phpVersionsFromSource = [
         'forkPhpVersion' => '7.4' /* use 8.1 once https://github.com/docker-library/php/pull/1076 is released */, 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
 ];
-$phpVersions = [...array_keys($phpVersionsFromSource)];
 $osNames = ['alpine', 'debian'];
 $targetNames = ['basic', 'node', 'selenium'];
 
@@ -81,10 +84,9 @@ $phpVersionByImageName = [];
 $isTsByImageName = [];
 $osNameByImageName = [];
 foreach ($osNames as $osName) {
-    foreach ($phpVersions as $phpVersion) {
+    foreach (array_keys($phpVersionsFromSource) as $phpVersion) {
         foreach ([false, true] as $isTs) {
-            $dockerFile = 'FROM ' . (isset($phpVersionsFromSource[$phpVersion]) ? 'ci-target:base' : 'php:' . $phpVersion . ($phpVersion === '8.2' ? '-rc' : '') . ($isTs ? '-zts' : '')
-                . '-' . ['alpine' => 'alpine', 'debian' => 'bullseye'][$osName]) . ' as basic
+            $dockerFile = 'FROM ci-target:base as basic
 
 # install basic system tools
 RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')
@@ -135,7 +137,7 @@ FROM basic as basic__test
 RUN php --version
 COPY test.php ./
 RUN (/usr/lib/oracle/setup.sh || true) && php test.php
-RUN test -f /usr/local/lib/libphp' . (in_array($phpVersion, ['7.3', '7.4'], true) ? '7' : '') . '.so
+RUN test -f /usr/local/lib/libphp' . (in_array($phpVersion, ['7.2', '7.3', '7.4'], true) ? '7' : '') . '.so
 RUN composer diagnose
 
 
@@ -209,12 +211,6 @@ $genRuntimeConditionalCode = function ($imageNames, \Closure $gen) use ($phpVers
     }, array_keys($imageNamesByCode))) . (count($imageNamesByCode) === 0 ? 'true' : "\n" . '          ; fi');
 };
 
-$genRuntimeConditionalCodeFromSourceOnly = function ($imageNames, \Closure $gen) use ($genRuntimeConditionalCode, $phpVersionsFromSource, $phpVersionByImageName): string {
-    return $genRuntimeConditionalCode(array_filter($imageNames, function ($imageName) use ($phpVersionsFromSource, $phpVersionByImageName) {
-        return isset($phpVersionsFromSource[$phpVersionByImageName[$imageName]]) ? $imageName : null;
-    }), $gen);
-};
-
 $ciFile = 'name: CI
 
 on:
@@ -237,7 +233,7 @@ jobs:
         run: |
           rm -rf data/
           php make.php
-          git diff --exit-code
+          git add . -N && git diff --exit-code
 
   build:
     name: Build
@@ -256,53 +252,74 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: \'Target "base" - build from php-src\'
-        if: ' . (implode(' || ', array_map(function ($imageName) {
-            return 'matrix.imageName == \'' . $imageName . '\'';
-        }, array_filter($imageNames, function ($imageName) use ($phpVersionsFromSource, $phpVersionByImageName) {
-            return isset($phpVersionsFromSource[$phpVersionByImageName[$imageName]]) ? $imageName : null;
-        }))) ?: 'false') . '
-        # try to build twice to suppress random network issues with Github Actions
+      - name: \'Build base image - clone & patch\'
         run: >-
-          git clone https://github.com/docker-library/php.git dlphp
-          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-            return ['7.3' => '(cd dlphp && git reset --hard 35d0a69)'][$phpVersionsFromSource[$phpVersion]['forkPhpVersion']] ?? null;
-}) . '
-          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return 'cd dlphp/' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '/' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '/';
-}) . '
-          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
+          ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
     return 'export PHPSRC_BRANCH="$(git ls-remote \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' | grep -iE \'\s' . $phpVersionsFromSource[$phpVersion]['branchRegex'] . '$\' | sort -k2 -V | tee /dev/stderr | awk \'END{print $NF}\' | sed -E \'s~^refs/[^/]+/~~\')"';
 }) . '
-          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return 'git clone --depth 1 \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' -b "$PHPSRC_BRANCH" php';
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
+    return 'git clone --depth 1 \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' -b "$PHPSRC_BRANCH" phpsrc';
 }) . '
-          && (cd php && git checkout -B master)
-          && (cd php && git apply -v ../../../../../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci NCLOB read")' . /* remove once https://github.com/php/php-src/pull/8018 is merged & released */ '
+          && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
+          && git checkout -B master
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    return in_array($phpVersion, ['7.2'], true)
+        ? 'sed -E \'s~ --remote=\$PHPROOT ~ ~\' -i makedist && git -c user.name="a" -c user.email="a@a" commit -am "Fix makedist for PHP 7.2"'
+        : null;
+}) . '
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    return in_array($phpVersion, ['7.2'], true) && $osName === 'alpine'
+        ? 'git apply -v ../fix-intl-php72-bug80310.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix intl ext build with ICU 68.1+ for PHP 7.2"'
+        : null;
+}) . '
+          && git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read"' . /* remove once https://github.com/php/php-src/pull/8018 is merged & released */ '
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
-          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return in_array($phpVersion, ['7.3'], true)
-        ? '(cd php && git tag php-1.0 && ./makedist 1.0 > /dev/null && mv php-1.0.tar.xz php.tar.xz)'
-        : '(cd php && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz)';
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    return in_array($phpVersion, ['7.2', '7.3'], true)
+        ? 'git tag php-1.0 && ./makedist 1.0 > /dev/null && mv php-1.0.tar.xz php.tar.xz'
+        : 'scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz';
 }) . '
-          && sed -E \'s~^(ENV (GPG_KEYS|PHP_SHA256|PHP_ASC_URL)[ =]).*~~\' -i Dockerfile
-          && sed -E \'s~^(ENV PHP_VERSION[ =]).*~\\1CUSTOM~\' -i Dockerfile
-          && sed -E \'s~^(ENV PHP_URL[ =]).*~COPY php/php.tar.xz /usr/src/~\' -i Dockerfile
+          && cd ..
+          && git clone https://github.com/docker-library/php.git dlphp && cd dlphp
+          && rm -r [0-9].[0-9]*/ && sed -E \'s~( // )error\("missing GPG keys for " \+ env\.version\)~\1["x"]~\' -i Dockerfile-linux.template
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
+    return 'echo \'{ "' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '": { "url": "x", "variants": [ "' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '" ], "version": "' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '.99" } }\' > versions.json';
+}) . '
+          && ./apply-templates.sh
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
+    return 'mv ' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '/' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '/ img';
+}) . '
+          && cd img && mv ../../phpsrc/php.tar.xz .
+          && sed -E \'s~^(ENV GPG_KEYS[ =]).*~~\' -i Dockerfile
+          && sed -E \'s~^(ENV PHP_VERSION[ =]).*~\1CUSTOM--\'"$PHPSRC_BRANCH--$PHPSRC_COMMIT"\'~\' -i Dockerfile
+          && sed -E \'s~^(ENV PHP_URL[ =]).*~COPY php.tar.xz /usr/src/~\' -i Dockerfile
           && sed -E \'s~-n "\$(PHP_SHA256|PHP_ASC_URL)"~-n ""~\' -i Dockerfile
           && sed -E \'s~curl -fsSL -o php.tar.xz .*; ~~\' -i Dockerfile
-          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return $osName === 'debian' ? null : 'sed -E \'s~(--with-curl.*)( \\\\)~\\1 --enable-embed\\2~\' -i Dockerfile';
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    return $osName === 'debian' ? null : 'sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-embed\2~\' -i Dockerfile';
 }) . '
-          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     // remove once https://github.com/docker-library/php/pull/1076 is released
-    return in_array($phpVersion, ['7.3', '7.4'], true) ? null : 'sed -E \'s~--enable-maintainer-zts~--enable-zts~\' -i Dockerfile';
+    return in_array($phpVersion, ['7.2', '7.3', '7.4'], true) ? null : 'sed -E \'s~--enable-maintainer-zts~--enable-zts~\' -i Dockerfile';
 }) . '
-          && git diff
-          && ' . $genRuntimeConditionalCodeFromSourceOnly($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    $forkImageTag = 'php:' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '-' . ($isTs ? 'zts' : 'cli') . '-' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName];
+          && git add . -N && git diff --diff-filter=d
 
-    return 'docker pull "' . $forkImageTag . '"
-          && (' . implode("\n" . '          || ', array_fill(0, 2, 'docker build --cache-from "' . $forkImageTag . '" -t "ci-target:base" ./')) . ')';
+      - name: \'Build base image - build\'
+        # try to build twice to suppress random network issues with Github Actions
+        run: >-
+          cd dlphp/img
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource, $createFullName) {
+    $cacheFromImages = [
+        'php:' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '-' . ($isTs ? 'zts' : 'cli') . '-' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName],
+        '$REGISTRY_IMAGE_NAME:' . $createFullName($imageName, 'base'),
+    ];
+
+    return implode("\n" . '          && ', array_map(function ($name) {
+        return '((' . implode(' || ', array_fill(0, 2, 'docker pull "' . $name . '"')) . ') || true)';
+    }, $cacheFromImages)) . '
+          && (' . implode("\n" . '          || ', array_fill(0, 2, 'docker build ' . implode(' ', array_map(function ($name) {
+        return '--cache-from "' . $name . '"';
+    }, $cacheFromImages)) . ' -t "ci-target:base" ./')) . ')';
 }) . '
 ' . implode("\n", array_map(function ($targetName) {
     $imageHashCmd = '$(docker inspect --format="{{.Id}}" "ci-target:' . $targetName . '")';
@@ -332,12 +349,12 @@ jobs:
         if: github.ref == \'refs/heads/master\'
         run: >-
           dtp() { docker tag "ci-target:$1" "$REGISTRY_IMAGE_NAME:$2" && docker push "$REGISTRY_IMAGE_NAME:$2"; }
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion) use ($phpVersionsFromSource, $targetNames, $genImageTags, $createFullName) {
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion) use ($targetNames, $genImageTags, $createFullName) {
     return implode("\n" . '          && ', array_merge(...array_map(function ($targetName) use ($genImageTags, $createFullName, $imageName) {
         return array_map(function ($imageTag) use ($targetName) {
             return 'dtp "' . $targetName . '" "' . $imageTag . '"';
         }, $genImageTags($createFullName($imageName, $targetName)));
-    }, [...(isset($phpVersionsFromSource[$phpVersion]) ? ['base'] : []), ...$targetNames])));
+    }, ['base', ...$targetNames])));
 }) . '
 ';
 file_put_contents(__DIR__ . '/.github/workflows/ci.yml', $ciFile);
