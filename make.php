@@ -85,15 +85,21 @@ $isTsByImageName = [];
 $osNameByImageName = [];
 foreach ($osNames as $osName) {
     foreach (array_keys($phpVersionsFromSource) as $phpVersion) {
-        foreach ([false, true] as $isTs) {
-            $dockerFile = 'FROM ci-target:base as basic
+        foreach ([false, true] as $isDebug) {
+            foreach ([false, true] as $isTs) {
+                if ($isDebug && $isTs) {
+                    continue;
+                }
+
+                $dockerFile = 'FROM ci-target:base as basic
 
 # install basic system tools
 RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')
-    . $genPackageInstallCommand($osName, array_merge(
-        ['*upgrade*', 'bash', 'git', 'make', 'unzip', 'gnupg', 'ca-certificates'],
-        ['alpine' => ['coreutils'], 'debian' => ['apt-utils', 'apt-transport-https', 'netcat']][$osName]
-    )) . ' \
+    . $genPackageInstallCommand($osName, [
+        ...['*upgrade*', 'bash', 'git', 'make', 'unzip', 'gnupg', 'ca-certificates'],
+        ...['alpine' => ['coreutils'], 'debian' => ['apt-utils', 'apt-transport-https', 'netcat']][$osName],
+        ...($isDebug ? ['gdb'] : []),
+    ]) . ' \
     && git config --system url."https://github.com/".insteadOf "git@github.com:" \
     && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
 
@@ -137,8 +143,18 @@ FROM basic as basic__test
 RUN php --version
 COPY test.php ./
 RUN (/usr/lib/oracle/setup.sh || true) && php test.php
-RUN test -f /usr/local/lib/libphp' . (in_array($phpVersion, ['7.2', '7.3', '7.4'], true) ? '7' : '') . '.so
+RUN php -n -r \'exit(' . ($isDebug ? '' : '!') . 'ZEND_DEBUG_BUILD ? 0 : 1);\'
+RUN ' . $genPackageInstallCommand($osName, ['binutils']) . '
+RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) use ($isDebug) {
+    return ($isDebug ? '' : '! ') . 'readelf -S ' . $pathUnescaped . ' | grep -q \' \.symtab \'';
+}, [
+    '/usr/local/bin/php',
+    '/usr/local/lib/libphp' . (in_array($phpVersion, ['7.2', '7.3', '7.4'], true) ? '7' : '') . '.so',
+    '"$(find /usr/local/lib/php/extensions -name bcmath.so)"',
+    '"$(find /usr/local/lib/php/extensions -name xdebug.so)"'
+])) . '
 RUN composer diagnose
+RUN mkdir t && (cd t && composer require phpunit/phpunit) && rm -r t/
 
 
 FROM basic as node
@@ -149,6 +165,7 @@ RUN ' . $genPackageInstallCommand($osName, ['nodejs', 'npm'])
 
 FROM node as node__test
 RUN npm version
+RUN mkdir t && (cd t && npm install mocha) && rm -r t/
 
 
 FROM node as selenium
@@ -171,20 +188,21 @@ RUN ' . ($osName === 'alpine' ? 'chromium-browser' : 'chromium') . ' --version
 RUN firefox --version
 ';
 
-            $dataDir = __DIR__ . '/data';
-            $imageName = $phpVersion . ($isTs ? '-zts' : '') . '-' . $osName;
-            $imageNames[] = $imageName;
-            $phpVersionByImageName[$imageName] = $phpVersion;
-            $isTsByImageName[$imageName] = $isTs;
-            $osNameByImageName[$imageName] = $osName;
+                $dataDir = __DIR__ . '/data';
+                $imageName = $phpVersion . ($isDebug ? '-debug' : '') . ($isTs ? '-zts' : '') . '-' . $osName;
+                $imageNames[] = $imageName;
+                $phpVersionByImageName[$imageName] = $phpVersion;
+                $isTsByImageName[$imageName] = $isTs;
+                $osNameByImageName[$imageName] = $osName;
 
-            if (!is_dir($dataDir)) {
-                mkdir($dataDir);
+                if (!is_dir($dataDir)) {
+                    mkdir($dataDir);
+                }
+                if (!is_dir($dataDir . '/' . $imageName)) {
+                    mkdir($dataDir . '/' . $imageName);
+                }
+                file_put_contents($dataDir . '/' . $imageName . '/Dockerfile', $dockerFile);
             }
-            if (!is_dir($dataDir . '/' . $imageName)) {
-                mkdir($dataDir . '/' . $imageName);
-            }
-            file_put_contents($dataDir . '/' . $imageName . '/Dockerfile', $dockerFile);
         }
     }
 }
@@ -279,24 +297,29 @@ jobs:
         ? 'git tag php-1.0 && ./makedist 1.0 > /dev/null && mv php-1.0.tar.xz php.tar.xz'
         : 'scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz';
 }) . '
+          && git add . -N && git diff --diff-filter=d "$PHPSRC_COMMIT"
           && cd ..
           && git clone https://github.com/docker-library/php.git dlphp && cd dlphp
           && rm -r [0-9].[0-9]*/ && sed -E \'s~( // )error\("missing GPG keys for " \+ env\.version\)~\1["x"]~\' -i Dockerfile-linux.template
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
     return 'echo \'{ "' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '": { "url": "x", "variants": [ "' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '" ], "version": "' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '.99" } }\' > versions.json';
 }) . '
+          && git apply -v ../fix-dlphp-strip-pr1280.patch
           && ./apply-templates.sh
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
     return 'mv ' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '/' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '/ img';
 }) . '
           && cd img && mv ../../phpsrc/php.tar.xz .
-          && sed -E \'s~^(ENV GPG_KEYS[ =]).*~~\' -i Dockerfile
           && sed -E \'s~^(ENV PHP_VERSION[ =]).*~\1CUSTOM--\'"$PHPSRC_BRANCH--$PHPSRC_COMMIT"\'~\' -i Dockerfile
           && sed -E \'s~^(ENV PHP_URL[ =]).*~COPY php.tar.xz /usr/src/~\' -i Dockerfile
+          && sed -E \'s~^(ENV (GPG_KEYS|PHP_URL|PHP_ASC_URL|PHP_SHA256)[ =]).*~~\' -i Dockerfile
           && sed -E \'s~-n "\$(PHP_SHA256|PHP_ASC_URL)"~-n ""~\' -i Dockerfile
           && sed -E \'s~curl -fsSL -o php.tar.xz .*; ~~\' -i Dockerfile
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     return $osName === 'debian' ? null : 'sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-embed\2~\' -i Dockerfile';
+}) . '
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    return strpos($imageName, '-debug-') === false ? null : 'sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-debug\2~\' -i Dockerfile';
 }) . '
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     // remove once https://github.com/docker-library/php/pull/1076 is released

@@ -45,8 +45,16 @@ FROM basic as basic__test
 RUN php --version
 COPY test.php ./
 RUN (/usr/lib/oracle/setup.sh || true) && php test.php
-RUN test -f /usr/local/lib/libphp.so
+RUN php -n -r 'exit(!ZEND_DEBUG_BUILD ? 0 : 1);'
+RUN apt-get -y update \
+    && apt-get -y install binutils \
+    && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN ! readelf -S /usr/local/bin/php | grep -q ' \.symtab ' \
+    && ! readelf -S /usr/local/lib/libphp.so | grep -q ' \.symtab ' \
+    && ! readelf -S "$(find /usr/local/lib/php/extensions -name bcmath.so)" | grep -q ' \.symtab ' \
+    && ! readelf -S "$(find /usr/local/lib/php/extensions -name xdebug.so)" | grep -q ' \.symtab '
 RUN composer diagnose
+RUN mkdir t && (cd t && composer require phpunit/phpunit) && rm -r t/
 
 
 FROM basic as node
@@ -58,6 +66,7 @@ RUN apt-get -y update \
 
 FROM node as node__test
 RUN npm version
+RUN mkdir t && (cd t && npm install mocha) && rm -r t/
 
 
 FROM node as selenium
