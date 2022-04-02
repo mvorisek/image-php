@@ -5,23 +5,43 @@ $phpVersionsFromSource = [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.2\.[0-9]+',
         'forkPhpVersion' => '7.2', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
+    '7.2dev' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/PHP-7\.2',
+        'forkPhpVersion' => '7.2', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+    ],
     '7.3' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.3\.[0-9]+',
+        'forkPhpVersion' => '7.3', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+    ],
+    '7.3dev' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/PHP-7\.3',
         'forkPhpVersion' => '7.3', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
     '7.4' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.4\.[0-9]+',
         'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
+    '7.4dev' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/PHP-7\.4',
+        'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+    ],
     '8.0' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.0\.[0-9]+',
+        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+    ],
+    '8.0dev' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/PHP-8\.0',
         'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
     '8.1' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
         'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
-    '8.2' => [
+    '8.1dev' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/PHP-8\.1',
+        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+    ],
+    '8.2dev' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
         'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
@@ -133,7 +153,7 @@ RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://gi
     'redis',
     'sockets',
     'tidy',
-    in_array($phpVersion, ['8.2'], true) ? 'xdebug/xdebug@a08cd4a294d8ab49acb38abc32e1203596cad1b8' : 'xdebug',
+    version_compare($phpVersion, '8.2dev') >= 0 ? 'xdebug/xdebug@a08cd4a294d8ab49acb38abc32e1203596cad1b8' : 'xdebug',
     'xsl',
     'zip',
 ]) . ($osName === 'alpine' ? ' \
@@ -156,12 +176,12 @@ RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) us
     return ($isDebug ? '' : '! ') . 'readelf -S ' . $pathUnescaped . ' | grep -q \' \.symtab \'';
 }, [
     '/usr/local/bin/php',
-    '/usr/local/lib/libphp' . (in_array($phpVersion, ['7.2', '7.3', '7.4'], true) ? '7' : '') . '.so',
+    '/usr/local/lib/libphp' . (version_compare($phpVersion, '7.4.99') <= 0 ? '7' : '') . '.so',
     '"$(find /usr/local/lib/php/extensions -name bcmath.so)"',
     '"$(find /usr/local/lib/php/extensions -name xdebug.so)"'
 ])) . '
 RUN composer diagnose
-RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.2'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.1 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
+RUN mkdir t && (cd t && ' . (version_compare($phpVersion, '8.2dev') >= 0 ? 'echo \'{}\' > composer.json && composer config platform.php 8.1 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
 
 
 FROM basic as node
@@ -213,6 +233,29 @@ RUN firefox --version
         }
     }
 }
+
+// overcome Github Actions step code limits, see https://github.com/github/feedback/discussions/12775
+$genBatchedStepCode = function (\Closure $gen) use ($imageNames, $phpVersionByImageName): string {
+    $codes = [];
+    foreach ([[true, false], [true, true], [false, false], [false, true]] as [$isPhp7Version, $isDevVersion]) {
+        $imageNamesBatch = array_filter($imageNames, function ($imageName) use ($phpVersionByImageName, $isPhp7Version, $isDevVersion) {
+            return (version_compare($phpVersionByImageName[$imageName], '7.99.99') <= 0) === $isPhp7Version
+                && (strpos($imageName, 'dev-') !== false) === $isDevVersion;
+        });
+
+        $codeRaw = $gen($imageNamesBatch);
+        $code = preg_replace_callback('~( {6}- *name:[^\n]+)\'(?:\n {8}if: *(.+?))?(?=\n)~', function ($matches) use ($isPhp7Version, $isDevVersion, $imageNamesBatch) {
+            return $matches[1] . ' - ' . ($isPhp7Version ? '7.x' : '8.x') . ($isDevVersion ? 'dev' : '') . '\'' . "\n"
+                . '        if: ' . (isset($matches[2]) ? '(' . $matches[2] . ') && ' : '') . '(' . (implode(' || ', array_map(function ($imageName) {
+                    return 'matrix.imageName == \'' . $imageName . '\'';
+                }, $imageNamesBatch)) ?: 'false') . ')';
+        }, $codeRaw);
+
+        $codes[] = $code;
+    }
+
+    return implode("\n\n", $codes);
+};
 
 $genRuntimeConditionalCode = function ($imageNames, \Closure $gen) use ($phpVersionByImageName, $isTsByImageName, $osNameByImageName): string {
     $imageNamesByCode = [];
@@ -277,7 +320,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: \'Build base image - clone & patch\'
+' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Build base image - clone & patch\'
         run: >-
           ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
     return 'export PHPSRC_BRANCH="$(git ls-remote \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' | grep -iE \'\s' . $phpVersionsFromSource[$phpVersion]['branchRegex'] . '$\' | sort -k2 -V | tee /dev/stderr | awk \'END{print $NF}\' | sed -E \'s~^refs/[^/]+/~~\')"';
@@ -288,19 +331,19 @@ jobs:
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return in_array($phpVersion, ['7.2'], true)
+    return version_compare($phpVersion, '7.2.99') <= 0
         ? 'sed -E \'s~ --remote=\$PHPROOT ~ ~\' -i makedist && git -c user.name="a" -c user.email="a@a" commit -am "Fix makedist for PHP 7.2"'
         : null;
 }) . '
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return in_array($phpVersion, ['7.2'], true) && $osName === 'alpine'
+    return version_compare($phpVersion, '7.2.99') <= 0 && $osName === 'alpine'
         ? 'git apply -v ../fix-intl-php72-bug80310.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix intl ext build with ICU 68.1+ for PHP 7.2"'
         : null;
 }) . '
           && git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read"' . /* remove once https://github.com/php/php-src/pull/8018 is merged & released */ '
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return in_array($phpVersion, ['7.2', '7.3'], true)
+    return version_compare($phpVersion, '7.3.99') <= 0
         ? 'git tag php-1.0 && ./makedist 1.0 > /dev/null && mv php-1.0.tar.xz php.tar.xz'
         : 'scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz';
 }) . '
@@ -328,9 +371,9 @@ jobs:
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     return strpos($imageName, '-debug-') === false ? null : 'sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-debug\2~\' -i Dockerfile';
 }) . '
-          && git add . -N && git diff --diff-filter=d
+          && git add . -N && git diff --diff-filter=d') . '
 
-      - name: \'Build base image - build\'
+' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Build base image - build\'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           cd dlphp/img
@@ -346,7 +389,7 @@ jobs:
           && (' . implode("\n" . '          || ', array_fill(0, 2, 'docker build ' . implode(' ', array_map(function ($name) {
         return '--cache-from "' . $name . '"';
     }, $cacheFromImages)) . ' -t "ci-target:base" ./')) . ')';
-}) . '
+})) . '
 ' . implode("\n", array_map(function ($targetName) {
     $imageHashCmd = '$(docker inspect --format="{{.Id}}" "ci-target:' . $targetName . '")';
     return implode("\n", array_map(function ($targetName) {
@@ -371,7 +414,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: \'Push tags to registry\'
+' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Push tags to registry\'
         if: github.ref == \'refs/heads/master\'
         run: >-
           dtp() { docker tag "ci-target:$1" "$REGISTRY_IMAGE_NAME:$2" && docker push "$REGISTRY_IMAGE_NAME:$2"; }
@@ -381,7 +424,7 @@ jobs:
             return 'dtp "' . $targetName . '" "' . $imageTag . '"';
         }, $genImageTags($createFullName($imageName, $targetName)));
     }, ['base', ...$targetNames])));
-}) . '
+})) . '
 ';
 file_put_contents(__DIR__ . '/.github/workflows/ci.yml', $ciFile);
 

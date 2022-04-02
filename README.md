@@ -7,111 +7,201 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `7.2` `7.2-alpine`
 - `7.2-zts` `7.2-zts-alpine`
 - `7.2-debug` `7.2-debug-alpine`
+- `7.2dev` `7.2dev-alpine`
+- `7.2dev-zts` `7.2dev-zts-alpine`
+- `7.2dev-debug` `7.2dev-debug-alpine`
 - `7.3` `7.3-alpine`
 - `7.3-zts` `7.3-zts-alpine`
 - `7.3-debug` `7.3-debug-alpine`
+- `7.3dev` `7.3dev-alpine`
+- `7.3dev-zts` `7.3dev-zts-alpine`
+- `7.3dev-debug` `7.3dev-debug-alpine`
 - `7.4` `7.4-alpine`
 - `7.4-zts` `7.4-zts-alpine`
 - `7.4-debug` `7.4-debug-alpine`
+- `7.4dev` `7.4dev-alpine`
+- `7.4dev-zts` `7.4dev-zts-alpine`
+- `7.4dev-debug` `7.4dev-debug-alpine`
 - `8.0` `8.0-alpine` `latest` `latest-alpine`
 - `8.0-zts` `8.0-zts-alpine` `latest-zts` `latest-zts-alpine`
 - `8.0-debug` `8.0-debug-alpine` `latest-debug` `latest-debug-alpine`
+- `8.0dev` `8.0dev-alpine` `latestdev` `latestdev-alpine`
+- `8.0dev-zts` `8.0dev-zts-alpine` `latestdev-zts` `latestdev-zts-alpine`
+- `8.0dev-debug` `8.0dev-debug-alpine` `latestdev-debug` `latestdev-debug-alpine`
 - `8.1` `8.1-alpine`
 - `8.1-zts` `8.1-zts-alpine`
 - `8.1-debug` `8.1-debug-alpine`
-- `8.2` `8.2-alpine`
-- `8.2-zts` `8.2-zts-alpine`
-- `8.2-debug` `8.2-debug-alpine`
+- `8.1dev` `8.1dev-alpine`
+- `8.1dev-zts` `8.1dev-zts-alpine`
+- `8.1dev-debug` `8.1dev-debug-alpine`
+- `8.2dev` `8.2dev-alpine`
+- `8.2dev-zts` `8.2dev-zts-alpine`
+- `8.2dev-debug` `8.2dev-debug-alpine`
 - `7.2-debian`
 - `7.2-zts-debian`
 - `7.2-debug-debian`
+- `7.2dev-debian`
+- `7.2dev-zts-debian`
+- `7.2dev-debug-debian`
 - `7.3-debian`
 - `7.3-zts-debian`
 - `7.3-debug-debian`
+- `7.3dev-debian`
+- `7.3dev-zts-debian`
+- `7.3dev-debug-debian`
 - `7.4-debian`
 - `7.4-zts-debian`
 - `7.4-debug-debian`
+- `7.4dev-debian`
+- `7.4dev-zts-debian`
+- `7.4dev-debug-debian`
 - `8.0-debian` `latest-debian`
 - `8.0-zts-debian` `latest-zts-debian`
 - `8.0-debug-debian` `latest-debug-debian`
+- `8.0dev-debian` `latestdev-debian`
+- `8.0dev-zts-debian` `latestdev-zts-debian`
+- `8.0dev-debug-debian` `latestdev-debug-debian`
 - `8.1-debian`
 - `8.1-zts-debian`
 - `8.1-debug-debian`
-- `8.2-debian`
-- `8.2-zts-debian`
-- `8.2-debug-debian`
+- `8.1dev-debian`
+- `8.1dev-zts-debian`
+- `8.1dev-debug-debian`
+- `8.2dev-debian`
+- `8.2dev-zts-debian`
+- `8.2dev-debug-debian`
 - `7.2-node` `7.2-alpine-node`
 - `7.2-zts-node` `7.2-zts-alpine-node`
 - `7.2-debug-node` `7.2-debug-alpine-node`
+- `7.2dev-node` `7.2dev-alpine-node`
+- `7.2dev-zts-node` `7.2dev-zts-alpine-node`
+- `7.2dev-debug-node` `7.2dev-debug-alpine-node`
 - `7.3-node` `7.3-alpine-node`
 - `7.3-zts-node` `7.3-zts-alpine-node`
 - `7.3-debug-node` `7.3-debug-alpine-node`
+- `7.3dev-node` `7.3dev-alpine-node`
+- `7.3dev-zts-node` `7.3dev-zts-alpine-node`
+- `7.3dev-debug-node` `7.3dev-debug-alpine-node`
 - `7.4-node` `7.4-alpine-node`
 - `7.4-zts-node` `7.4-zts-alpine-node`
 - `7.4-debug-node` `7.4-debug-alpine-node`
+- `7.4dev-node` `7.4dev-alpine-node`
+- `7.4dev-zts-node` `7.4dev-zts-alpine-node`
+- `7.4dev-debug-node` `7.4dev-debug-alpine-node`
 - `8.0-node` `8.0-alpine-node` `latest-node` `latest-alpine-node`
 - `8.0-zts-node` `8.0-zts-alpine-node` `latest-zts-node` `latest-zts-alpine-node`
 - `8.0-debug-node` `8.0-debug-alpine-node` `latest-debug-node` `latest-debug-alpine-node`
+- `8.0dev-node` `8.0dev-alpine-node` `latestdev-node` `latestdev-alpine-node`
+- `8.0dev-zts-node` `8.0dev-zts-alpine-node` `latestdev-zts-node` `latestdev-zts-alpine-node`
+- `8.0dev-debug-node` `8.0dev-debug-alpine-node` `latestdev-debug-node` `latestdev-debug-alpine-node`
 - `8.1-node` `8.1-alpine-node`
 - `8.1-zts-node` `8.1-zts-alpine-node`
 - `8.1-debug-node` `8.1-debug-alpine-node`
-- `8.2-node` `8.2-alpine-node`
-- `8.2-zts-node` `8.2-zts-alpine-node`
-- `8.2-debug-node` `8.2-debug-alpine-node`
+- `8.1dev-node` `8.1dev-alpine-node`
+- `8.1dev-zts-node` `8.1dev-zts-alpine-node`
+- `8.1dev-debug-node` `8.1dev-debug-alpine-node`
+- `8.2dev-node` `8.2dev-alpine-node`
+- `8.2dev-zts-node` `8.2dev-zts-alpine-node`
+- `8.2dev-debug-node` `8.2dev-debug-alpine-node`
 - `7.2-debian-node`
 - `7.2-zts-debian-node`
 - `7.2-debug-debian-node`
+- `7.2dev-debian-node`
+- `7.2dev-zts-debian-node`
+- `7.2dev-debug-debian-node`
 - `7.3-debian-node`
 - `7.3-zts-debian-node`
 - `7.3-debug-debian-node`
+- `7.3dev-debian-node`
+- `7.3dev-zts-debian-node`
+- `7.3dev-debug-debian-node`
 - `7.4-debian-node`
 - `7.4-zts-debian-node`
 - `7.4-debug-debian-node`
+- `7.4dev-debian-node`
+- `7.4dev-zts-debian-node`
+- `7.4dev-debug-debian-node`
 - `8.0-debian-node` `latest-debian-node`
 - `8.0-zts-debian-node` `latest-zts-debian-node`
 - `8.0-debug-debian-node` `latest-debug-debian-node`
+- `8.0dev-debian-node` `latestdev-debian-node`
+- `8.0dev-zts-debian-node` `latestdev-zts-debian-node`
+- `8.0dev-debug-debian-node` `latestdev-debug-debian-node`
 - `8.1-debian-node`
 - `8.1-zts-debian-node`
 - `8.1-debug-debian-node`
-- `8.2-debian-node`
-- `8.2-zts-debian-node`
-- `8.2-debug-debian-node`
+- `8.1dev-debian-node`
+- `8.1dev-zts-debian-node`
+- `8.1dev-debug-debian-node`
+- `8.2dev-debian-node`
+- `8.2dev-zts-debian-node`
+- `8.2dev-debug-debian-node`
 - `7.2-selenium` `7.2-alpine-selenium`
 - `7.2-zts-selenium` `7.2-zts-alpine-selenium`
 - `7.2-debug-selenium` `7.2-debug-alpine-selenium`
+- `7.2dev-selenium` `7.2dev-alpine-selenium`
+- `7.2dev-zts-selenium` `7.2dev-zts-alpine-selenium`
+- `7.2dev-debug-selenium` `7.2dev-debug-alpine-selenium`
 - `7.3-selenium` `7.3-alpine-selenium`
 - `7.3-zts-selenium` `7.3-zts-alpine-selenium`
 - `7.3-debug-selenium` `7.3-debug-alpine-selenium`
+- `7.3dev-selenium` `7.3dev-alpine-selenium`
+- `7.3dev-zts-selenium` `7.3dev-zts-alpine-selenium`
+- `7.3dev-debug-selenium` `7.3dev-debug-alpine-selenium`
 - `7.4-selenium` `7.4-alpine-selenium`
 - `7.4-zts-selenium` `7.4-zts-alpine-selenium`
 - `7.4-debug-selenium` `7.4-debug-alpine-selenium`
+- `7.4dev-selenium` `7.4dev-alpine-selenium`
+- `7.4dev-zts-selenium` `7.4dev-zts-alpine-selenium`
+- `7.4dev-debug-selenium` `7.4dev-debug-alpine-selenium`
 - `8.0-selenium` `8.0-alpine-selenium` `latest-selenium` `latest-alpine-selenium`
 - `8.0-zts-selenium` `8.0-zts-alpine-selenium` `latest-zts-selenium` `latest-zts-alpine-selenium`
 - `8.0-debug-selenium` `8.0-debug-alpine-selenium` `latest-debug-selenium` `latest-debug-alpine-selenium`
+- `8.0dev-selenium` `8.0dev-alpine-selenium` `latestdev-selenium` `latestdev-alpine-selenium`
+- `8.0dev-zts-selenium` `8.0dev-zts-alpine-selenium` `latestdev-zts-selenium` `latestdev-zts-alpine-selenium`
+- `8.0dev-debug-selenium` `8.0dev-debug-alpine-selenium` `latestdev-debug-selenium` `latestdev-debug-alpine-selenium`
 - `8.1-selenium` `8.1-alpine-selenium`
 - `8.1-zts-selenium` `8.1-zts-alpine-selenium`
 - `8.1-debug-selenium` `8.1-debug-alpine-selenium`
-- `8.2-selenium` `8.2-alpine-selenium`
-- `8.2-zts-selenium` `8.2-zts-alpine-selenium`
-- `8.2-debug-selenium` `8.2-debug-alpine-selenium`
+- `8.1dev-selenium` `8.1dev-alpine-selenium`
+- `8.1dev-zts-selenium` `8.1dev-zts-alpine-selenium`
+- `8.1dev-debug-selenium` `8.1dev-debug-alpine-selenium`
+- `8.2dev-selenium` `8.2dev-alpine-selenium`
+- `8.2dev-zts-selenium` `8.2dev-zts-alpine-selenium`
+- `8.2dev-debug-selenium` `8.2dev-debug-alpine-selenium`
 - `7.2-debian-selenium`
 - `7.2-zts-debian-selenium`
 - `7.2-debug-debian-selenium`
+- `7.2dev-debian-selenium`
+- `7.2dev-zts-debian-selenium`
+- `7.2dev-debug-debian-selenium`
 - `7.3-debian-selenium`
 - `7.3-zts-debian-selenium`
 - `7.3-debug-debian-selenium`
+- `7.3dev-debian-selenium`
+- `7.3dev-zts-debian-selenium`
+- `7.3dev-debug-debian-selenium`
 - `7.4-debian-selenium`
 - `7.4-zts-debian-selenium`
 - `7.4-debug-debian-selenium`
+- `7.4dev-debian-selenium`
+- `7.4dev-zts-debian-selenium`
+- `7.4dev-debug-debian-selenium`
 - `8.0-debian-selenium` `latest-debian-selenium`
 - `8.0-zts-debian-selenium` `latest-zts-debian-selenium`
 - `8.0-debug-debian-selenium` `latest-debug-debian-selenium`
+- `8.0dev-debian-selenium` `latestdev-debian-selenium`
+- `8.0dev-zts-debian-selenium` `latestdev-zts-debian-selenium`
+- `8.0dev-debug-debian-selenium` `latestdev-debug-debian-selenium`
 - `8.1-debian-selenium`
 - `8.1-zts-debian-selenium`
 - `8.1-debug-debian-selenium`
-- `8.2-debian-selenium`
-- `8.2-zts-debian-selenium`
-- `8.2-debug-debian-selenium`
+- `8.1dev-debian-selenium`
+- `8.1dev-zts-debian-selenium`
+- `8.1dev-debug-debian-selenium`
+- `8.2dev-debian-selenium`
+- `8.2dev-zts-debian-selenium`
+- `8.2dev-debug-debian-selenium`
 
 ## Running Locally
 
