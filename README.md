@@ -19,6 +19,9 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1` `8.1-alpine`
 - `8.1-zts` `8.1-zts-alpine`
 - `8.1-debug` `8.1-debug-alpine`
+- `8.2` `8.2-alpine`
+- `8.2-zts` `8.2-zts-alpine`
+- `8.2-debug` `8.2-debug-alpine`
 - `7.2-debian`
 - `7.2-zts-debian`
 - `7.2-debug-debian`
@@ -34,6 +37,9 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1-debian`
 - `8.1-zts-debian`
 - `8.1-debug-debian`
+- `8.2-debian`
+- `8.2-zts-debian`
+- `8.2-debug-debian`
 - `7.2-node` `7.2-alpine-node`
 - `7.2-zts-node` `7.2-zts-alpine-node`
 - `7.2-debug-node` `7.2-debug-alpine-node`
@@ -49,6 +55,9 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1-node` `8.1-alpine-node`
 - `8.1-zts-node` `8.1-zts-alpine-node`
 - `8.1-debug-node` `8.1-debug-alpine-node`
+- `8.2-node` `8.2-alpine-node`
+- `8.2-zts-node` `8.2-zts-alpine-node`
+- `8.2-debug-node` `8.2-debug-alpine-node`
 - `7.2-debian-node`
 - `7.2-zts-debian-node`
 - `7.2-debug-debian-node`
@@ -64,6 +73,9 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1-debian-node`
 - `8.1-zts-debian-node`
 - `8.1-debug-debian-node`
+- `8.2-debian-node`
+- `8.2-zts-debian-node`
+- `8.2-debug-debian-node`
 - `7.2-selenium` `7.2-alpine-selenium`
 - `7.2-zts-selenium` `7.2-zts-alpine-selenium`
 - `7.2-debug-selenium` `7.2-debug-alpine-selenium`
@@ -79,6 +91,9 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1-selenium` `8.1-alpine-selenium`
 - `8.1-zts-selenium` `8.1-zts-alpine-selenium`
 - `8.1-debug-selenium` `8.1-debug-alpine-selenium`
+- `8.2-selenium` `8.2-alpine-selenium`
+- `8.2-zts-selenium` `8.2-zts-alpine-selenium`
+- `8.2-debug-selenium` `8.2-debug-alpine-selenium`
 - `7.2-debian-selenium`
 - `7.2-zts-debian-selenium`
 - `7.2-debug-debian-selenium`
@@ -94,6 +109,9 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1-debian-selenium`
 - `8.1-zts-debian-selenium`
 - `8.1-debug-debian-selenium`
+- `8.2-debian-selenium`
+- `8.2-zts-debian-selenium`
+- `8.2-debug-debian-selenium`
 
 ## Running Locally
 

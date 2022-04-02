@@ -47,6 +47,9 @@ jobs:
           - "8.1-alpine"
           - "8.1-zts-alpine"
           - "8.1-debug-alpine"
+          - "8.2-alpine"
+          - "8.2-zts-alpine"
+          - "8.2-debug-alpine"
           - "7.2-debian"
           - "7.2-zts-debian"
           - "7.2-debug-debian"
@@ -62,6 +65,9 @@ jobs:
           - "8.1-debian"
           - "8.1-zts-debian"
           - "8.1-debug-debian"
+          - "8.2-debian"
+          - "8.2-zts-debian"
+          - "8.2-debug-debian"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -78,8 +84,10 @@ jobs:
           export PHPSRC_BRANCH="$(git ls-remote 'https://github.com/php/php-src.git' | grep -iE '\srefs/heads/PHP-8\.0$' | sort -k2 -V | tee /dev/stderr | awk 'END{print $NF}' | sed -E 's~^refs/[^/]+/~~')"
           ; elif [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ]; then
           export PHPSRC_BRANCH="$(git ls-remote 'https://github.com/php/php-src.git' | grep -iE '\srefs/heads/PHP-8\.1$' | sort -k2 -V | tee /dev/stderr | awk 'END{print $NF}' | sed -E 's~^refs/[^/]+/~~')"
+          ; elif [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debian" ] || [ "${{ matrix.imageName }}" == "8.2-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debug-debian" ]; then
+          export PHPSRC_BRANCH="$(git ls-remote 'https://github.com/php/php-src.git' | grep -iE '\srefs/heads/master$' | sort -k2 -V | tee /dev/stderr | awk 'END{print $NF}' | sed -E 's~^refs/[^/]+/~~')"
           ; fi
-          && if [ "${{ matrix.imageName }}" == "7.2-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-debian" ] || [ "${{ matrix.imageName }}" == "7.2-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.2-debug-debian" ] || [ "${{ matrix.imageName }}" == "7.3-debian" ] || [ "${{ matrix.imageName }}" == "7.3-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.3-debug-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ]; then
+          && if [ "${{ matrix.imageName }}" == "7.2-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-debian" ] || [ "${{ matrix.imageName }}" == "7.2-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.2-debug-debian" ] || [ "${{ matrix.imageName }}" == "7.3-debian" ] || [ "${{ matrix.imageName }}" == "7.3-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.3-debug-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debian" ] || [ "${{ matrix.imageName }}" == "8.2-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debug-debian" ]; then
           git clone --depth 1 'https://github.com/php/php-src.git' -b "$PHPSRC_BRANCH" phpsrc
           ; fi
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
@@ -94,7 +102,7 @@ jobs:
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && if [ "${{ matrix.imageName }}" == "7.2-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-debian" ] || [ "${{ matrix.imageName }}" == "7.2-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.2-debug-debian" ] || [ "${{ matrix.imageName }}" == "7.3-debian" ] || [ "${{ matrix.imageName }}" == "7.3-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.3-debug-debian" ]; then
           git tag php-1.0 && ./makedist 1.0 > /dev/null && mv php-1.0.tar.xz php.tar.xz
-          ; elif [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debian" ] || [ "${{ matrix.imageName }}" == "8.2-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debug-debian" ]; then
           scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
           ; fi
           && git add . -N && git diff --diff-filter=d "$PHPSRC_COMMIT"
@@ -109,9 +117,9 @@ jobs:
           echo '{ "7.3": { "url": "x", "variants": [ "alpine3.15/cli" ], "version": "7.3.99" } }' > versions.json
           ; elif [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ]; then
           echo '{ "7.3": { "url": "x", "variants": [ "alpine3.15/zts" ], "version": "7.3.99" } }' > versions.json
-          ; elif [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ]; then
           echo '{ "7.4": { "url": "x", "variants": [ "alpine3.15/cli" ], "version": "7.4.99" } }' > versions.json
-          ; elif [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ]; then
           echo '{ "7.4": { "url": "x", "variants": [ "alpine3.15/zts" ], "version": "7.4.99" } }' > versions.json
           ; elif [ "${{ matrix.imageName }}" == "7.2-debian" ] || [ "${{ matrix.imageName }}" == "7.2-debug-debian" ]; then
           echo '{ "7.2": { "url": "x", "variants": [ "bullseye/cli" ], "version": "7.2.99" } }' > versions.json
@@ -121,9 +129,9 @@ jobs:
           echo '{ "7.3": { "url": "x", "variants": [ "bullseye/cli" ], "version": "7.3.99" } }' > versions.json
           ; elif [ "${{ matrix.imageName }}" == "7.3-zts-debian" ]; then
           echo '{ "7.3": { "url": "x", "variants": [ "bullseye/zts" ], "version": "7.3.99" } }' > versions.json
-          ; elif [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debug-debian" ]; then
           echo '{ "7.4": { "url": "x", "variants": [ "bullseye/cli" ], "version": "7.4.99" } }' > versions.json
-          ; elif [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.2-zts-debian" ]; then
           echo '{ "7.4": { "url": "x", "variants": [ "bullseye/zts" ], "version": "7.4.99" } }' > versions.json
           ; fi
           && git apply -v ../fix-dlphp-strip-pr1280.patch
@@ -136,9 +144,9 @@ jobs:
           mv 7.3/alpine3.15/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ]; then
           mv 7.3/alpine3.15/zts/ img
-          ; elif [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ]; then
           mv 7.4/alpine3.15/cli/ img
-          ; elif [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ]; then
           mv 7.4/alpine3.15/zts/ img
           ; elif [ "${{ matrix.imageName }}" == "7.2-debian" ] || [ "${{ matrix.imageName }}" == "7.2-debug-debian" ]; then
           mv 7.2/bullseye/cli/ img
@@ -148,9 +156,9 @@ jobs:
           mv 7.3/bullseye/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "7.3-zts-debian" ]; then
           mv 7.3/bullseye/zts/ img
-          ; elif [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debug-debian" ]; then
           mv 7.4/bullseye/cli/ img
-          ; elif [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
+          ; elif [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.2-zts-debian" ]; then
           mv 7.4/bullseye/zts/ img
           ; fi
           && cd img && mv ../../phpsrc/php.tar.xz .
@@ -159,13 +167,13 @@ jobs:
           && sed -E 's~^(ENV (GPG_KEYS|PHP_URL|PHP_ASC_URL|PHP_SHA256)[ =]).*~~' -i Dockerfile
           && sed -E 's~-n "\$(PHP_SHA256|PHP_ASC_URL)"~-n ""~' -i Dockerfile
           && sed -E 's~curl -fsSL -o php.tar.xz .*; ~~' -i Dockerfile
-          && if [ "${{ matrix.imageName }}" == "7.2-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ]; then
+          && if [ "${{ matrix.imageName }}" == "7.2-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ]; then
           sed -E 's~(--with-curl.*)( \\)~\1 --enable-embed\2~' -i Dockerfile
           ; fi
-          && if [ "${{ matrix.imageName }}" == "7.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-debug-debian" ] || [ "${{ matrix.imageName }}" == "7.3-debug-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ]; then
+          && if [ "${{ matrix.imageName }}" == "7.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.3-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.2-debug-debian" ] || [ "${{ matrix.imageName }}" == "7.3-debug-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debug-debian" ]; then
           sed -E 's~(--with-curl.*)( \\)~\1 --enable-debug\2~' -i Dockerfile
           ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ]; then
+          && if [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debian" ] || [ "${{ matrix.imageName }}" == "8.2-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.2-debug-debian" ]; then
           sed -E 's~--enable-maintainer-zts~--enable-zts~' -i Dockerfile
           ; fi
           && git add . -N && git diff --diff-filter=d
@@ -249,6 +257,21 @@ jobs:
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.1-debug-alpine-base" || docker pull "$REGISTRY_IMAGE_NAME:8.1-debug-alpine-base") || true)
           && (docker build --cache-from "php:7.4-cli-alpine3.15" --cache-from "$REGISTRY_IMAGE_NAME:8.1-debug-alpine-base" -t "ci-target:base" ./
           || docker build --cache-from "php:7.4-cli-alpine3.15" --cache-from "$REGISTRY_IMAGE_NAME:8.1-debug-alpine-base" -t "ci-target:base" ./)
+          ; elif [ "${{ matrix.imageName }}" == "8.2-alpine" ]; then
+          ((docker pull "php:7.4-cli-alpine3.15" || docker pull "php:7.4-cli-alpine3.15") || true)
+          && ((docker pull "$REGISTRY_IMAGE_NAME:8.2-alpine-base" || docker pull "$REGISTRY_IMAGE_NAME:8.2-alpine-base") || true)
+          && (docker build --cache-from "php:7.4-cli-alpine3.15" --cache-from "$REGISTRY_IMAGE_NAME:8.2-alpine-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:7.4-cli-alpine3.15" --cache-from "$REGISTRY_IMAGE_NAME:8.2-alpine-base" -t "ci-target:base" ./)
+          ; elif [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ]; then
+          ((docker pull "php:7.4-zts-alpine3.15" || docker pull "php:7.4-zts-alpine3.15") || true)
+          && ((docker pull "$REGISTRY_IMAGE_NAME:8.2-zts-alpine-base" || docker pull "$REGISTRY_IMAGE_NAME:8.2-zts-alpine-base") || true)
+          && (docker build --cache-from "php:7.4-zts-alpine3.15" --cache-from "$REGISTRY_IMAGE_NAME:8.2-zts-alpine-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:7.4-zts-alpine3.15" --cache-from "$REGISTRY_IMAGE_NAME:8.2-zts-alpine-base" -t "ci-target:base" ./)
+          ; elif [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ]; then
+          ((docker pull "php:7.4-cli-alpine3.15" || docker pull "php:7.4-cli-alpine3.15") || true)
+          && ((docker pull "$REGISTRY_IMAGE_NAME:8.2-debug-alpine-base" || docker pull "$REGISTRY_IMAGE_NAME:8.2-debug-alpine-base") || true)
+          && (docker build --cache-from "php:7.4-cli-alpine3.15" --cache-from "$REGISTRY_IMAGE_NAME:8.2-debug-alpine-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:7.4-cli-alpine3.15" --cache-from "$REGISTRY_IMAGE_NAME:8.2-debug-alpine-base" -t "ci-target:base" ./)
           ; elif [ "${{ matrix.imageName }}" == "7.2-debian" ]; then
           ((docker pull "php:7.2-cli-bullseye" || docker pull "php:7.2-cli-bullseye") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:7.2-debian-base" || docker pull "$REGISTRY_IMAGE_NAME:7.2-debian-base") || true)
@@ -324,6 +347,21 @@ jobs:
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.1-debug-debian-base" || docker pull "$REGISTRY_IMAGE_NAME:8.1-debug-debian-base") || true)
           && (docker build --cache-from "php:7.4-cli-bullseye" --cache-from "$REGISTRY_IMAGE_NAME:8.1-debug-debian-base" -t "ci-target:base" ./
           || docker build --cache-from "php:7.4-cli-bullseye" --cache-from "$REGISTRY_IMAGE_NAME:8.1-debug-debian-base" -t "ci-target:base" ./)
+          ; elif [ "${{ matrix.imageName }}" == "8.2-debian" ]; then
+          ((docker pull "php:7.4-cli-bullseye" || docker pull "php:7.4-cli-bullseye") || true)
+          && ((docker pull "$REGISTRY_IMAGE_NAME:8.2-debian-base" || docker pull "$REGISTRY_IMAGE_NAME:8.2-debian-base") || true)
+          && (docker build --cache-from "php:7.4-cli-bullseye" --cache-from "$REGISTRY_IMAGE_NAME:8.2-debian-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:7.4-cli-bullseye" --cache-from "$REGISTRY_IMAGE_NAME:8.2-debian-base" -t "ci-target:base" ./)
+          ; elif [ "${{ matrix.imageName }}" == "8.2-zts-debian" ]; then
+          ((docker pull "php:7.4-zts-bullseye" || docker pull "php:7.4-zts-bullseye") || true)
+          && ((docker pull "$REGISTRY_IMAGE_NAME:8.2-zts-debian-base" || docker pull "$REGISTRY_IMAGE_NAME:8.2-zts-debian-base") || true)
+          && (docker build --cache-from "php:7.4-zts-bullseye" --cache-from "$REGISTRY_IMAGE_NAME:8.2-zts-debian-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:7.4-zts-bullseye" --cache-from "$REGISTRY_IMAGE_NAME:8.2-zts-debian-base" -t "ci-target:base" ./)
+          ; elif [ "${{ matrix.imageName }}" == "8.2-debug-debian" ]; then
+          ((docker pull "php:7.4-cli-bullseye" || docker pull "php:7.4-cli-bullseye") || true)
+          && ((docker pull "$REGISTRY_IMAGE_NAME:8.2-debug-debian-base" || docker pull "$REGISTRY_IMAGE_NAME:8.2-debug-debian-base") || true)
+          && (docker build --cache-from "php:7.4-cli-bullseye" --cache-from "$REGISTRY_IMAGE_NAME:8.2-debug-debian-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:7.4-cli-bullseye" --cache-from "$REGISTRY_IMAGE_NAME:8.2-debug-debian-base" -t "ci-target:base" ./)
           ; fi
 
       - name: 'Target "basic" - build'
@@ -553,6 +591,33 @@ jobs:
           && dtp "node" "8.1-debug-alpine-node"
           && dtp "selenium" "8.1-debug-selenium"
           && dtp "selenium" "8.1-debug-alpine-selenium"
+          ; elif [ "${{ matrix.imageName }}" == "8.2-alpine" ]; then
+          dtp "base" "8.2-base"
+          && dtp "base" "8.2-alpine-base"
+          && dtp "basic" "8.2"
+          && dtp "basic" "8.2-alpine"
+          && dtp "node" "8.2-node"
+          && dtp "node" "8.2-alpine-node"
+          && dtp "selenium" "8.2-selenium"
+          && dtp "selenium" "8.2-alpine-selenium"
+          ; elif [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ]; then
+          dtp "base" "8.2-zts-base"
+          && dtp "base" "8.2-zts-alpine-base"
+          && dtp "basic" "8.2-zts"
+          && dtp "basic" "8.2-zts-alpine"
+          && dtp "node" "8.2-zts-node"
+          && dtp "node" "8.2-zts-alpine-node"
+          && dtp "selenium" "8.2-zts-selenium"
+          && dtp "selenium" "8.2-zts-alpine-selenium"
+          ; elif [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ]; then
+          dtp "base" "8.2-debug-base"
+          && dtp "base" "8.2-debug-alpine-base"
+          && dtp "basic" "8.2-debug"
+          && dtp "basic" "8.2-debug-alpine"
+          && dtp "node" "8.2-debug-node"
+          && dtp "node" "8.2-debug-alpine-node"
+          && dtp "selenium" "8.2-debug-selenium"
+          && dtp "selenium" "8.2-debug-alpine-selenium"
           ; elif [ "${{ matrix.imageName }}" == "7.2-debian" ]; then
           dtp "base" "7.2-debian-base"
           && dtp "basic" "7.2-debian"
@@ -640,4 +705,19 @@ jobs:
           && dtp "basic" "8.1-debug-debian"
           && dtp "node" "8.1-debug-debian-node"
           && dtp "selenium" "8.1-debug-debian-selenium"
+          ; elif [ "${{ matrix.imageName }}" == "8.2-debian" ]; then
+          dtp "base" "8.2-debian-base"
+          && dtp "basic" "8.2-debian"
+          && dtp "node" "8.2-debian-node"
+          && dtp "selenium" "8.2-debian-selenium"
+          ; elif [ "${{ matrix.imageName }}" == "8.2-zts-debian" ]; then
+          dtp "base" "8.2-zts-debian-base"
+          && dtp "basic" "8.2-zts-debian"
+          && dtp "node" "8.2-zts-debian-node"
+          && dtp "selenium" "8.2-zts-debian-selenium"
+          ; elif [ "${{ matrix.imageName }}" == "8.2-debug-debian" ]; then
+          dtp "base" "8.2-debug-debian-base"
+          && dtp "basic" "8.2-debug-debian"
+          && dtp "node" "8.2-debug-debian-node"
+          && dtp "selenium" "8.2-debug-debian-selenium"
           ; fi

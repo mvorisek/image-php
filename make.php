@@ -21,6 +21,10 @@ $phpVersionsFromSource = [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/PHP-8\.1' /* use tags once PHP 8.1.5 is released */,
         'forkPhpVersion' => '7.4' /* use 8.1 once https://github.com/docker-library/php/pull/1076 is released */, 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
+    '8.2' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
+        'forkPhpVersion' => '7.4' /* use 8.1 once https://github.com/docker-library/php/pull/1076 is released */, 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+    ],
 ];
 $osNames = ['alpine', 'debian'];
 $targetNames = ['basic', 'node', 'selenium'];
@@ -126,7 +130,7 @@ RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://gi
     'redis',
     'sockets',
     'tidy',
-    'xdebug',
+    in_array($phpVersion, ['8.2'], true) ? 'xdebug/xdebug@a08cd4a294d8ab49acb38abc32e1203596cad1b8' : 'xdebug',
     'xsl',
     'zip',
 ]) . ($osName === 'alpine' ? ' \
@@ -154,7 +158,7 @@ RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) us
     '"$(find /usr/local/lib/php/extensions -name xdebug.so)"'
 ])) . '
 RUN composer diagnose
-RUN mkdir t && (cd t && composer require phpunit/phpunit) && rm -r t/
+RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.2'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.1 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
 
 
 FROM basic as node
