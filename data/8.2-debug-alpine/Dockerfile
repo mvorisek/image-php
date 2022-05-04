@@ -5,8 +5,10 @@ RUN apk update \
     && apk upgrade \
     && apk add bash git make unzip gnupg ca-certificates coreutils gdb \
     && rm -rf /var/cache/apk/* \
-    && git config --system url."https://github.com/".insteadOf "git@github.com:" \
-    && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
+    && git config --system --add url."https://github.com/".insteadOf "git@github.com:" \
+    && git config --system --add url."https://github.com/".insteadOf "ssh://git@github.com/" \
+    # fix git repository directory is owned by someone else for Github Actions
+    && { echo '#!/bin/sh'; echo 'if [ -n "$GITHUB_WORKSPACE" ] && [ "$(id -u)" -eq 0 ]; then'; echo '    (cd / && /usr/bin/git config --global --add safe.directory "$GITHUB_WORKSPACE")'; echo 'fi'; echo '/usr/bin/git "$@"'; } > /usr/local/bin/git && chmod +x /usr/local/bin/git
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/

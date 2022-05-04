@@ -104,8 +104,11 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
         ...['alpine' => ['coreutils'], 'debian' => ['apt-utils', 'apt-transport-https', 'netcat']][$osName],
         ...($isDebug ? ['gdb'] : []),
     ]) . ' \
-    && git config --system url."https://github.com/".insteadOf "git@github.com:" \
-    && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
+    && git config --system --add url."https://github.com/".insteadOf "git@github.com:" \
+    && git config --system --add url."https://github.com/".insteadOf "ssh://git@github.com/" \
+    # fix git repository directory is owned by someone else for Github Actions' . /*
+    see https://github.com/actions/checkout/issues/766, remove once fixed officially */ '
+    && { echo \'#!/bin/sh\'; echo \'if [ -n "$GITHUB_WORKSPACE" ] && [ "$(id -u)" -eq 0 ]; then\'; echo \'    (cd / && /usr/bin/git config --global --add safe.directory "$GITHUB_WORKSPACE")\'; echo \'fi\'; echo \'/usr/bin/git "$@"\'; } > /usr/local/bin/git && chmod +x /usr/local/bin/git
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/

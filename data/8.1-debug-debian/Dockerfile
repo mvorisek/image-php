@@ -6,8 +6,10 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
     && apt-get -y upgrade \
     && apt-get -y install bash git make unzip gnupg ca-certificates apt-utils apt-transport-https netcat gdb \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && git config --system url."https://github.com/".insteadOf "git@github.com:" \
-    && git config --system url."https://github.com/".insteadOf "ssh://git@github.com/"
+    && git config --system --add url."https://github.com/".insteadOf "git@github.com:" \
+    && git config --system --add url."https://github.com/".insteadOf "ssh://git@github.com/" \
+    # fix git repository directory is owned by someone else for Github Actions
+    && { echo '#!/bin/sh'; echo 'if [ -n "$GITHUB_WORKSPACE" ] && [ "$(id -u)" -eq 0 ]; then'; echo '    (cd / && /usr/bin/git config --global --add safe.directory "$GITHUB_WORKSPACE")'; echo 'fi'; echo '/usr/bin/git "$@"'; } > /usr/local/bin/git && chmod +x /usr/local/bin/git
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
