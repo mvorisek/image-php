@@ -14,16 +14,16 @@ $phpVersionsFromSource = [
         'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
     '8.0' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/PHP-8\.0' /* use tags once PHP 8.0.18 is released */,
-        'forkPhpVersion' => '7.4' /* use 8.0 once https://github.com/docker-library/php/pull/1076 is released */, 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.0\.[0-9]+',
+        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
     '8.1' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/PHP-8\.1' /* use tags once PHP 8.1.5 is released */,
-        'forkPhpVersion' => '7.4' /* use 8.1 once https://github.com/docker-library/php/pull/1076 is released */, 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
+        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
     '8.2' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-        'forkPhpVersion' => '7.4' /* use 8.1 once https://github.com/docker-library/php/pull/1076 is released */, 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
     ],
 ];
 $osNames = ['alpine', 'debian'];
@@ -137,7 +137,7 @@ RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://gi
     'xsl',
     'zip',
 ]) . ($osName === 'alpine' ? ' \
-    # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://github.com/mlocati/docker-php-extension-installer/issues/519 is fixed
+    # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
     && rm /usr/bin/gs' : '') . ' \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
     && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -rf /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
@@ -327,10 +327,6 @@ jobs:
 }) . '
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     return strpos($imageName, '-debug-') === false ? null : 'sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-debug\2~\' -i Dockerfile';
-}) . '
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    // remove once https://github.com/docker-library/php/pull/1076 is released
-    return in_array($phpVersion, ['7.2', '7.3', '7.4'], true) ? null : 'sed -E \'s~--enable-maintainer-zts~--enable-zts~\' -i Dockerfile';
 }) . '
           && git add . -N && git diff --diff-filter=d
 
