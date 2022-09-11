@@ -32,7 +32,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     redis \
     sockets \
     tidy \
-    xdebug/xdebug@a08cd4a294 \
+    xdebug \
     xsl \
     zip \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
@@ -57,7 +57,7 @@ RUN readelf -S /usr/local/bin/php | grep -q ' \.symtab ' \
     && readelf -S "$(find /usr/local/lib/php/extensions -name bcmath.so)" | grep -q ' \.symtab ' \
     && readelf -S "$(find /usr/local/lib/php/extensions -name xdebug.so)" | grep -q ' \.symtab '
 RUN composer diagnose
-RUN mkdir t && (cd t && echo '{}' > composer.json && composer config platform.php 8.1 && composer require phpunit/phpunit) && rm -r t/
+RUN mkdir t && (cd t && composer require phpunit/phpunit) && rm -r t/
 
 
 FROM basic as node

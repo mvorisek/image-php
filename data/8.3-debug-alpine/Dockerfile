@@ -3,7 +3,7 @@ FROM ci-target:base as basic
 # install basic system tools
 RUN apk update \
     && apk upgrade \
-    && apk add bash git make unzip gnupg ca-certificates coreutils \
+    && apk add bash git make unzip gnupg ca-certificates coreutils gdb \
     && rm -rf /var/cache/apk/* \
     && git config --system --add url."https://github.com/".insteadOf "git@github.com:" \
     && git config --system --add url."https://github.com/".insteadOf "ssh://git@github.com/" \
@@ -32,7 +32,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     redis \
     sockets \
     tidy \
-    xdebug \
+    xdebug/xdebug@f8cd33609c \
     xsl \
     zip \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
@@ -48,16 +48,16 @@ FROM basic as basic__test
 RUN php --version
 COPY test.php ./
 RUN (/usr/lib/oracle/setup.sh || true) && php test.php
-RUN php -n -r 'exit(!ZEND_DEBUG_BUILD ? 0 : 1);'
+RUN php -n -r 'exit(ZEND_DEBUG_BUILD ? 0 : 1);'
 RUN apk update \
     && apk add binutils \
     && rm -rf /var/cache/apk/*
-RUN ! readelf -S /usr/local/bin/php | grep -q ' \.symtab ' \
-    && ! readelf -S /usr/local/lib/libphp.so | grep -q ' \.symtab ' \
-    && ! readelf -S "$(find /usr/local/lib/php/extensions -name bcmath.so)" | grep -q ' \.symtab ' \
-    && ! readelf -S "$(find /usr/local/lib/php/extensions -name xdebug.so)" | grep -q ' \.symtab '
+RUN readelf -S /usr/local/bin/php | grep -q ' \.symtab ' \
+    && readelf -S /usr/local/lib/libphp.so | grep -q ' \.symtab ' \
+    && readelf -S "$(find /usr/local/lib/php/extensions -name bcmath.so)" | grep -q ' \.symtab ' \
+    && readelf -S "$(find /usr/local/lib/php/extensions -name xdebug.so)" | grep -q ' \.symtab '
 RUN composer diagnose
-RUN mkdir t && (cd t && composer require phpunit/phpunit) && rm -r t/
+RUN mkdir t && (cd t && echo '{}' > composer.json && composer config platform.php 8.2 && composer require phpunit/phpunit) && rm -r t/
 
 
 FROM basic as node

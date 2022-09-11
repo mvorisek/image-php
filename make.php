@@ -7,26 +7,30 @@ namespace Mvorisek\Docker\ImagePhp;
 $phpVersionsFromSource = [
     '7.4' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.4\.[0-9]+',
-        'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye'], 'forkRepoCommit' => '7388e44e40',
+        'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'], 'forkRepoCommit' => '7388e44e40',
     ],
     '8.0' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.0\.[0-9]+',
-        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye'],
+        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'],
     ],
     '8.1' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
-        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye'],
+        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.17', 'debian' => 'bullseye'],
     ],
     '8.2' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.2\.[0-9]+',
-        'forkPhpVersion' => '8.2-rc', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye'],
+        'forkPhpVersion' => '8.2-rc', 'forkOsName' => ['alpine' => 'alpine3.17', 'debian' => 'bullseye'],
+    ],
+    '8.3' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
+        'forkPhpVersion' => '8.2-rc', 'forkOsName' => ['alpine' => 'alpine3.17', 'debian' => 'bullseye']
     ],
 ];
 $osNames = ['alpine', 'debian'];
 $targetNames = ['basic', 'node', 'selenium'];
 
 $aliasesPhpVersions = [
-    '8.0' => ['latest'],
+    '8.1' => ['latest'],
 ];
 $defaultOs = 'alpine';
 
@@ -129,7 +133,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
         'redis',
         'sockets',
         'tidy',
-        in_array($phpVersion, ['8.2'], true) ? 'xdebug/xdebug@a08cd4a294' : 'xdebug',
+        in_array($phpVersion, ['8.3'], true) ? 'xdebug/xdebug@f8cd33609c' : 'xdebug',
         'xsl',
         'zip',
     ]) . ($osName === 'alpine' ? ' \
@@ -157,7 +161,7 @@ RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) us
         '"$(find /usr/local/lib/php/extensions -name xdebug.so)"',
     ])) . '
 RUN composer diagnose
-RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.2'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.1 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
+RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.3'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.2 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
 
 
 FROM basic as node
