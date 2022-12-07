@@ -1,29 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
+namespace Mvorisek\Docker\ImagePhp;
+
 $phpVersionsFromSource = [
-    '7.2' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.2\.[0-9]+',
-        'forkPhpVersion' => '7.2', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
-    ],
-    '7.3' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.3\.[0-9]+',
-        'forkPhpVersion' => '7.3', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
-    ],
     '7.4' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.4\.[0-9]+',
-        'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+        'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye'], 'forkRepoCommit' => '7388e44e40',
     ],
     '8.0' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.0\.[0-9]+',
-        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye'],
     ],
     '8.1' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
-        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye'],
     ],
     '8.2' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye']
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.2\.[0-9]+',
+        'forkPhpVersion' => '8.2-rc', 'forkOsName' => ['alpine' => 'alpine3.15', 'debian' => 'bullseye'],
     ],
 ];
 $osNames = ['alpine', 'debian'];
@@ -112,31 +108,31 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN IPE_GD_WITHOUTAVIF=1' /* AVIF support needs slow compilation, see https://github.com/mlocati/docker-php-extension-installer/issues/514, remove once the php images are based on Debian 12 */ . ' install-php-extensions \
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     ' . implode(' \\' . "\n" . '    ', [
-    'bcmath',
-    'exif',
-    'gd',
-    'gmp',
-    'igbinary',
-    'imagick',
-    'imap',
-    'intl',
-    'mysqli',
-    'oci8',
-    'opcache',
-    'pcntl',
-    'pdo_mysql',
-    'pdo_oci',
-    'pdo_pgsql',
-    'pdo_sqlsrv',
-    'redis',
-    'sockets',
-    'tidy',
-    in_array($phpVersion, ['8.2'], true) ? 'xdebug/xdebug@a08cd4a294d8ab49acb38abc32e1203596cad1b8' : 'xdebug',
-    'xsl',
-    'zip',
-]) . ($osName === 'alpine' ? ' \
+        'bcmath',
+        'exif',
+        'gd',
+        'gmp',
+        'igbinary',
+        'imagick',
+        'imap',
+        'intl',
+        'mysqli',
+        'oci8',
+        'opcache',
+        'pcntl',
+        'pdo_mysql',
+        'pdo_oci',
+        'pdo_pgsql',
+        'pdo_sqlsrv',
+        'redis',
+        'sockets',
+        'tidy',
+        in_array($phpVersion, ['8.2'], true) ? 'xdebug/xdebug@a08cd4a294' : 'xdebug',
+        'xsl',
+        'zip',
+    ]) . ($osName === 'alpine' ? ' \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
     && rm /usr/bin/gs' : '') . ' \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
@@ -153,13 +149,13 @@ RUN (/usr/lib/oracle/setup.sh || true) && php test.php
 RUN php -n -r \'exit(' . ($isDebug ? '' : '!') . 'ZEND_DEBUG_BUILD ? 0 : 1);\'
 RUN ' . $genPackageInstallCommand($osName, ['binutils']) . '
 RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) use ($isDebug) {
-    return ($isDebug ? '' : '! ') . 'readelf -S ' . $pathUnescaped . ' | grep -q \' \.symtab \'';
-}, [
-    '/usr/local/bin/php',
-    '/usr/local/lib/libphp' . (in_array($phpVersion, ['7.2', '7.3', '7.4'], true) ? '7' : '') . '.so',
-    '"$(find /usr/local/lib/php/extensions -name bcmath.so)"',
-    '"$(find /usr/local/lib/php/extensions -name xdebug.so)"'
-])) . '
+        return ($isDebug ? '' : '! ') . 'readelf -S ' . $pathUnescaped . ' | grep -q \' \.symtab \'';
+    }, [
+        '/usr/local/bin/php',
+        '/usr/local/lib/libphp' . (in_array($phpVersion, ['7.4'], true) ? '7' : '') . '.so',
+        '"$(find /usr/local/lib/php/extensions -name bcmath.so)"',
+        '"$(find /usr/local/lib/php/extensions -name xdebug.so)"',
+    ])) . '
 RUN composer diagnose
 RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.2'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.1 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
 
@@ -167,7 +163,8 @@ RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.2'], true) ? 'echo \'{}\'
 FROM basic as node
 
 # install Node JS with npm
-RUN ' . $genPackageInstallCommand($osName, ['nodejs', 'npm'])
+RUN ' . ($osName === 'debian' ? 'curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && ' : '') . $genPackageInstallCommand($osName, ['nodejs', ...($osName === 'debian' ? [/* fix nodejs and npm apt config, drop once we migrate to Debian 12/Bookworm */] : ['npm'])])
     . ($osName === 'debian' ? ' && npm install --global npm@latest' : '') . '
 
 FROM node as node__test
@@ -186,7 +183,7 @@ RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['chromium', 'chromium-c
 
 # install Firefox
 RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['firefox'], 'debian' => ['firefox-esr']][$osName]) . ' \
-    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
+    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 
@@ -214,6 +211,28 @@ RUN firefox --version
     }
 }
 
+// overcome Github Actions step code size limit, see https://github.com/github/feedback/discussions/12775
+$genBatchedStepCode = function (\Closure $gen) use ($imageNames, $phpVersionByImageName): string {
+    $codeParts = [];
+    foreach (array_unique($phpVersionByImageName) as $phpVersion) {
+        $imageNamesBatch = array_filter($imageNames, function ($imageName) use ($phpVersionByImageName, $phpVersion) {
+            return $phpVersionByImageName[$imageName] === $phpVersion;
+        });
+
+        $codeRaw = $gen($imageNamesBatch);
+        $code = preg_replace_callback('~( {6}- *name:[^\n]+)\'(?:\n {8}if: *(.+?))?(?=\n)~', function ($matches) use ($phpVersion, $imageNamesBatch) {
+            return $matches[1] . ' - ' . $phpVersion . '.x\'' . "\n"
+                . '        if: ' . (isset($matches[2]) ? '(' . $matches[2] . ') && ' : '') . '(' . (implode(' || ', array_map(function ($imageName) {
+                    return 'matrix.imageName == \'' . $imageName . '\'';
+                }, $imageNamesBatch)) ?: 'false') . ')';
+        }, $codeRaw);
+
+        $codeParts[] = $code;
+    }
+
+    return implode("\n\n", $codeParts);
+};
+
 $genRuntimeConditionalCode = function ($imageNames, \Closure $gen) use ($phpVersionByImageName, $isTsByImageName, $osNameByImageName): string {
     $imageNamesByCode = [];
     foreach ($imageNames as $imageName) {
@@ -232,7 +251,7 @@ $genRuntimeConditionalCode = function ($imageNames, \Closure $gen) use ($phpVers
     return implode("\n" . '          ; el', array_map(function ($code) use ($imageNamesByCode) {
         return 'if ' . implode(' || ', array_map(function ($imageName) {
             return '[ "${{ matrix.imageName }}" == "' . $imageName . '" ]';
-        }, $imageNamesByCode[$code])) . '; then' . "\n" . '          '. $code;
+        }, $imageNamesByCode[$code])) . '; then' . "\n" . '          ' . $code;
     }, array_keys($imageNamesByCode))) . (count($imageNamesByCode) === 0 ? 'true' : "\n" . '          ; fi');
 };
 
@@ -252,7 +271,7 @@ jobs:
       image: ghcr.io/mvorisek/image-php
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: "Check if files are in-sync"
         run: |
@@ -275,9 +294,9 @@ jobs:
 }, $imageNames)) . '
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: \'Build base image - clone & patch\'
+' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Build base image - clone & patch\'
         run: >-
           ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
     return 'export PHPSRC_BRANCH="$(git ls-remote \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' | grep -iE \'\s' . $phpVersionsFromSource[$phpVersion]['branchRegex'] . '$\' | sort -k2 -V | tee /dev/stderr | awk \'END{print $NF}\' | sed -E \'s~^refs/[^/]+/~~\')"';
@@ -287,29 +306,20 @@ jobs:
 }) . '
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return in_array($phpVersion, ['7.2'], true)
-        ? 'sed -E \'s~ --remote=\$PHPROOT ~ ~\' -i makedist && git -c user.name="a" -c user.email="a@a" commit -am "Fix makedist for PHP 7.2"'
-        : null;
-}) . '
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return in_array($phpVersion, ['7.2'], true) && $osName === 'alpine'
-        ? 'git apply -v ../fix-intl-php72-bug80310.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix intl ext build with ICU 68.1+ for PHP 7.2"'
-        : null;
-}) . '
           && git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read"' . /* remove once https://github.com/php/php-src/pull/8018 is merged & released */ '
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return in_array($phpVersion, ['7.2', '7.3'], true)
-        ? 'git tag php-1.0 && ./makedist 1.0 > /dev/null && mv php-1.0.tar.xz php.tar.xz'
-        : 'scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz';
-}) . '
+          && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
           && git add . -N && git diff --diff-filter=d "$PHPSRC_COMMIT"
           && cd ..
           && git clone https://github.com/docker-library/php.git dlphp && cd dlphp
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
+    return in_array($phpVersion, ['7.4'], true)
+        ? 'git checkout ' . $phpVersionsFromSource[$phpVersion]['forkRepoCommit']
+        : null;
+}) . '
           && rm -r [0-9].[0-9]*/ && sed -E \'s~( // )error\("missing GPG keys for " \+ env\.version\)~\1["x"]~\' -i Dockerfile-linux.template
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return 'echo \'{ "' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '": { "url": "x", "variants": [ "' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '" ], "version": "' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '.99" } }\' > versions.json';
+    return 'echo \'{ "' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '": { "url": "x", "variants": [ "' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '" ], "version": "' . preg_replace('~-rc\.$~', 'RC', $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '.') . '99" } }\' > versions.json';
 }) . '
           && git apply -v ../fix-dlphp-strip-pr1280.patch
           && ./apply-templates.sh
@@ -328,9 +338,9 @@ jobs:
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     return strpos($imageName, '-debug-') === false ? null : 'sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-debug\2~\' -i Dockerfile';
 }) . '
-          && git add . -N && git diff --diff-filter=d
+          && git add . -N && git diff --diff-filter=d') . '
 
-      - name: \'Build base image - build\'
+' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Build base image - build\'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           cd dlphp/img
@@ -346,17 +356,18 @@ jobs:
           && (' . implode("\n" . '          || ', array_fill(0, 2, 'docker build ' . implode(' ', array_map(function ($name) {
         return '--cache-from "' . $name . '"';
     }, $cacheFromImages)) . ' -t "ci-target:base" ./')) . ')';
-}) . '
+})) . '
 ' . implode("\n", array_map(function ($targetName) {
     $imageHashCmd = '$(docker inspect --format="{{.Id}}" "ci-target:' . $targetName . '")';
+
     return implode("\n", array_map(function ($targetName) {
-    return '
+        return '
       - name: \'Target "' . (substr($targetName, -6) === '__test' ? substr($targetName, 0, -6) . '" - test' : $targetName . '" - build') . '\'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           sed -i \'s~^[ \t]*~~\' data/${{ matrix.imageName }}/Dockerfile
           && (' . implode("\n" . '          || ', array_fill(0, 2, 'docker build -f data/${{ matrix.imageName }}/Dockerfile --target "' . $targetName . '" -t "ci-target:' . $targetName . '" ./')) . ')';
-}, [$targetName, $targetName . '__test'])) . '
+    }, [$targetName, $targetName . '__test'])) . '
 
       - name: \'Target "' . $targetName . '" - display layer sizes\'
         run: >-
@@ -365,13 +376,13 @@ jobs:
 }, $targetNames)) . '
 
       - name: Login to registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY_NAME }}
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: \'Push tags to registry\'
+' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Push tags to registry\'
         if: github.ref == \'refs/heads/master\'
         run: >-
           dtp() { docker tag "ci-target:$1" "$REGISTRY_IMAGE_NAME:$2" && docker push "$REGISTRY_IMAGE_NAME:$2"; }
@@ -381,10 +392,9 @@ jobs:
             return 'dtp "' . $targetName . '" "' . $imageTag . '"';
         }, $genImageTags($createFullName($imageName, $targetName)));
     }, ['base', ...$targetNames])));
-}) . '
+})) . '
 ';
 file_put_contents(__DIR__ . '/.github/workflows/ci.yml', $ciFile);
-
 
 $githubRepository = getenv('GITHUB_REPOSITORY') ?: 'mvorisek/image-php';
 $registryImageName = getenv('REGISTRY_IMAGE_NAME') ?: 'ghcr.io/' . $githubRepository;
@@ -401,7 +411,7 @@ This repository builds `' . $registryImageName . '` image and publishes the foll
     }, $genImageTags($imageNameFull)));
 }, array_merge(
     ...array_map(function ($targetName) use ($imageNames, $createFullName) {
-        return array_map(function($imageName) use ($createFullName, $targetName) {
+        return array_map(function ($imageName) use ($createFullName, $targetName) {
             return $createFullName($imageName, $targetName);
         }, $imageNames);
     }, $targetNames)

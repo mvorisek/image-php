@@ -4,12 +4,6 @@
 
 This repository builds `ghcr.io/mvorisek/image-php` image and publishes the following tags:
 
-- `7.2` `7.2-alpine`
-- `7.2-zts` `7.2-zts-alpine`
-- `7.2-debug` `7.2-debug-alpine`
-- `7.3` `7.3-alpine`
-- `7.3-zts` `7.3-zts-alpine`
-- `7.3-debug` `7.3-debug-alpine`
 - `7.4` `7.4-alpine`
 - `7.4-zts` `7.4-zts-alpine`
 - `7.4-debug` `7.4-debug-alpine`
@@ -22,12 +16,6 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.2` `8.2-alpine`
 - `8.2-zts` `8.2-zts-alpine`
 - `8.2-debug` `8.2-debug-alpine`
-- `7.2-debian`
-- `7.2-zts-debian`
-- `7.2-debug-debian`
-- `7.3-debian`
-- `7.3-zts-debian`
-- `7.3-debug-debian`
 - `7.4-debian`
 - `7.4-zts-debian`
 - `7.4-debug-debian`
@@ -40,12 +28,6 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.2-debian`
 - `8.2-zts-debian`
 - `8.2-debug-debian`
-- `7.2-node` `7.2-alpine-node`
-- `7.2-zts-node` `7.2-zts-alpine-node`
-- `7.2-debug-node` `7.2-debug-alpine-node`
-- `7.3-node` `7.3-alpine-node`
-- `7.3-zts-node` `7.3-zts-alpine-node`
-- `7.3-debug-node` `7.3-debug-alpine-node`
 - `7.4-node` `7.4-alpine-node`
 - `7.4-zts-node` `7.4-zts-alpine-node`
 - `7.4-debug-node` `7.4-debug-alpine-node`
@@ -58,12 +40,6 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.2-node` `8.2-alpine-node`
 - `8.2-zts-node` `8.2-zts-alpine-node`
 - `8.2-debug-node` `8.2-debug-alpine-node`
-- `7.2-debian-node`
-- `7.2-zts-debian-node`
-- `7.2-debug-debian-node`
-- `7.3-debian-node`
-- `7.3-zts-debian-node`
-- `7.3-debug-debian-node`
 - `7.4-debian-node`
 - `7.4-zts-debian-node`
 - `7.4-debug-debian-node`
@@ -76,12 +52,6 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.2-debian-node`
 - `8.2-zts-debian-node`
 - `8.2-debug-debian-node`
-- `7.2-selenium` `7.2-alpine-selenium`
-- `7.2-zts-selenium` `7.2-zts-alpine-selenium`
-- `7.2-debug-selenium` `7.2-debug-alpine-selenium`
-- `7.3-selenium` `7.3-alpine-selenium`
-- `7.3-zts-selenium` `7.3-zts-alpine-selenium`
-- `7.3-debug-selenium` `7.3-debug-alpine-selenium`
 - `7.4-selenium` `7.4-alpine-selenium`
 - `7.4-zts-selenium` `7.4-zts-alpine-selenium`
 - `7.4-debug-selenium` `7.4-debug-alpine-selenium`
@@ -94,12 +64,6 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.2-selenium` `8.2-alpine-selenium`
 - `8.2-zts-selenium` `8.2-zts-alpine-selenium`
 - `8.2-debug-selenium` `8.2-debug-alpine-selenium`
-- `7.2-debian-selenium`
-- `7.2-zts-debian-selenium`
-- `7.2-debug-debian-selenium`
-- `7.3-debian-selenium`
-- `7.3-zts-debian-selenium`
-- `7.3-debug-debian-selenium`
 - `7.4-debian-selenium`
 - `7.4-zts-debian-selenium`
 - `7.4-debug-debian-selenium`

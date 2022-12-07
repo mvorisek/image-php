@@ -1,5 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
+namespace Mvorisek\Docker\ImagePhp;
+
 $loadedExts = get_loaded_extensions();
 $missingExts = array_diff([
     'bcmath',
@@ -35,11 +39,13 @@ $missingExts = array_diff([
 
 if (count($missingExts) > 0) {
     echo 'TEST FAILED - missing php extensions: ' . implode(', ', $missingExts) . "\n";
+
     exit(1);
 }
 
 $xdebugConfPath = '/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini';
 if (!file_exists($xdebugConfPath) && in_array('xdebug', $loadedExts, true)) {
     echo 'TEST FAILED - missing xdebug configuration: ' . $xdebugConfPath . "\n";
+
     exit(1);
 }

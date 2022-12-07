@@ -13,7 +13,7 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions \
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     bcmath \
     exif \
     gd \
@@ -33,7 +33,7 @@ RUN IPE_GD_WITHOUTAVIF=1 install-php-extensions \
     redis \
     sockets \
     tidy \
-    xdebug/xdebug@a08cd4a294d8ab49acb38abc32e1203596cad1b8 \
+    xdebug/xdebug@a08cd4a294 \
     xsl \
     zip \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
@@ -62,8 +62,9 @@ RUN mkdir t && (cd t && echo '{}' > composer.json && composer config platform.ph
 FROM basic as node
 
 # install Node JS with npm
-RUN apt-get -y update \
-    && apt-get -y install nodejs npm \
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get -y update \
+    && apt-get -y install nodejs \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* && npm install --global npm@latest
 
 FROM node as node__test
@@ -88,7 +89,7 @@ RUN apt-get -y update \
 RUN apt-get -y update \
     && apt-get -y install firefox-esr \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
+    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 
