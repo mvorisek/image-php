@@ -12,7 +12,6 @@ RUN apk update \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN sed 's~rm -rf /tmp/pear~~' -i /usr/local/bin/install-php-extensions
 RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     bcmath \
     exif \
@@ -35,7 +34,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     tidy \
     xdebug \
     xsl \
-    zip || (cat /tmp/pear/temp/imagick/Imagick.stub.php && cat /tmp/pear/temp/imagick/ImagickKernel_arginfo.h && cat force-failure-unexistent) && (cat /tmp/pear/temp/imagick/Imagick.stub.php && cat /tmp/pear/temp/imagick/ImagickKernel_arginfo.h) \
+    zip \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
     && rm /usr/bin/gs \
     # pack Oracle Instant Client libs, reduce image size by 85 MB

@@ -13,7 +13,6 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN sed 's~rm -rf /tmp/pear~~' -i /usr/local/bin/install-php-extensions
 RUN git clone --depth 1 https://github.com/xdebug/xdebug.git -b master xdebug \
     && cd xdebug && git reset --hard 28f528d0ef \
     && sed 's~<max>8.2.99</max>~<max>8.3.0</max>~' -i package.xml

@@ -13,7 +13,6 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN sed 's~rm -rf /tmp/pear~~' -i /usr/local/bin/install-php-extensions
 RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     bcmath \
     exif \
