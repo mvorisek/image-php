@@ -107,33 +107,8 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 ' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     ' . implode(' \\' . "\n" . '    ', [
         'bcmath',
-        'exif',
-        'gd',
-        'gmp',
-        'igbinary',
         'imagick',
-        'imap',
-        'intl',
-        'mysqli',
-        'oci8',
-        'opcache',
-        'pcntl',
-        'pdo_mysql',
-        'pdo_oci',
-        'pdo_pgsql',
-        'pdo_sqlsrv',
-        'redis',
-        'sockets',
-        'tidy',
-        in_array($phpVersion, ['8.3'], true) ? '$(realpath xdebug)' : 'xdebug',
-        'xsl',
-        'zip',
-    ]) . ($osName === 'alpine' ? ' \
-    # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
-    && rm /usr/bin/gs' : '') . ' \
-    # pack Oracle Instant Client libs, reduce image size by 85 MB
-    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -rf /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
-    && { echo \'#!/bin/sh\'; echo \'if [ ! -d /usr/lib/oracle/*/client64 ]; then\'; echo \'    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz\'; echo \'fi\'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
+    ]) . '
 
 # install Composer
 RUN install-php-extensions @composer
@@ -141,7 +116,7 @@ RUN install-php-extensions @composer
 FROM basic as basic__test
 RUN php --version
 COPY test.php ./
-RUN (/usr/lib/oracle/setup.sh || true) && php test.php
+RUN php test.php
 RUN php -n -r \'exit(' . ($isDebug ? '' : '!') . 'ZEND_DEBUG_BUILD ? 0 : 1);\'
 RUN ' . $genPackageInstallCommand($osName, ['binutils']) . '
 RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) use ($isDebug) {
@@ -150,7 +125,6 @@ RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) us
         '/usr/local/bin/php',
         '/usr/local/lib/libphp' . (in_array($phpVersion, ['7.4'], true) ? '7' : '') . '.so',
         '"$(find /usr/local/lib/php/extensions -name bcmath.so)"',
-        '"$(find /usr/local/lib/php/extensions -name xdebug.so)"',
     ])) . '
 RUN composer diagnose
 RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.3'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.2 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
