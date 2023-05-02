@@ -101,6 +101,7 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+RUN sed \'s~rm -rf /tmp/pear~~\' -i /usr/local/bin/install-php-extensions
 ' . (in_array($phpVersion, ['8.3'], true) ? 'RUN git clone --depth 1 https://github.com/xdebug/xdebug.git -b master xdebug \
     && cd xdebug && git reset --hard 28f528d0ef \
     && sed \'s~<max>8.2.99</max>~<max>8.3.0</max>~\' -i package.xml
@@ -128,7 +129,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         in_array($phpVersion, ['8.3'], true) ? '$(realpath xdebug)' : 'xdebug',
         'xsl',
         'zip',
-    ]) . ($osName === 'alpine' ? ' \
+    ]) . ($osName === 'alpine' ? ' || (cat /tmp/pear/temp/imagick/Imagick.stub.php && cat /tmp/pear/temp/imagick/ImagickKernel_arginfo.h && cat force-failure-unexistent) && (cat /tmp/pear/temp/imagick/Imagick.stub.php && cat /tmp/pear/temp/imagick/ImagickKernel_arginfo.h) \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
     && rm /usr/bin/gs' : '') . ' \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
