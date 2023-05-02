@@ -1,4 +1,4 @@
-FROM ci-target:base as basic
+FROM ghcr.io/mvorisek/image-php:8.2-zts-debian-base as basic
 
 # install basic system tools
 RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \

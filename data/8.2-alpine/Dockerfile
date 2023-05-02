@@ -1,4 +1,4 @@
-FROM ci-target:base as basic
+FROM ghcr.io/mvorisek/image-php:8.2-base as basic
 
 # install basic system tools
 RUN apk update \
