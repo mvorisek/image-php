@@ -189,7 +189,9 @@ jobs:
           ; fi
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
-          && true
+          && if [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ]; then
+          sed -E 's~#if HAVE_OCILOBREAD2$~#if 1~' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine"
+          ; fi
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
           && git add . -N && git diff --diff-filter=d "$PHPSRC_COMMIT"
@@ -242,7 +244,9 @@ jobs:
           ; fi
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
-          && true
+          && if [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ]; then
+          sed -E 's~#if HAVE_OCILOBREAD2$~#if 1~' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine"
+          ; fi
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
           && git add . -N && git diff --diff-filter=d "$PHPSRC_COMMIT"
@@ -295,7 +299,9 @@ jobs:
           ; fi
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
-          && true
+          && if [ "${{ matrix.imageName }}" == "8.3-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debug-alpine" ]; then
+          sed -E 's~#if HAVE_OCILOBREAD2$~#if 1~' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine"
+          ; fi
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
           && git add . -N && git diff --diff-filter=d "$PHPSRC_COMMIT"
