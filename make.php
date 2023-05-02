@@ -5,18 +5,6 @@ declare(strict_types=1);
 namespace Mvorisek\Docker\ImagePhp;
 
 $phpVersionsFromSource = [
-    '7.4' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.4\.[0-9]+',
-        'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'], 'forkRepoCommit' => '7388e44e40',
-    ],
-    '8.0' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.0\.[0-9]+',
-        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'],
-    ],
-    '8.1' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
-        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.17', 'debian' => 'bullseye'],
-    ],
     '8.2' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.2\.[0-9]+',
         'forkPhpVersion' => '8.2-rc', 'forkOsName' => ['alpine' => 'alpine3.17', 'debian' => 'bullseye'],
