@@ -112,7 +112,10 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
+' . (in_array($phpVersion, ['8.3'], true) ? 'RUN git clone --depth 1 https://github.com/xdebug/xdebug.git -b master xdebug \
+    && cd xdebug && git reset --hard 28f528d0ef \
+    && sed \'s~<max>8.2.99</max>~<max>8.3.0</max>~\' -i package.xml
+' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     ' . implode(' \\' . "\n" . '    ', [
         'bcmath',
         'exif',
@@ -133,7 +136,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
         'redis',
         'sockets',
         'tidy',
-        in_array($phpVersion, ['8.3'], true) ? 'xdebug/xdebug@f8cd33609c' : 'xdebug',
+        in_array($phpVersion, ['8.3'], true) ? '$(realpath xdebug)' : 'xdebug',
         'xsl',
         'zip',
     ]) . ($osName === 'alpine' ? ' \

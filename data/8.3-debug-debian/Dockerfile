@@ -13,6 +13,9 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+RUN git clone --depth 1 https://github.com/xdebug/xdebug.git -b master xdebug \
+    && cd xdebug && git reset --hard 28f528d0ef \
+    && sed 's~<max>8.2.99</max>~<max>8.3.0</max>~' -i package.xml
 RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     bcmath \
     exif \
@@ -33,7 +36,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     redis \
     sockets \
     tidy \
-    xdebug/xdebug@f8cd33609c \
+    $(realpath xdebug) \
     xsl \
     zip \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
