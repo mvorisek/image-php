@@ -1,0 +1,767 @@
++ strip --strip-all modules/bcmath.so
+Installing shared extensions:     /usr/local/lib/php/extensions/no-debug-zts-20220830/
+find . -name \*.gcno -o -name \*.gcda | xargs rm -f
+find . -name \*.lo -o -name \*.o -o -name \*.dep | xargs rm -f
+find . -name \*.la -o -name \*.a | xargs rm -f
+find . -name \*.so | xargs rm -f
+find . -name .libs -a -type d|xargs rm -rf
+rm -f libphp.la      modules/* libs/*
+rm -f ext/opcache/jit/zend_jit_x86.c
+rm -f ext/opcache/jit/zend_jit_arm64.c
+rm -f ext/opcache/minilua
+### INSTALLING REMOTE MODULE imagick ###
+downloading imagick-3.7.0.tgz ...
+Starting to download imagick-3.7.0.tgz (360,138 bytes)
+.........................................................................done: 360,138 bytes
+33 source files, building
+running: phpize
+Configuring for:
+PHP Api Version:         20220830
+Zend Module Api No:      20220830
+Zend Extension Api No:   420220830
+Please provide the prefix of ImageMagick installation [autodetect] : building in /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0
+running: /tmp/pear/temp/imagick/configure --with-php-config=/usr/local/bin/php-config --with-imagick
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for a sed that does not truncate output... /bin/sed
+checking for pkg-config... /usr/bin/pkg-config
+checking pkg-config is at least version 0.9.0... yes
+checking for cc... cc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables...
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether cc accepts -g... yes
+checking for cc option to accept ISO C89... none needed
+checking how to run the C preprocessor... cc -E
+checking for icc... no
+checking for suncc... no
+checking for system library directory... lib
+checking if compiler supports -Wl,-rpath,... yes
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking target system type... x86_64-pc-linux-gnu
+checking for PHP prefix... /usr/local
+checking for PHP includes... -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib
+checking for PHP extension directory... /usr/local/lib/php/extensions/no-debug-zts-20220830
+checking for PHP installed headers prefix... /usr/local/include/php
+checking if debug is enabled... no
+checking if zts is enabled... yes
+checking for gawk... no
+checking for nawk... nawk
+checking if nawk is broken... no
+checking whether to enable the imagick extension... yes, shared
+checking for pkg-config... /usr/bin/pkg-config
+checking ImageMagick MagickWand API configuration program... checking Testing /usr/local/bin/MagickWand-config... Doesn't exist
+checking Testing /usr/bin/MagickWand-config... Doesn't exist
+checking Testing /usr/sbin/bin/MagickWand-config... Doesn't exist
+checking Testing /opt/bin/MagickWand-config... Doesn't exist
+checking Testing /opt/local/bin/MagickWand-config... Doesn't exist
+checking Testing /opt/homebrew/bin/MagickWand-config... Doesn't exist
+found in /usr/bin/pkg-config
+checking if ImageMagick version is at least 6.2.4... found version 6.9.11
+checking for MagickWand.h or magick-wand.h header... /usr/include/ImageMagick-6/wand/MagickWand.h
+checking PHP version is at least 5.3.2... yes. found 8.3.0-dev
+libs
+-lMagickWand-6.Q16 -lMagickCore-6.Q16
+
+
+checking for MagickGetVersion... yes
+checking omp_pause_resource_all usability... yes
+checking Which flavour of OpenMP to link... checking for omp_pause_resource_all... no
+checking for __omp_pause_resource_all... no
+checking for omp_pause_resource_all in -lgomp... yes
+GCC flavoured OpenMP
+checking for a sed that does not truncate output... /bin/sed
+checking for ld used by cc... /usr/bin/ld
+checking if the linker (/usr/bin/ld) is GNU ld... yes
+checking for /usr/bin/ld option to reload object files... -r
+checking for BSD-compatible nm... /usr/bin/nm -B
+checking whether ln -s works... yes
+checking how to recognize dependent libraries... pass_all
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking dlfcn.h usability... yes
+checking dlfcn.h presence... yes
+checking for dlfcn.h... yes
+checking the maximum length of command line arguments... 1572864
+checking command to parse /usr/bin/nm -B output from cc object... ok
+checking for objdir... .libs
+checking for ar... ar
+checking for ranlib... ranlib
+checking for strip... strip
+checking if cc supports -fno-rtti -fno-exceptions... no
+checking for cc option to produce PIC... -fPIC
+checking if cc PIC flag -fPIC works... yes
+checking if cc static flag -static works... yes
+checking if cc supports -c -o file.o... yes
+checking whether the cc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... no
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... no
+
+creating libtool
+appending configuration tag "CXX" to libtool
+configure: patching config.h.in
+configure: creating ./config.status
+config.status: creating config.h
+running: make -j6
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=compile cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE   -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagick_file.c -o imagick_file.lo  -MMD -MF imagick_file.dep -MT imagick_file.lo
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=compile cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE   -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagick_class.c -o imagick_class.lo  -MMD -MF imagick_class.dep -MT imagick_class.lo
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=compile cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE   -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagickdraw_class.c -o imagickdraw_class.lo  -MMD -MF imagickdraw_class.dep -MT imagickdraw_class.lo
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=compile cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE   -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagickpixel_class.c -o imagickpixel_class.lo  -MMD -MF imagickpixel_class.dep -MT imagickpixel_class.lo
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=compile cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE   -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagickpixeliterator_class.c -o imagickpixeliterator_class.lo  -MMD -MF imagickpixeliterator_class.dep -MT im
+agickpixeliterator_class.lo
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=compile cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE   -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagick_helpers.c -o imagick_helpers.lo  -MMD -MF imagick_helpers.dep -MT imagick_helpers.lo
+mkdir .libs
+ cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DHAVE_CONFIG_H -g -O2 -D_GNU_SOURCE -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagick_helpers.c -MMD -MF imagick_helpers.dep -MT imagick_helpers.lo  -fPIC -DPIC -o .libs/imagick_helpers.o
+ cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DHAVE_CONFIG_H -g -O2 -D_GNU_SOURCE -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagickpixel_class.c -MMD -MF imagickpixel_class.dep -MT imagickpixel_class.lo  -fPIC -DPIC -o .libs/imagickpixel_class.o
+ cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DHAVE_CONFIG_H -g -O2 -D_GNU_SOURCE -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagick_class.c -MMD -MF imagick_class.dep -MT imagick_class.lo  -fPIC -DPIC -o .libs/imagick_class.o
+ cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DHAVE_CONFIG_H -g -O2 -D_GNU_SOURCE -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagickdraw_class.c -MMD -MF imagickdraw_class.dep -MT imagickdraw_class.lo  -fPIC -DPIC -o .libs/imagickdraw_class.o
+ cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DHAVE_CONFIG_H -g -O2 -D_GNU_SOURCE -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagickpixeliterator_class.c -MMD -MF imagickpixeliterator_class.dep -MT imagickpixeliterator_class.lo  -fPIC -DPIC -o .libs/imagickpixeliterator_class.o
+ cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DHAVE_CONFIG_H -g -O2 -D_GNU_SOURCE -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagick_file.c -MMD -MF imagick_file.dep -MT imagick_file.lo  -fPIC -DPIC -o .libs/imagick_file.o
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_getImageMatte':
+/tmp/pear/temp/imagick/imagick_class.c:300:2: warning: 'MagickGetImageMatte' is deprecated [-Wdeprecated-declarations]
+  300 |  matte = MagickGetImageMatte(intern->magick_wand);
+      |  ^~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:85:3: note: declared here
+   85 |   MagickGetImageMatte(MagickWand *) magick_attribute((deprecated)),
+      |   ^~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_paintFloodfillImage':
+/tmp/pear/temp/imagick/imagick_class.c:1330:3: warning: 'MagickPaintFloodfillImage' is deprecated [-Wdeprecated-declarations]
+ 1330 |   status = MagickPaintFloodfillImage(intern->magick_wand, channel, fill_wand, fuzz, NULL, x, y);
+      |   ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:102:3: note: declared here
+  102 |   MagickPaintFloodfillImage(MagickWand *,const ChannelType,const PixelWand *,
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c:1338:3: warning: 'MagickPaintFloodfillImage' is deprecated [-Wdeprecated-declarations]
+ 1338 |   status = MagickPaintFloodfillImage(intern->magick_wand, channel, fill_wand, fuzz, border_wand, x, y);
+      |   ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:102:3: note: declared here
+  102 |   MagickPaintFloodfillImage(MagickWand *,const ChannelType,const PixelWand *,
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_recolorImage':
+/tmp/pear/temp/imagick/imagick_class.c:1820:2: warning: 'MagickRecolorImage' is deprecated [-Wdeprecated-declarations]
+ 1820 |  status = MagickRecolorImage(intern->magick_wand, order, array);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:116:3: note: declared here
+  116 |   MagickRecolorImage(MagickWand *,const size_t,const double *)
+      |   ^~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_colorFloodfillImage':
+/tmp/pear/temp/imagick/imagick_class.c:4510:2: warning: 'MagickColorFloodfillImage' is deprecated [-Wdeprecated-declarations]
+ 4510 |  status = MagickColorFloodfillImage(intern->magick_wand, fill_wand, fuzz, border_wand, x, y);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:78:3: note: declared here
+   78 |   MagickColorFloodfillImage(MagickWand *,const PixelWand *,const double,
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_mapImage':
+/tmp/pear/temp/imagick/imagick_class.c:4991:2: warning: 'MagickMapImage' is deprecated [-Wdeprecated-declarations]
+ 4991 |  status = MagickMapImage(intern->magick_wand, intern_map->magick_wand, dither);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:89:3: note: declared here
+   89 |   MagickMapImage(MagickWand *,const MagickWand *,const MagickBooleanType)
+      |   ^~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_matteFloodfillImage':
+/tmp/pear/temp/imagick/imagick_class.c:5032:2: warning: 'MagickMatteFloodfillImage' is deprecated [-Wdeprecated-declarations]
+ 5032 |  status = MagickMatteFloodfillImage(intern->magick_wand, alpha, fuzz, color_wand, x, y);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:91:3: note: declared here
+   91 |   MagickMatteFloodfillImage(MagickWand *,const double,const double,
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_medianFilterImage':
+/tmp/pear/temp/imagick/imagick_class.c:5070:2: warning: 'MagickMedianFilterImage' is deprecated [-Wdeprecated-declarations]
+ 5070 |  status = MagickMedianFilterImage(intern->magick_wand, radius);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:89,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/magick-image.h:229:3: note: declared here
+  229 |   MagickMedianFilterImage(MagickWand *,const double),
+      |   ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_paintOpaqueImage':
+/tmp/pear/temp/imagick/imagick_class.c:5152:2: warning: 'MagickPaintOpaqueImageChannel' is deprecated [-Wdeprecated-declarations]
+ 5152 |  status = MagickPaintOpaqueImageChannel(intern->magick_wand, channel, target_wand, fill_wand, fuzz);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:107:3: note: declared here
+  107 |   MagickPaintOpaqueImageChannel(MagickWand *,const ChannelType,
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_paintTransparentImage':
+/tmp/pear/temp/imagick/imagick_class.c:5235:2: warning: 'MagickPaintTransparentImage' is deprecated [-Wdeprecated-declarations]
+ 5235 |  status = MagickPaintTransparentImage(intern->magick_wand, color_wand, alpha, fuzz);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:110:3: note: declared here
+  110 |   MagickPaintTransparentImage(MagickWand *,const PixelWand *,const double,
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_reduceNoiseImage':
+/tmp/pear/temp/imagick/imagick_class.c:5399:2: warning: 'MagickReduceNoiseImage' is deprecated [-Wdeprecated-declarations]
+ 5399 |  status = MagickReduceNoiseImage(intern->magick_wand, radius);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:89,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/magick-image.h:276:3: note: declared here
+  276 |   MagickReduceNoiseImage(MagickWand *,const double),
+      |   ^~~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_getImageAttribute':
+/tmp/pear/temp/imagick/imagick_class.c:6729:2: warning: 'MagickGetImageAttribute' is deprecated [-Wdeprecated-declarations]
+ 6729 |  attribute = MagickGetImageAttribute(intern->magick_wand, key);
+      |  ^~~~~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:62:4: note: declared here
+   62 |   *MagickGetImageAttribute(MagickWand *,const char *)
+      |    ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_getImageChannelExtrema':
+/tmp/pear/temp/imagick/imagick_class.c:6946:2: warning: 'MagickGetImageChannelExtrema' is deprecated [-Wdeprecated-declarations]
+ 6946 |  status = MagickGetImageChannelExtrema(intern->magick_wand, channel_type, &minima, &maxima);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:81:3: note: declared here
+   81 |   MagickGetImageChannelExtrema(MagickWand *,const ChannelType,size_t *,
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_getImageExtrema':
+/tmp/pear/temp/imagick/imagick_class.c:7285:2: warning: 'MagickGetImageExtrema' is deprecated [-Wdeprecated-declarations]
+ 7285 |  status = MagickGetImageExtrema(intern->magick_wand, &min, &max);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:83:3: note: declared here
+   83 |   MagickGetImageExtrema(MagickWand *,size_t *,size_t *)
+      |   ^~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_getImageIndex':
+/tmp/pear/temp/imagick/imagick_class.c:8450:2: warning: 'MagickGetImageIndex' is deprecated [-Wdeprecated-declarations]
+ 8450 |  status = MagickGetImageIndex(intern->magick_wand);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:68:3: note: declared here
+   68 |   MagickGetImageIndex(MagickWand *) magick_attribute((deprecated));
+      |   ^~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_getImageSize':
+/tmp/pear/temp/imagick/imagick_class.c:8571:2: warning: 'MagickGetImageSize' is deprecated [-Wdeprecated-declarations]
+ 8571 |  ZVAL_LONG(return_value, (long)MagickGetImageSize(intern->magick_wand));
+      |  ^~~~~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:147:3: note: declared here
+  147 |   MagickGetImageSize(MagickWand *) magick_attribute((deprecated));
+      |   ^~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_setImageAttribute':
+/tmp/pear/temp/imagick/imagick_class.c:9045:2: warning: 'MagickSetImageAttribute' is deprecated [-Wdeprecated-declarations]
+ 9045 |  status = MagickSetImageAttribute(intern->magick_wand, key, attribute);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:118:3: note: declared here
+  118 |   MagickSetImageAttribute(MagickWand *,const char *,const char *)
+      |   ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_flattenImages':
+/tmp/pear/temp/imagick/imagick_class.c:9418:2: warning: 'MagickFlattenImages' is deprecated [-Wdeprecated-declarations]
+ 9418 |  tmp_wand = MagickFlattenImages(intern->magick_wand);
+      |  ^~~~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:139:4: note: declared here
+  139 |   *MagickFlattenImages(MagickWand *) magick_attribute((deprecated)),
+      |    ^~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_averageImages':
+/tmp/pear/temp/imagick/imagick_class.c:10747:2: warning: 'MagickAverageImages' is deprecated [-Wdeprecated-declarations]
+10747 |  tmp_wand = MagickAverageImages(intern->magick_wand);
+      |  ^~~~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:138:4: note: declared here
+  138 |   *MagickAverageImages(MagickWand *) magick_attribute((deprecated)),
+      |    ^~~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_mosaicImages':
+/tmp/pear/temp/imagick/imagick_class.c:11291:2: warning: 'MagickMosaicImages' is deprecated [-Wdeprecated-declarations]
+11291 |  tmp_wand = MagickMosaicImages(intern->magick_wand);
+      |  ^~~~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:142:4: note: declared here
+  142 |   *MagickMosaicImages(MagickWand *) magick_attribute((deprecated)),
+      |    ^~~~~~~~~~~~~~~~~~
+/tmp/pear/temp/imagick/imagick_class.c: In function 'zim_Imagick_radialBlurImage':
+/tmp/pear/temp/imagick/imagick_class.c:11421:2: warning: 'MagickRadialBlurImageChannel' is deprecated [-Wdeprecated-declarations]
+11421 |  status = MagickRadialBlurImageChannel(intern->magick_wand, channel, angle);
+      |  ^~~~~~
+In file included from /usr/include/ImageMagick-6/wand/MagickWand.h:83,
+                 from /tmp/pear/temp/imagick/php_imagick_defs.h:29,
+                 from /tmp/pear/temp/imagick/imagick_class.c:22:
+/usr/include/ImageMagick-6/wand/deprecate.h:114:3: note: declared here
+  114 |   MagickRadialBlurImageChannel(MagickWand *,const ChannelType,const double)
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=compile cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE   -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagick.c -o imagick.lo  -MMD -MF imagick.dep -MT imagick.lo
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=compile cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE   -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagickkernel_class.c -o imagickkernel_class.lo  -MMD -MF imagickkernel_class.dep -MT imagickkernel_class.lo
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=compile cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE   -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/shim_im6_to_im7.c -o shim_im6_to_im7.lo  -MMD -MF shim_im6_to_im7.dep -MT shim_im6_to_im7.lo
+ cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DHAVE_CONFIG_H -g -O2 -D_GNU_SOURCE -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagick.c -MMD -MF imagick.dep -MT imagick.lo  -fPIC -DPIC -o .libs/imagick.o
+ cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DHAVE_CONFIG_H -g -O2 -D_GNU_SOURCE -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagickkernel_class.c -MMD -MF imagickkernel_class.dep -MT imagickkernel_class.lo  -fPIC -DPIC -o .libs/imagickkernel_class.o
+ cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DHAVE_CONFIG_H -g -O2 -D_GNU_SOURCE -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/shim_im6_to_im7.c -MMD -MF shim_im6_to_im7.dep -MT shim_im6_to_im7.lo  -fPIC -DPIC -o .libs/shim_im6_to_im7.o
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=link cc -shared -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE    -o imagick.la -export-dynamic -avoid-version -prefer-pic -module -rpath /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules  imagick_file.lo imagick_class.lo imagickdraw_class.lo imagickpixel_class.lo imagickpixeliterator_class.lo imagick_helpers.lo imagick.lo imagickkernel_class.lo shim_im6_to_im7.lo -lgomp -lMagickWand-6.Q16 -lMagickCore-6.Q16
+cc -shared  .libs/imagick_file.o .libs/imagick_class.o .libs/imagickdraw_class.o .libs/imagickpixel_class.o .libs/imagickpixeliterator_class.o .libs/imagick_helpers.o .libs/imagick.o .libs/imagickkernel_class.o .libs/shim_im6_to_im7.o  -lgomp /usr/lib/x86_64-linux-gnu/libMagickWand-6.Q16.so /usr/lib/x86_64-linux-gnu/libMagickCore-6.Q16.so  -Wl,-soname -Wl,imagick.so -o .libs/imagick.so
+creating imagick.la
+(cd .libs && rm -f imagick.la && ln -s ../imagick.la imagick.la)
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=install cp ./imagick.la /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules
+cp ./.libs/imagick.so /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules/imagick.so
+cp ./.libs/imagick.lai /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules/imagick.la
+PATH="$PATH:/sbin" ldconfig -n /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,--rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+
+Build complete.
+Don't forget to run 'make test'.
+
+running: make -j6 INSTALL_ROOT="/tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0" install
+Parse /tmp/pear/temp/imagick/ImagickPixel.stub.php to generate /tmp/pear/temp/imagick/ImagickPixel_arginfo.h
+sh: 1: wget: not found
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0Installing header files:          /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/include/php/
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100  150k  100  150k    0     0   108k      0  0:00:01  0:00:01 --:--:--  728k
+PHP-Parser-4.15.1/LICENSE
+PHP-Parser-4.15.1/README.md
+PHP-Parser-4.15.1/bin/
+PHP-Parser-4.15.1/bin/php-parse
+PHP-Parser-4.15.1/composer.json
+PHP-Parser-4.15.1/grammar/
+PHP-Parser-4.15.1/grammar/README.md
+PHP-Parser-4.15.1/grammar/parser.template
+PHP-Parser-4.15.1/grammar/php5.y
+PHP-Parser-4.15.1/grammar/php7.y
+PHP-Parser-4.15.1/grammar/phpyLang.php
+PHP-Parser-4.15.1/grammar/rebuildParsers.php
+PHP-Parser-4.15.1/grammar/tokens.template
+PHP-Parser-4.15.1/grammar/tokens.y
+PHP-Parser-4.15.1/lib/
+PHP-Parser-4.15.1/lib/PhpParser/
+PHP-Parser-4.15.1/lib/PhpParser/Builder.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/
+PHP-Parser-4.15.1/lib/PhpParser/Builder/ClassConst.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/Class_.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/Declaration.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/EnumCase.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/Enum_.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/FunctionLike.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/Function_.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/Interface_.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/Method.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/Namespace_.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/Param.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/Property.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/TraitUse.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/TraitUseAdaptation.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/Trait_.php
+PHP-Parser-4.15.1/lib/PhpParser/Builder/Use_.php
+PHP-Parser-4.15.1/lib/PhpParser/BuilderFactory.php
+PHP-Parser-4.15.1/lib/PhpParser/BuilderHelpers.php
+PHP-Parser-4.15.1/lib/PhpParser/Comment.php
+PHP-Parser-4.15.1/lib/PhpParser/Comment/
+PHP-Parser-4.15.1/lib/PhpParser/Comment/Doc.php
+PHP-Parser-4.15.1/lib/PhpParser/ConstExprEvaluationException.php
+PHP-Parser-4.15.1/lib/PhpParser/ConstExprEvaluator.php
+PHP-Parser-4.15.1/lib/PhpParser/Error.php
+PHP-Parser-4.15.1/lib/PhpParser/ErrorHandler.php
+PHP-Parser-4.15.1/lib/PhpParser/ErrorHandler/
+PHP-Parser-4.15.1/lib/PhpParser/ErrorHandler/Collecting.php
+PHP-Parser-4.15.1/lib/PhpParser/ErrorHandler/Throwing.php
+PHP-Parser-4.15.1/lib/PhpParser/Internal/
+PHP-Parser-4.15.1/lib/PhpParser/Internal/DiffElem.php
+PHP-Parser-4.15.1/lib/PhpParser/Internal/Differ.php
+PHP-Parser-4.15.1/lib/PhpParser/Internal/PrintableNewAnonClassNode.php
+PHP-Parser-4.15.1/lib/PhpParser/Internal/TokenStream.php
+PHP-Parser-4.15.1/lib/PhpParser/JsonDecoder.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/Emulative.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/AttributeEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/CoaleseEqualTokenEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/EnumTokenEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/ExplicitOctalEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/FlexibleDocStringEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/FnTokenEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/KeywordEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/MatchTokenEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/NullsafeTokenEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/NumericLiteralSeparatorEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/ReadonlyTokenEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/ReverseEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/Lexer/TokenEmulator/TokenEmulator.php
+PHP-Parser-4.15.1/lib/PhpParser/NameContext.php
+PHP-Parser-4.15.1/lib/PhpParser/Node.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/
+PHP-Parser-4.15.1/lib/PhpParser/Node/Arg.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Attribute.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/AttributeGroup.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/ComplexType.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Const_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/ArrayDimFetch.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/ArrayItem.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Array_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/ArrowFunction.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Assign.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/BitwiseAnd.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/BitwiseOr.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/BitwiseXor.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/Coalesce.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/Concat.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/Div.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/Minus.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/Mod.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/Mul.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/Plus.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/Pow.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/ShiftLeft.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignOp/ShiftRight.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/AssignRef.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/BitwiseAnd.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/BitwiseOr.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/BitwiseXor.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/BooleanAnd.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/BooleanOr.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Coalesce.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Concat.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Div.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Equal.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Greater.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/GreaterOrEqual.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Identical.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/LogicalAnd.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/LogicalOr.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/LogicalXor.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Minus.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Mod.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Mul.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/NotEqual.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/NotIdentical.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Plus.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Pow.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/ShiftLeft.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/ShiftRight.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Smaller.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/SmallerOrEqual.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BinaryOp/Spaceship.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BitwiseNot.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/BooleanNot.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/CallLike.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Cast.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Cast/
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Cast/Array_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Cast/Bool_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Cast/Double.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Cast/Int_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Cast/Object_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Cast/String_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Cast/Unset_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/ClassConstFetch.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Clone_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Closure.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/ClosureUse.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/ConstFetch.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Empty_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Error.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/ErrorSuppress.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Eval_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Exit_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/FuncCall.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Include_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Instanceof_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Isset_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/List_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Match_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/MethodCall.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/New_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/NullsafeMethodCall.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/NullsafePropertyFetch.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/PostDec.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/PostInc.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/PreDec.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/PreInc.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Print_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/PropertyFetch.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/ShellExec.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/StaticCall.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/StaticPropertyFetch.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Ternary.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Throw_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/UnaryMinus.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/UnaryPlus.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Variable.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/YieldFrom.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Expr/Yield_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/FunctionLike.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Identifier.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/IntersectionType.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/MatchArm.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Name.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Name/
+PHP-Parser-4.15.1/lib/PhpParser/Node/Name/FullyQualified.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Name/Relative.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/NullableType.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Param.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/DNumber.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/Encapsed.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/EncapsedStringPart.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/LNumber.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/MagicConst.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/MagicConst/
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/MagicConst/Class_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/MagicConst/Dir.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/MagicConst/File.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/MagicConst/Function_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/MagicConst/Line.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/MagicConst/Method.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/MagicConst/Namespace_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/MagicConst/Trait_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Scalar/String_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Break_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Case_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Catch_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/ClassConst.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/ClassLike.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/ClassMethod.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Class_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Const_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Continue_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/DeclareDeclare.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Declare_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Do_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Echo_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/ElseIf_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Else_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/EnumCase.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Enum_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Expression.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Finally_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/For_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Foreach_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Function_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Global_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Goto_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/GroupUse.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/HaltCompiler.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/If_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/InlineHTML.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Interface_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Label.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Namespace_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Nop.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Property.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/PropertyProperty.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Return_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/StaticVar.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Static_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Switch_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Throw_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/TraitUse.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/TraitUseAdaptation.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/TraitUseAdaptation/
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/TraitUseAdaptation/Alias.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/TraitUseAdaptation/Precedence.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Trait_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/TryCatch.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Unset_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/UseUse.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/Use_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/Stmt/While_.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/UnionType.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/VarLikeIdentifier.php
+PHP-Parser-4.15.1/lib/PhpParser/Node/VariadicPlaceholder.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeAbstract.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeDumper.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeFinder.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeTraverser.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeTraverserInterface.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeVisitor.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeVisitor/
+PHP-Parser-4.15.1/lib/PhpParser/NodeVisitor/CloningVisitor.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeVisitor/FindingVisitor.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeVisitor/FirstFindingVisitor.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeVisitor/NameResolver.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeVisitor/NodeConnectingVisitor.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeVisitor/ParentConnectingVisitor.php
+PHP-Parser-4.15.1/lib/PhpParser/NodeVisitorAbstract.php
+PHP-Parser-4.15.1/lib/PhpParser/Parser.php
+PHP-Parser-4.15.1/lib/PhpParser/Parser/
+PHP-Parser-4.15.1/lib/PhpParser/Parser/Multiple.php
+PHP-Parser-4.15.1/lib/PhpParser/Parser/Php5.php
+PHP-Parser-4.15.1/lib/PhpParser/Parser/Php7.php
+PHP-Parser-4.15.1/lib/PhpParser/Parser/Tokens.php
+PHP-Parser-4.15.1/lib/PhpParser/ParserAbstract.php
+PHP-Parser-4.15.1/lib/PhpParser/ParserFactory.php
+PHP-Parser-4.15.1/lib/PhpParser/PrettyPrinter/
+PHP-Parser-4.15.1/lib/PhpParser/PrettyPrinter/Standard.php
+PHP-Parser-4.15.1/lib/PhpParser/PrettyPrinterAbstract.php
+Saved /tmp/pear/temp/imagick/ImagickPixel_arginfo.h
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=compile cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE   -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagick.c -o imagick.lo  -MMD -MF imagick.dep -MT imagick.lo
+ cc -I. -I/tmp/pear/temp/imagick -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DHAVE_CONFIG_H -g -O2 -D_GNU_SOURCE -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -fopenmp -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6 -DZEND_COMPILE_DL_EXT=1 -c /tmp/pear/temp/imagick/imagick.c -MMD -MF imagick.dep -MT imagick.lo  -fPIC -DPIC -o .libs/imagick.o
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=link cc -shared -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/include -I/tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/main -I/tmp/pear/temp/imagick -I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend -I/usr/local/include/php/ext -I/usr/local/include/php/ext/date/lib -I/usr/include/x86_64-linux-gnu//ImageMagick-6 -I/usr/include/ImageMagick-6  -DHAVE_CONFIG_H  -g -O2 -D_GNU_SOURCE    -o imagick.la -export-dynamic -avoid-version -prefer-pic -module -rpath /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules  imagick_file.lo imagick_class.lo imagickdraw_class.lo imagickpixel_class.lo imagickpixeliterator_class.lo imagick_helpers.lo imagick.lo imagickkernel_class.lo shim_im6_to_im7.lo -lgomp -lMagickWand-6.Q16 -lMagickCore-6.Q16
+rm -fr  .libs/imagick.la .libs/imagick.lai .libs/imagick.so
+cc -shared  .libs/imagick_file.o .libs/imagick_class.o .libs/imagickdraw_class.o .libs/imagickpixel_class.o .libs/imagickpixeliterator_class.o .libs/imagick_helpers.o .libs/imagick.o .libs/imagickkernel_class.o .libs/shim_im6_to_im7.o  -lgomp /usr/lib/x86_64-linux-gnu/libMagickWand-6.Q16.so /usr/lib/x86_64-linux-gnu/libMagickCore-6.Q16.so  -Wl,-soname -Wl,imagick.so -o .libs/imagick.so
+creating imagick.la
+(cd .libs && rm -f imagick.la && ln -s ../imagick.la imagick.la)
+/bin/bash /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/libtool --mode=install cp ./imagick.la /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules
+cp ./.libs/imagick.so /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules/imagick.so
+cp ./.libs/imagick.lai /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules/imagick.la
+PATH="$PATH:/sbin" ldconfig -n /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /tmp/pear/temp/pear-build-defaultuser7dQeUG/imagick-3.7.0/modules
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the `LD_RUN_PATH' environment variable
+     during linking
+   - use the `-Wl,--rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to `/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+Installing shared extensions:     /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/lib/php/extensions/no-debug-zts-20220830/
+running: find "/tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0" | xargs ls -dils
+1884357    4 drwxr-xr-x 3 root root    4096 May  2 13:02 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0
+1964207    4 drwxr-xr-x 3 root root    4096 May  2 13:02 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr
+1964208    4 drwxr-xr-x 4 root root    4096 May  2 13:03 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local
+1964209    4 drwxr-xr-x 3 root root    4096 May  2 13:02 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/include
+1964210    4 drwxr-xr-x 3 root root    4096 May  2 13:02 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/include/php
+1964211    4 drwxr-xr-x 3 root root    4096 May  2 13:02 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/include/php/ext
+1964212    4 drwxr-xr-x 2 root root    4096 May  2 13:02 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/include/php/ext/imagick
+1964213    4 -rw-r--r-- 1 root root    1828 May  2 13:02 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/include/php/ext/imagick/php_imagick_shared.h
+1964206    4 drwxr-xr-x 3 root root    4096 May  2 13:03 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/lib
+1964214    4 drwxr-xr-x 3 root root    4096 May  2 13:03 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/lib/php
+1964500    4 drwxr-xr-x 3 root root    4096 May  2 13:03 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/lib/php/extensions
+1964501    4 drwxr-xr-x 2 root root    4096 May  2 13:03 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/lib/php/extensions/no-debug-zts-20220830
+1964502 1536 -rwxr-xr-x 1 root root 1569424 May  2 13:03 /tmp/pear/temp/pear-build-defaultuser7dQeUG/install-imagick-3.7.0/usr/local/lib/php/extensions/no-debug-zts-20220830/imagick.so
+
+Build process completed successfully
+Installing '/usr/local/lib/php/extensions/no-debug-zts-20220830/imagick.so'
+Installing '/usr/local/include/php/ext/imagick/php_imagick_shared.h'
+install ok: channel://pecl.php.net/imagick-3.7.0
+configuration option "php_ini" is not set to php.ini location
+You should add "extension=imagick.so" to php.ini
+Removing symbols from /usr/local/lib/php/extensions/no-debug-zts-20220830/imagick.so... done (1127368 bytes saved).
+Check if the imagick module can be loaded... ok.
+Removing intermediate container 52c865930612
+ ---> b686fbdc7f27
+Step 10/11 : RUN install-php-extensions @composer
+ ---> Running in 1c9666c9ed9a
+install-php-extensions v.2.1.20
+#StandWithUkraine
+Warning: Module "imagick" is already loaded in Unknown on line 0
+### WARNING Unrecognized module name: Warning: Module "imagick" is already loaded in Unknown on line 0 ###
+### ERROR: Unsupported PHP version: 8.3 ###
+
+Warning: Module "imagick" is already loaded in Unknown on line 0
+Updating channel "pecl.php.net"
+Channel "pecl.php.net" is up to date
+Hit:1 http://deb.debian.org/debian bullseye InRelease
+Hit:2 http://deb.debian.org/debian-security bullseye-security InRelease
+Hit:3 http://deb.debian.org/debian bullseye-updates InRelease
+Reading package lists...
+### MARKING PRE-INSTALLED PACKAGES AS IN-USE ###
+unzip was already set to manually installed.
+### INSTALLING composer ###
+
+Warning: Module "imagick" is already loaded in Unknown on line 0
+All settings correct for using Composer
+Downloading...
+
+Composer (version 2.5.5) successfully installed to: /usr/local/bin/composer
+Use it: php /usr/local/bin/composer
+
+Removing intermediate container 1c9666c9ed9a
+ ---> a6fa64037262
+Step 11/11 : RUN php --version
+ ---> Running in d9f78e4e2f87
+
+Warning: Module "imagick" is already loaded in Unknown on line 0
+PHP 8.3.0-dev (cli) (built: May  2 2023 11:12:52) (ZTS)
+Copyright (c) The PHP Group
+Zend Engine v4.3.0-dev, Copyright (c) Zend Technologies
+Removing intermediate container d9f78e4e2f87
+ ---> 9530d7a011f7
+Successfully built 9530d7a011f7
