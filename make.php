@@ -310,7 +310,11 @@ jobs:
 }) . '
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
-          && git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read"' . /* remove once https://github.com/php/php-src/pull/8018 is merged & released */ '
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    return in_array($phpVersion, ['7.4', '8.0'], true)
+        ? 'git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read"'
+        : null; // fix https://github.com/php/php-src/pull/8018 was merged into PHP 8.1+ officially
+}) . '
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
           && git add . -N && git diff --diff-filter=d "$PHPSRC_COMMIT"
