@@ -15,15 +15,15 @@ $phpVersionsFromSource = [
     ],
     '8.1' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
-        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.17', 'debian' => 'bullseye'],
+        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bullseye'],
     ],
     '8.2' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.2\.[0-9]+',
-        'forkPhpVersion' => '8.2-rc', 'forkOsName' => ['alpine' => 'alpine3.17', 'debian' => 'bullseye'],
+        'forkPhpVersion' => '8.2-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bullseye'],
     ],
     '8.3' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-        'forkPhpVersion' => '8.2-rc', 'forkOsName' => ['alpine' => 'alpine3.17', 'debian' => 'bullseye']
+        'forkPhpVersion' => '8.2-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bullseye']
     ],
 ];
 $osNames = ['alpine', 'debian'];
