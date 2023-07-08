@@ -35,6 +35,8 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     xdebug \
     xsl \
     zip \
+    # allow icu-data-full install required by chromium package, remove once https://github.com/mlocati/docker-php-extension-installer/issues/766 is fixed
+    && apk del icu-data-en \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
     && rm /usr/bin/gs \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
@@ -76,7 +78,7 @@ FROM node as selenium
 
 # install Selenium
 RUN apk update \
-    && apk add openjdk11-jre-headless xvfb ttf-freefont \
+    && apk add openjdk17-jre-headless xvfb ttf-freefont \
     && rm -rf /var/cache/apk/* \
     && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar
 

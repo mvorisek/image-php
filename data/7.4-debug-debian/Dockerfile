@@ -4,7 +4,7 @@ FROM ci-target:base as basic
 RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
     && apt-get -y update \
     && apt-get -y upgrade \
-    && apt-get -y install bash git make unzip gnupg ca-certificates apt-utils apt-transport-https netcat gdb \
+    && apt-get -y install bash git make unzip gnupg ca-certificates apt-utils apt-transport-https netcat-traditional gdb \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && git config --system --add url."https://github.com/".insteadOf "git@github.com:" \
     && git config --system --add url."https://github.com/".insteadOf "ssh://git@github.com/" \
@@ -76,7 +76,10 @@ FROM node as selenium
 
 # install Selenium
 RUN apt-get -y update \
-    && apt-get -y install openjdk-11-jre-headless xvfb fonts-freefont-ttf \
+    && apt-get -y install ca-certificates-java \
+    && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && apt-get -y update \
+    && apt-get -y install openjdk-17-jre-headless xvfb fonts-freefont-ttf \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar
 

@@ -15,15 +15,15 @@ $phpVersionsFromSource = [
     ],
     '8.1' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
-        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bullseye'],
+        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm'],
     ],
     '8.2' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.2\.[0-9]+',
-        'forkPhpVersion' => '8.2-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bullseye'],
+        'forkPhpVersion' => '8.2', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm'],
     ],
     '8.3' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-        'forkPhpVersion' => '8.2-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bullseye']
+        'forkPhpVersion' => '8.3-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm']
     ],
 ];
 $osNames = ['alpine', 'debian'];
@@ -101,7 +101,7 @@ foreach ($osNames as $osName) {
 RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')
     . $genPackageInstallCommand($osName, [
         ...['*upgrade*', 'bash', 'git', 'make', 'unzip', 'gnupg', 'ca-certificates'],
-        ...['alpine' => ['coreutils'], 'debian' => ['apt-utils', 'apt-transport-https', 'netcat']][$osName],
+        ...['alpine' => ['coreutils'], 'debian' => ['apt-utils', 'apt-transport-https', 'netcat-traditional']][$osName],
         ...($isDebug ? ['gdb'] : []),
     ]) . ' \
     && git config --system --add url."https://github.com/".insteadOf "git@github.com:" \
@@ -112,8 +112,8 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-' . (in_array($phpVersion, ['8.3'], true) ? 'RUN git clone --depth 1 https://github.com/xdebug/xdebug.git -b master xdebug \
-    && cd xdebug && git reset --hard 28f528d0ef \
+' . (in_array($phpVersion, ['8.3'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
+    && cd xdebug && git reset --hard 6a2ee68a05 \
     && sed \'s~<max>8.2.99</max>~<max>8.3.0</max>~\' -i package.xml
 ' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     ' . implode(' \\' . "\n" . '    ', [
@@ -140,6 +140,8 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'xsl',
         'zip',
     ]) . ($osName === 'alpine' ? ' \
+    # allow icu-data-full install required by chromium package, remove once https://github.com/mlocati/docker-php-extension-installer/issues/766 is fixed
+    && apk del icu-data-en \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
     && rm /usr/bin/gs' : '') . ' \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
@@ -182,7 +184,8 @@ RUN mkdir t && (cd t && npm install mocha) && rm -r t/
 FROM node as selenium
 
 # install Selenium
-RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['openjdk11-jre-headless', 'xvfb', 'ttf-freefont'], 'debian' => ['openjdk-11-jre-headless', 'xvfb', 'fonts-freefont-ttf']][$osName]) . ' \
+RUN ' . ($osName === 'debian' /* needed to fix https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1911078.html, remove once fixed by Debian officially */ ? $genPackageInstallCommand($osName, ['ca-certificates-java']) . ' \
+    && ' : '') . $genPackageInstallCommand($osName, ['alpine' => ['openjdk17-jre-headless', 'xvfb', 'ttf-freefont'], 'debian' => ['openjdk-17-jre-headless', 'xvfb', 'fonts-freefont-ttf']][$osName]) . ' \
     && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar
 
 # install Chrome

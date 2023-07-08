@@ -4,7 +4,7 @@ FROM ci-target:base as basic
 RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
     && apt-get -y update \
     && apt-get -y upgrade \
-    && apt-get -y install bash git make unzip gnupg ca-certificates apt-utils apt-transport-https netcat gdb \
+    && apt-get -y install bash git make unzip gnupg ca-certificates apt-utils apt-transport-https netcat-traditional gdb \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && git config --system --add url."https://github.com/".insteadOf "git@github.com:" \
     && git config --system --add url."https://github.com/".insteadOf "ssh://git@github.com/" \
@@ -13,8 +13,8 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN git clone --depth 1 https://github.com/xdebug/xdebug.git -b master xdebug \
-    && cd xdebug && git reset --hard 28f528d0ef \
+RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
+    && cd xdebug && git reset --hard 6a2ee68a05 \
     && sed 's~<max>8.2.99</max>~<max>8.3.0</max>~' -i package.xml
 RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     bcmath \
@@ -79,7 +79,10 @@ FROM node as selenium
 
 # install Selenium
 RUN apt-get -y update \
-    && apt-get -y install openjdk-11-jre-headless xvfb fonts-freefont-ttf \
+    && apt-get -y install ca-certificates-java \
+    && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && apt-get -y update \
+    && apt-get -y install openjdk-17-jre-headless xvfb fonts-freefont-ttf \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar
 
