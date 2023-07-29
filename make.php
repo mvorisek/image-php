@@ -140,8 +140,6 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'xsl',
         'zip',
     ]) . ($osName === 'alpine' ? ' \
-    # allow icu-data-full install required by chromium package, remove once https://github.com/mlocati/docker-php-extension-installer/issues/766 is fixed
-    && apk del icu-data-en \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
     && rm /usr/bin/gs' : '') . ' \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
