@@ -30,7 +30,7 @@ $osNames = ['alpine', 'debian'];
 $targetNames = ['basic', 'node', 'selenium'];
 
 $aliasesPhpVersions = [
-    '8.1' => ['latest'],
+    '8.2' => ['latest'],
 ];
 $defaultOs = 'alpine';
 
