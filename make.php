@@ -22,9 +22,13 @@ $phpVersionsFromSource = [
         'forkPhpVersion' => '8.2', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm'],
     ],
     '8.3' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.3\.[0-9]+RC[0-9]+',
         'forkPhpVersion' => '8.3-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm']
     ],
+//    '8.4' => [
+//        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
+//        'forkPhpVersion' => '8.3-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm']
+//    ],
 ];
 $osNames = ['alpine', 'debian'];
 $targetNames = ['basic', 'node', 'selenium'];
