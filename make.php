@@ -25,10 +25,10 @@ $phpVersionsFromSource = [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.3\.[0-9]+RC[0-9]+',
         'forkPhpVersion' => '8.3-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm']
     ],
-//    '8.4' => [
-//        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-//        'forkPhpVersion' => '8.3-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm']
-//    ],
+    '8.4' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
+        'forkPhpVersion' => '8.3-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm']
+    ],
 ];
 $osNames = ['alpine', 'debian'];
 $targetNames = ['basic', 'node', 'selenium'];
@@ -116,9 +116,9 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-' . (in_array($phpVersion, ['8.3'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
-    && cd xdebug && git reset --hard 6a2ee68a05 \
-    && sed \'s~<max>8.2.99</max>~<max>8.3.0</max>~\' -i package.xml
+' . (in_array($phpVersion, ['8.3', '8.4'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
+    && cd xdebug && git reset --hard 16621167bc && rm -r .git \
+    && sed \'s~<max>8.3.99</max>~<max>99.99.99</max>~\' -i package.xml
 ' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     ' . implode(' \\' . "\n" . '    ', [
         'bcmath',
@@ -126,7 +126,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'gd',
         'gmp',
         'igbinary',
-        in_array($phpVersion, ['8.3'], true) ? 'Imagick/imagick@28f27044e4' : 'imagick',
+        in_array($phpVersion, ['8.3', '8.4'], true) ? 'Imagick/imagick@28f27044e4' : 'imagick',
         'imap',
         'intl',
         'mysqli',
@@ -140,14 +140,14 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'redis',
         'sockets',
         'tidy',
-        in_array($phpVersion, ['8.3'], true) ? '$(realpath xdebug)' : 'xdebug',
+        in_array($phpVersion, ['8.3', '8.4'], true) ? '$(realpath xdebug)' : 'xdebug',
         'xsl',
         'zip',
     ]) . ($osName === 'alpine' ? ' \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
     && rm /usr/bin/gs' : '') . ' \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
-    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -rf /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
+    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -r /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
     && { echo \'#!/bin/sh\'; echo \'if [ ! -d /usr/lib/oracle/*/client64 ]; then\'; echo \'    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz\'; echo \'fi\'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
 
 # install Composer
@@ -168,7 +168,7 @@ RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) us
         '"$(find /usr/local/lib/php/extensions -name xdebug.so)"',
     ])) . '
 RUN composer diagnose
-RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.3'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.2 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
+RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.4'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.3 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
 
 
 FROM basic as node
@@ -195,7 +195,7 @@ RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['chromium', 'chromium-c
 
 # install Firefox
 RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['firefox'], 'debian' => ['firefox-esr']][$osName]) . ' \
-    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
+    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 
@@ -287,7 +287,7 @@ jobs:
 
       - name: "Check if files are in-sync"
         run: |
-          rm -rf data/
+          rm -r data/
           php make.php
           git add . -N && git diff --exit-code
 
@@ -417,7 +417,7 @@ $registryImageName = getenv('REGISTRY_IMAGE_NAME') ?: 'ghcr.io/' . $githubReposi
 
 $readmeFile = '# Docker Images for PHP
 
-<a href="https://github.com/' . $githubRepository . '/actions"><img src="https://github.com/' . $githubRepository . '/workflows/CI/badge.svg" alt="Build Status"></a>
+[![CI](https://github.com/' . $githubRepository . '/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/' . $githubRepository . '/actions?query=branch:master)
 
 This repository builds `' . $registryImageName . '` image and publishes the following tags:
 

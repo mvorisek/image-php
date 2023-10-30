@@ -14,8 +14,8 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
-    && cd xdebug && git reset --hard 6a2ee68a05 \
-    && sed 's~<max>8.2.99</max>~<max>8.3.0</max>~' -i package.xml
+    && cd xdebug && git reset --hard 16621167bc && rm -r .git \
+    && sed 's~<max>8.3.99</max>~<max>99.99.99</max>~' -i package.xml
 RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     bcmath \
     exif \
@@ -40,7 +40,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     xsl \
     zip \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
-    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -rf /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
+    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -r /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
     && { echo '#!/bin/sh'; echo 'if [ ! -d /usr/lib/oracle/*/client64 ]; then'; echo '    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz'; echo 'fi'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
 
 # install Composer
@@ -59,7 +59,7 @@ RUN readelf -S /usr/local/bin/php | grep -q ' \.symtab ' \
     && readelf -S "$(find /usr/local/lib/php/extensions -name bcmath.so)" | grep -q ' \.symtab ' \
     && readelf -S "$(find /usr/local/lib/php/extensions -name xdebug.so)" | grep -q ' \.symtab '
 RUN composer diagnose
-RUN mkdir t && (cd t && echo '{}' > composer.json && composer config platform.php 8.2 && composer require phpunit/phpunit) && rm -r t/
+RUN mkdir t && (cd t && composer require phpunit/phpunit) && rm -r t/
 
 
 FROM basic as node
@@ -95,7 +95,7 @@ RUN apt-get -y update \
 RUN apt-get -y update \
     && apt-get -y install firefox-esr \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
+    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 
