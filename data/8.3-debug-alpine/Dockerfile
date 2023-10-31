@@ -12,9 +12,6 @@ RUN apk update \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
-    && cd xdebug && git reset --hard 16621167bc && rm -r .git \
-    && sed 's~<max>8.3.99</max>~<max>99.99.99</max>~' -i package.xml
 RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     bcmath \
     exif \
@@ -35,7 +32,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     redis \
     sockets \
     tidy \
-    $(realpath xdebug) \
+    xdebug \
     xsl \
     zip \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed

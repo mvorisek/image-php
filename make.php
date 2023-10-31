@@ -22,19 +22,19 @@ $phpVersionsFromSource = [
         'forkPhpVersion' => '8.2', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm'],
     ],
     '8.3' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.3\.[0-9]+RC[0-9]+',
-        'forkPhpVersion' => '8.3-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm']
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.3\.[0-9]+',
+        'forkPhpVersion' => '8.3', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm']
     ],
     '8.4' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-        'forkPhpVersion' => '8.3-rc', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm']
+        'forkPhpVersion' => '8.3', 'forkOsName' => ['alpine' => 'alpine3.18', 'debian' => 'bookworm']
     ],
 ];
 $osNames = ['alpine', 'debian'];
 $targetNames = ['basic', 'node', 'selenium'];
 
 $aliasesPhpVersions = [
-    '8.2' => ['latest'],
+    '8.3' => ['latest'],
 ];
 $defaultOs = 'alpine';
 
@@ -116,7 +116,7 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-' . (in_array($phpVersion, ['8.3', '8.4'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
+' . (in_array($phpVersion, ['8.4'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
     && cd xdebug && git reset --hard 16621167bc && rm -r .git \
     && sed \'s~<max>8.3.99</max>~<max>99.99.99</max>~\' -i package.xml
 ' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
@@ -140,7 +140,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'redis',
         'sockets',
         'tidy',
-        in_array($phpVersion, ['8.3', '8.4'], true) ? '$(realpath xdebug)' : 'xdebug',
+        in_array($phpVersion, ['8.4'], true) ? '$(realpath xdebug)' : 'xdebug',
         'xsl',
         'zip',
     ]) . ($osName === 'alpine' ? ' \

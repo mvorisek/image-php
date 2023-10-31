@@ -13,12 +13,12 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1` `8.1-alpine`
 - `8.1-zts` `8.1-zts-alpine`
 - `8.1-debug` `8.1-debug-alpine`
-- `8.2` `8.2-alpine` `latest` `latest-alpine`
-- `8.2-zts` `8.2-zts-alpine` `latest-zts` `latest-zts-alpine`
-- `8.2-debug` `8.2-debug-alpine` `latest-debug` `latest-debug-alpine`
-- `8.3` `8.3-alpine`
-- `8.3-zts` `8.3-zts-alpine`
-- `8.3-debug` `8.3-debug-alpine`
+- `8.2` `8.2-alpine`
+- `8.2-zts` `8.2-zts-alpine`
+- `8.2-debug` `8.2-debug-alpine`
+- `8.3` `8.3-alpine` `latest` `latest-alpine`
+- `8.3-zts` `8.3-zts-alpine` `latest-zts` `latest-zts-alpine`
+- `8.3-debug` `8.3-debug-alpine` `latest-debug` `latest-debug-alpine`
 - `8.4` `8.4-alpine`
 - `8.4-zts` `8.4-zts-alpine`
 - `8.4-debug` `8.4-debug-alpine`
@@ -31,12 +31,12 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1-debian`
 - `8.1-zts-debian`
 - `8.1-debug-debian`
-- `8.2-debian` `latest-debian`
-- `8.2-zts-debian` `latest-zts-debian`
-- `8.2-debug-debian` `latest-debug-debian`
-- `8.3-debian`
-- `8.3-zts-debian`
-- `8.3-debug-debian`
+- `8.2-debian`
+- `8.2-zts-debian`
+- `8.2-debug-debian`
+- `8.3-debian` `latest-debian`
+- `8.3-zts-debian` `latest-zts-debian`
+- `8.3-debug-debian` `latest-debug-debian`
 - `8.4-debian`
 - `8.4-zts-debian`
 - `8.4-debug-debian`
@@ -49,12 +49,12 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1-node` `8.1-alpine-node`
 - `8.1-zts-node` `8.1-zts-alpine-node`
 - `8.1-debug-node` `8.1-debug-alpine-node`
-- `8.2-node` `8.2-alpine-node` `latest-node` `latest-alpine-node`
-- `8.2-zts-node` `8.2-zts-alpine-node` `latest-zts-node` `latest-zts-alpine-node`
-- `8.2-debug-node` `8.2-debug-alpine-node` `latest-debug-node` `latest-debug-alpine-node`
-- `8.3-node` `8.3-alpine-node`
-- `8.3-zts-node` `8.3-zts-alpine-node`
-- `8.3-debug-node` `8.3-debug-alpine-node`
+- `8.2-node` `8.2-alpine-node`
+- `8.2-zts-node` `8.2-zts-alpine-node`
+- `8.2-debug-node` `8.2-debug-alpine-node`
+- `8.3-node` `8.3-alpine-node` `latest-node` `latest-alpine-node`
+- `8.3-zts-node` `8.3-zts-alpine-node` `latest-zts-node` `latest-zts-alpine-node`
+- `8.3-debug-node` `8.3-debug-alpine-node` `latest-debug-node` `latest-debug-alpine-node`
 - `8.4-node` `8.4-alpine-node`
 - `8.4-zts-node` `8.4-zts-alpine-node`
 - `8.4-debug-node` `8.4-debug-alpine-node`
@@ -67,12 +67,12 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1-debian-node`
 - `8.1-zts-debian-node`
 - `8.1-debug-debian-node`
-- `8.2-debian-node` `latest-debian-node`
-- `8.2-zts-debian-node` `latest-zts-debian-node`
-- `8.2-debug-debian-node` `latest-debug-debian-node`
-- `8.3-debian-node`
-- `8.3-zts-debian-node`
-- `8.3-debug-debian-node`
+- `8.2-debian-node`
+- `8.2-zts-debian-node`
+- `8.2-debug-debian-node`
+- `8.3-debian-node` `latest-debian-node`
+- `8.3-zts-debian-node` `latest-zts-debian-node`
+- `8.3-debug-debian-node` `latest-debug-debian-node`
 - `8.4-debian-node`
 - `8.4-zts-debian-node`
 - `8.4-debug-debian-node`
@@ -85,12 +85,12 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1-selenium` `8.1-alpine-selenium`
 - `8.1-zts-selenium` `8.1-zts-alpine-selenium`
 - `8.1-debug-selenium` `8.1-debug-alpine-selenium`
-- `8.2-selenium` `8.2-alpine-selenium` `latest-selenium` `latest-alpine-selenium`
-- `8.2-zts-selenium` `8.2-zts-alpine-selenium` `latest-zts-selenium` `latest-zts-alpine-selenium`
-- `8.2-debug-selenium` `8.2-debug-alpine-selenium` `latest-debug-selenium` `latest-debug-alpine-selenium`
-- `8.3-selenium` `8.3-alpine-selenium`
-- `8.3-zts-selenium` `8.3-zts-alpine-selenium`
-- `8.3-debug-selenium` `8.3-debug-alpine-selenium`
+- `8.2-selenium` `8.2-alpine-selenium`
+- `8.2-zts-selenium` `8.2-zts-alpine-selenium`
+- `8.2-debug-selenium` `8.2-debug-alpine-selenium`
+- `8.3-selenium` `8.3-alpine-selenium` `latest-selenium` `latest-alpine-selenium`
+- `8.3-zts-selenium` `8.3-zts-alpine-selenium` `latest-zts-selenium` `latest-zts-alpine-selenium`
+- `8.3-debug-selenium` `8.3-debug-alpine-selenium` `latest-debug-selenium` `latest-debug-alpine-selenium`
 - `8.4-selenium` `8.4-alpine-selenium`
 - `8.4-zts-selenium` `8.4-zts-alpine-selenium`
 - `8.4-debug-selenium` `8.4-debug-alpine-selenium`
@@ -103,12 +103,12 @@ This repository builds `ghcr.io/mvorisek/image-php` image and publishes the foll
 - `8.1-debian-selenium`
 - `8.1-zts-debian-selenium`
 - `8.1-debug-debian-selenium`
-- `8.2-debian-selenium` `latest-debian-selenium`
-- `8.2-zts-debian-selenium` `latest-zts-debian-selenium`
-- `8.2-debug-debian-selenium` `latest-debug-debian-selenium`
-- `8.3-debian-selenium`
-- `8.3-zts-debian-selenium`
-- `8.3-debug-debian-selenium`
+- `8.2-debian-selenium`
+- `8.2-zts-debian-selenium`
+- `8.2-debug-debian-selenium`
+- `8.3-debian-selenium` `latest-debian-selenium`
+- `8.3-zts-debian-selenium` `latest-zts-debian-selenium`
+- `8.3-debug-debian-selenium` `latest-debug-debian-selenium`
 - `8.4-debian-selenium`
 - `8.4-zts-debian-selenium`
 - `8.4-debug-debian-selenium`
