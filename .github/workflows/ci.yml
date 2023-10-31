@@ -644,6 +644,7 @@ jobs:
         run: >-
           docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker inspect --format="{{.Id}}" "ci-target:basic")
           && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker inspect --format="{{.Id}}" "ci-target:basic") | cut -f1
+          && php analyse-layers.php "ci-target:basic" "ci-target:base"
 
       - name: 'Target "node" - build'
         # try to build twice to suppress random network issues with Github Actions
@@ -663,6 +664,7 @@ jobs:
         run: >-
           docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker inspect --format="{{.Id}}" "ci-target:node")
           && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker inspect --format="{{.Id}}" "ci-target:node") | cut -f1
+          && php analyse-layers.php "ci-target:node" "ci-target:base"
 
       - name: 'Target "selenium" - build'
         # try to build twice to suppress random network issues with Github Actions
@@ -682,6 +684,7 @@ jobs:
         run: >-
           docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" $(docker inspect --format="{{.Id}}" "ci-target:selenium")
           && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker inspect --format="{{.Id}}" "ci-target:selenium") | cut -f1
+          && php analyse-layers.php "ci-target:selenium" "ci-target:node"
 
       - name: Login to registry
         uses: docker/login-action@v2

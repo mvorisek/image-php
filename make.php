@@ -119,22 +119,28 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 ' . (in_array($phpVersion, ['8.4'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
     && cd xdebug && git reset --hard 16621167bc && rm -r .git \
     && sed \'s~<max>8.3.99</max>~<max>99.99.99</max>~\' -i package.xml
-' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
-    ' . implode(' \\' . "\n" . '    ', [
+' : '') . implode("\n", array_map(function (string $ext) {
+    return 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions ' . $ext;
+}, [
         'bcmath',
         'exif',
         'gd',
         'gmp',
         'igbinary',
-        in_array($phpVersion, ['8.3', '8.4'], true) ? 'Imagick/imagick@28f27044e4' : 'imagick',
+        (in_array($phpVersion, ['8.3', '8.4'], true) ? 'Imagick/imagick@28f27044e4' : 'imagick')
+            . ($osName === 'alpine' ? ' \
+    # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
+    && rm /usr/bin/gs' : ''),
         'imap',
         'intl',
         'mysqli',
-        'oci8',
         'opcache',
         'pcntl',
         'pdo_mysql',
-        'pdo_oci',
+        'oci8 pdo_oci \
+    # pack Oracle Instant Client libs, reduce image size by 85 MB
+    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -r /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
+    && { echo \'#!/bin/sh\'; echo \'if [ ! -d /usr/lib/oracle/*/client64 ]; then\'; echo \'    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz\'; echo \'fi\'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh',
         'pdo_pgsql',
         'pdo_sqlsrv',
         'redis',
@@ -143,12 +149,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         in_array($phpVersion, ['8.4'], true) ? '$(realpath xdebug)' : 'xdebug',
         'xsl',
         'zip',
-    ]) . ($osName === 'alpine' ? ' \
-    # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
-    && rm /usr/bin/gs' : '') . ' \
-    # pack Oracle Instant Client libs, reduce image size by 85 MB
-    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -r /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
-    && { echo \'#!/bin/sh\'; echo \'if [ ! -d /usr/lib/oracle/*/client64 ]; then\'; echo \'    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz\'; echo \'fi\'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
+    ])) . '
 
 # install Composer
 RUN install-php-extensions @composer
@@ -387,7 +388,8 @@ jobs:
       - name: \'Target "' . $targetName . '" - display layer sizes\'
         run: >-
           docker history --no-trunc --format "table {{.CreatedSince}}\t{{.Size}}\t{{.CreatedBy}}" ' . $imageHashCmd . '
-          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep ' . $imageHashCmd . ' | cut -f1';
+          && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep ' . $imageHashCmd . ' | cut -f1
+          && php analyse-layers.php "ci-target:' . $targetName . '"' . (['base' => '', 'selenium' => ' "ci-target:node"'][$targetName] ?? ' "ci-target:base"');
 }, $targetNames)) . '
 
       - name: Login to registry

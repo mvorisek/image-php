@@ -16,32 +16,30 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
     && cd xdebug && git reset --hard 16621167bc && rm -r .git \
     && sed 's~<max>8.3.99</max>~<max>99.99.99</max>~' -i package.xml
-RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
-    bcmath \
-    exif \
-    gd \
-    gmp \
-    igbinary \
-    Imagick/imagick@28f27044e4 \
-    imap \
-    intl \
-    mysqli \
-    oci8 \
-    opcache \
-    pcntl \
-    pdo_mysql \
-    pdo_oci \
-    pdo_pgsql \
-    pdo_sqlsrv \
-    redis \
-    sockets \
-    tidy \
-    $(realpath xdebug) \
-    xsl \
-    zip \
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions bcmath
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions exif
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions gd
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions gmp
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions igbinary
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions Imagick/imagick@28f27044e4
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions imap
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions intl
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions mysqli
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions opcache
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions pcntl
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions pdo_mysql
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions oci8 pdo_oci \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
     && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -r /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
     && { echo '#!/bin/sh'; echo 'if [ ! -d /usr/lib/oracle/*/client64 ]; then'; echo '    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz'; echo 'fi'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions pdo_pgsql
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions pdo_sqlsrv
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions redis
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions sockets
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions tidy
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions $(realpath xdebug)
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions xsl
+RUN IPE_ICU_EN_ONLY=1 install-php-extensions zip
 
 # install Composer
 RUN install-php-extensions @composer
