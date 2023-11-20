@@ -76,9 +76,6 @@ FROM node as selenium
 
 # install Selenium
 RUN apt-get -y update \
-    && apt-get -y install ca-certificates-java \
-    && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && apt-get -y update \
     && apt-get -y install openjdk-17-jre-headless xvfb fonts-freefont-ttf \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar
