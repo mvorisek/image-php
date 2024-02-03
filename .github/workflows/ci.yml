@@ -14,7 +14,7 @@ jobs:
       image: ghcr.io/mvorisek/image-php
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Check if files are in-sync"
         run: |
@@ -70,7 +70,7 @@ jobs:
           - "8.4-debug-debian"
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 'Build base image - clone & patch - 7.4.x'
         if: (matrix.imageName == '7.4-alpine' || matrix.imageName == '7.4-zts-alpine' || matrix.imageName == '7.4-debug-alpine' || matrix.imageName == '7.4-debian' || matrix.imageName == '7.4-zts-debian' || matrix.imageName == '7.4-debug-debian')
@@ -104,8 +104,14 @@ jobs:
           ; elif [ "${{ matrix.imageName }}" == "7.4-zts-debian" ]; then
           echo '{ "7.4": { "url": "x", "variants": [ "bullseye/zts" ], "version": "7.4.99" } }' > versions.json
           ; fi
-          && git apply -v ../fix-dlphp-strip-pr1280.patch
-          && ./apply-templates.sh
+          && if [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ]; then
+          git apply -v ../fix-dlphp-strip-pr1280.patch
+          ; fi
+          && if [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-zts-debian" ]; then
+          ./apply-templates.sh
+          ; elif [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ]; then
+          DOCKER_PHP_ENABLE_DEBUG=1 ./apply-templates.sh
+          ; fi
           && if [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ]; then
           mv 7.4/alpine3.16/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ]; then
@@ -159,8 +165,12 @@ jobs:
           ; elif [ "${{ matrix.imageName }}" == "8.0-zts-debian" ]; then
           echo '{ "8.0": { "url": "x", "variants": [ "bullseye/zts" ], "version": "8.0.99" } }' > versions.json
           ; fi
-          && git apply -v ../fix-dlphp-strip-pr1280.patch
-          && ./apply-templates.sh
+          && true
+          && if [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ]; then
+          ./apply-templates.sh
+          ; elif [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ]; then
+          DOCKER_PHP_ENABLE_DEBUG=1 ./apply-templates.sh
+          ; fi
           && if [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ]; then
           mv 8.0/alpine3.16/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ]; then
@@ -179,9 +189,7 @@ jobs:
           && if [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ]; then
           sed -E 's~(--with-curl.*)( \\)~\1 --enable-embed\2~' -i Dockerfile
           ; fi
-          && if [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ]; then
-          sed -E 's~(--with-curl.*)( \\)~\1 --enable-debug\2~' -i Dockerfile
-          ; fi
+          && true
           && git add . -N && git diff --diff-filter=d
 
       - name: 'Build base image - clone & patch - 8.1.x'
@@ -214,8 +222,12 @@ jobs:
           ; elif [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
           echo '{ "8.1": { "url": "x", "variants": [ "bookworm/zts" ], "version": "8.1.99" } }' > versions.json
           ; fi
-          && git apply -v ../fix-dlphp-strip-pr1280.patch
-          && ./apply-templates.sh
+          && true
+          && if [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debian" ] || [ "${{ matrix.imageName }}" == "8.1-zts-debian" ]; then
+          ./apply-templates.sh
+          ; elif [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ]; then
+          DOCKER_PHP_ENABLE_DEBUG=1 ./apply-templates.sh
+          ; fi
           && if [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ]; then
           mv 8.1/alpine3.18/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ]; then
@@ -234,9 +246,7 @@ jobs:
           && if [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ]; then
           sed -E 's~(--with-curl.*)( \\)~\1 --enable-embed\2~' -i Dockerfile
           ; fi
-          && if [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-debian" ]; then
-          sed -E 's~(--with-curl.*)( \\)~\1 --enable-debug\2~' -i Dockerfile
-          ; fi
+          && true
           && git add . -N && git diff --diff-filter=d
 
       - name: 'Build base image - clone & patch - 8.2.x'
@@ -269,8 +279,12 @@ jobs:
           ; elif [ "${{ matrix.imageName }}" == "8.2-zts-debian" ]; then
           echo '{ "8.2": { "url": "x", "variants": [ "bookworm/zts" ], "version": "8.2.99" } }' > versions.json
           ; fi
-          && git apply -v ../fix-dlphp-strip-pr1280.patch
-          && ./apply-templates.sh
+          && true
+          && if [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debian" ] || [ "${{ matrix.imageName }}" == "8.2-zts-debian" ]; then
+          ./apply-templates.sh
+          ; elif [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-debian" ]; then
+          DOCKER_PHP_ENABLE_DEBUG=1 ./apply-templates.sh
+          ; fi
           && if [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ]; then
           mv 8.2/alpine3.18/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ]; then
@@ -289,9 +303,7 @@ jobs:
           && if [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ]; then
           sed -E 's~(--with-curl.*)( \\)~\1 --enable-embed\2~' -i Dockerfile
           ; fi
-          && if [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-debian" ]; then
-          sed -E 's~(--with-curl.*)( \\)~\1 --enable-debug\2~' -i Dockerfile
-          ; fi
+          && true
           && git add . -N && git diff --diff-filter=d
 
       - name: 'Build base image - clone & patch - 8.3.x'
@@ -324,8 +336,12 @@ jobs:
           ; elif [ "${{ matrix.imageName }}" == "8.3-zts-debian" ]; then
           echo '{ "8.3": { "url": "x", "variants": [ "bookworm/zts" ], "version": "8.3.99" } }' > versions.json
           ; fi
-          && git apply -v ../fix-dlphp-strip-pr1280.patch
-          && ./apply-templates.sh
+          && true
+          && if [ "${{ matrix.imageName }}" == "8.3-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debian" ] || [ "${{ matrix.imageName }}" == "8.3-zts-debian" ]; then
+          ./apply-templates.sh
+          ; elif [ "${{ matrix.imageName }}" == "8.3-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debug-debian" ]; then
+          DOCKER_PHP_ENABLE_DEBUG=1 ./apply-templates.sh
+          ; fi
           && if [ "${{ matrix.imageName }}" == "8.3-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debug-alpine" ]; then
           mv 8.3/alpine3.18/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "8.3-zts-alpine" ]; then
@@ -344,9 +360,7 @@ jobs:
           && if [ "${{ matrix.imageName }}" == "8.3-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debug-alpine" ]; then
           sed -E 's~(--with-curl.*)( \\)~\1 --enable-embed\2~' -i Dockerfile
           ; fi
-          && if [ "${{ matrix.imageName }}" == "8.3-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debug-debian" ]; then
-          sed -E 's~(--with-curl.*)( \\)~\1 --enable-debug\2~' -i Dockerfile
-          ; fi
+          && true
           && git add . -N && git diff --diff-filter=d
 
       - name: 'Build base image - clone & patch - 8.4.x'
@@ -379,8 +393,12 @@ jobs:
           ; elif [ "${{ matrix.imageName }}" == "8.4-zts-debian" ]; then
           echo '{ "8.3": { "url": "x", "variants": [ "bookworm/zts" ], "version": "8.3.99" } }' > versions.json
           ; fi
-          && git apply -v ../fix-dlphp-strip-pr1280.patch
-          && ./apply-templates.sh
+          && true
+          && if [ "${{ matrix.imageName }}" == "8.4-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debian" ] || [ "${{ matrix.imageName }}" == "8.4-zts-debian" ]; then
+          ./apply-templates.sh
+          ; elif [ "${{ matrix.imageName }}" == "8.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debug-debian" ]; then
+          DOCKER_PHP_ENABLE_DEBUG=1 ./apply-templates.sh
+          ; fi
           && if [ "${{ matrix.imageName }}" == "8.4-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debug-alpine" ]; then
           mv 8.3/alpine3.18/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "8.4-zts-alpine" ]; then
@@ -399,9 +417,7 @@ jobs:
           && if [ "${{ matrix.imageName }}" == "8.4-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debug-alpine" ]; then
           sed -E 's~(--with-curl.*)( \\)~\1 --enable-embed\2~' -i Dockerfile
           ; fi
-          && if [ "${{ matrix.imageName }}" == "8.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debug-debian" ]; then
-          sed -E 's~(--with-curl.*)( \\)~\1 --enable-debug\2~' -i Dockerfile
-          ; fi
+          && true
           && git add . -N && git diff --diff-filter=d
 
       - name: 'Build base image - build - 7.4.x'
@@ -684,7 +700,7 @@ jobs:
           && docker images --no-trunc --format "Total size: {{.Size}}\t{{.ID}}" | grep $(docker inspect --format="{{.Id}}" "ci-target:selenium") | cut -f1
 
       - name: Login to registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY_NAME }}
           username: ${{ github.repository_owner }}

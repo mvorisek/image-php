@@ -282,7 +282,7 @@ jobs:
       image: ghcr.io/mvorisek/image-php
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Check if files are in-sync"
         run: |
@@ -305,7 +305,7 @@ jobs:
 }, $imageNames)) . '
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
 ' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Build base image - clone & patch\'
         run: >-
@@ -336,8 +336,14 @@ jobs:
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
     return 'echo \'{ "' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '": { "url": "x", "variants": [ "' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '" ], "version": "' . preg_replace('~-rc\.$~', 'RC', $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '.') . '99" } }\' > versions.json';
 }) . '
-          && git apply -v ../fix-dlphp-strip-pr1280.patch
-          && ./apply-templates.sh
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    return in_array($phpVersion, ['7.4'], true)
+        ? 'git apply -v ../fix-dlphp-strip-pr1280.patch'
+        : null;
+}) . '
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    return (strpos($imageName, '-debug-') !== false ? 'DOCKER_PHP_ENABLE_DEBUG=1 ' : '') . './apply-templates.sh';
+}) . '
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
     return 'mv ' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '/' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '/ img';
 }) . '
@@ -351,7 +357,9 @@ jobs:
     return $osName === 'debian' ? null : 'sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-embed\2~\' -i Dockerfile';
 }) . '
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return strpos($imageName, '-debug-') === false ? null : 'sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-debug\2~\' -i Dockerfile';
+    return in_array($phpVersion, ['7.4'], true) && strpos($imageName, '-debug-') !== false
+        ? 'sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-debug\2~\' -i Dockerfile'
+        : null;
 }) . '
           && git add . -N && git diff --diff-filter=d') . '
 
@@ -391,7 +399,7 @@ jobs:
 }, $targetNames)) . '
 
       - name: Login to registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY_NAME }}
           username: ${{ github.repository_owner }}
