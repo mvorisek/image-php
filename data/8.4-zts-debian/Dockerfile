@@ -13,8 +13,10 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
+    && cd phpredis && git reset --hard a51215ce2b && rm -r .git
 RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
-    && cd xdebug && git reset --hard 16621167bc && rm -r .git \
+    && cd xdebug && git reset --hard b303190f15 && rm -r .git \
     && sed 's~<max>8.3.99</max>~<max>99.99.99</max>~' -i package.xml
 RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     bcmath \
@@ -23,17 +25,17 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     gmp \
     igbinary \
     Imagick/imagick@28f27044e4 \
-    imap \
+    php/pecl-mail-imap@25b62dbf7b \
     intl \
     mysqli \
-    oci8 \
+    php/pecl-database-oci8@74893c6e3d \
     opcache \
     pcntl \
     pdo_mysql \
-    pdo_oci \
+    php/pecl-database-pdo_oci@be8a277c27 \
     pdo_pgsql \
     pdo_sqlsrv \
-    redis \
+    $(realpath phpredis) \
     sockets \
     tidy \
     $(realpath xdebug) \
@@ -92,7 +94,7 @@ RUN apt-get -y update \
 RUN apt-get -y update \
     && apt-get -y install firefox-esr \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
+    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 

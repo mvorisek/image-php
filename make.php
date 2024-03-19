@@ -116,8 +116,10 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-' . (in_array($phpVersion, ['8.4'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
-    && cd xdebug && git reset --hard 16621167bc && rm -r .git \
+' . (in_array($phpVersion, ['8.4'], true) ? 'RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
+    && cd phpredis && git reset --hard a51215ce2b && rm -r .git
+' : '') . (in_array($phpVersion, ['8.4'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
+    && cd xdebug && git reset --hard b303190f15 && rm -r .git \
     && sed \'s~<max>8.3.99</max>~<max>99.99.99</max>~\' -i package.xml
 ' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     ' . implode(' \\' . "\n" . '    ', [
@@ -127,17 +129,17 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'gmp',
         'igbinary',
         in_array($phpVersion, ['8.3', '8.4'], true) ? 'Imagick/imagick@28f27044e4' : 'imagick',
-        'imap',
+        in_array($phpVersion, ['8.4'], true) ? 'php/pecl-mail-imap@25b62dbf7b' : 'imap',
         'intl',
         'mysqli',
-        'oci8',
+        in_array($phpVersion, ['8.4'], true) ? 'php/pecl-database-oci8@74893c6e3d' : 'oci8',
         'opcache',
         'pcntl',
         'pdo_mysql',
-        'pdo_oci',
+        in_array($phpVersion, ['8.4'], true) ? 'php/pecl-database-pdo_oci@be8a277c27' : 'pdo_oci',
         'pdo_pgsql',
         'pdo_sqlsrv',
-        'redis',
+        in_array($phpVersion, ['8.4'], true) ? '$(realpath phpredis)' : 'redis',
         'sockets',
         'tidy',
         in_array($phpVersion, ['8.4'], true) ? '$(realpath xdebug)' : 'xdebug',
@@ -194,7 +196,7 @@ RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['chromium', 'chromium-c
 
 # install Firefox
 RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['firefox'], 'debian' => ['firefox-esr']][$osName]) . ' \
-    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
+    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 
@@ -319,8 +321,8 @@ jobs:
           && git checkout -B master
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     return in_array($phpVersion, ['7.4', '8.0'], true)
-        ? 'git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read"'
-        : ($osName === 'alpine' ? 'sed -E \'s~#if HAVE_OCILOBREAD2$~#if 1~\' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine"' : null); // fix https://github.com/php/php-src/pull/8018 was merged into PHP 8.1+ officially, but https://github.com/php/php-src/issues/8197 is still not fixed for Alpine
+        ? 'git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"'
+        : ($osName === 'alpine' && in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2', '8.3'], true) ? 'sed -E \'s~#if HAVE_OCILOBREAD2$~#if 1~\' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine - https://github.com/php/php-src/issues/8197"' : null);
 }) . '
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz

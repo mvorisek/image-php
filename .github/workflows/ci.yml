@@ -84,7 +84,7 @@ jobs:
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
           && if [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ]; then
-          git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read"
+          git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"
           ; fi
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
@@ -147,7 +147,7 @@ jobs:
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
           && if [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ]; then
-          git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read"
+          git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"
           ; fi
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
@@ -204,7 +204,7 @@ jobs:
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
           && if [ "${{ matrix.imageName }}" == "8.1-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.1-debug-alpine" ]; then
-          sed -E 's~#if HAVE_OCILOBREAD2$~#if 1~' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine"
+          sed -E 's~#if HAVE_OCILOBREAD2$~#if 1~' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine - https://github.com/php/php-src/issues/8197"
           ; fi
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
@@ -261,7 +261,7 @@ jobs:
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
           && if [ "${{ matrix.imageName }}" == "8.2-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.2-debug-alpine" ]; then
-          sed -E 's~#if HAVE_OCILOBREAD2$~#if 1~' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine"
+          sed -E 's~#if HAVE_OCILOBREAD2$~#if 1~' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine - https://github.com/php/php-src/issues/8197"
           ; fi
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
@@ -318,7 +318,7 @@ jobs:
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
           && if [ "${{ matrix.imageName }}" == "8.3-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debug-alpine" ]; then
-          sed -E 's~#if HAVE_OCILOBREAD2$~#if 1~' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine"
+          sed -E 's~#if HAVE_OCILOBREAD2$~#if 1~' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine - https://github.com/php/php-src/issues/8197"
           ; fi
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
@@ -374,9 +374,7 @@ jobs:
           ; fi
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
-          && if [ "${{ matrix.imageName }}" == "8.4-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debug-alpine" ]; then
-          sed -E 's~#if HAVE_OCILOBREAD2$~#if 1~' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine"
-          ; fi
+          && true
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
           && git add . -N && git diff --diff-filter=d "$PHPSRC_COMMIT"
