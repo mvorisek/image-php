@@ -117,7 +117,7 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 ' . (in_array($phpVersion, ['8.4'], true) ? 'RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
-    && cd phpredis && git reset --hard a51215ce2b && rm -r .git
+    && cd phpredis && git reset --hard d3b2d87b10 && rm -r .git
 ' : '') . (in_array($phpVersion, ['8.4'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
     && cd xdebug && git reset --hard b303190f15 && rm -r .git \
     && sed \'s~<max>8.3.99</max>~<max>99.99.99</max>~\' -i package.xml
