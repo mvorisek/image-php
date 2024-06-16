@@ -128,7 +128,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'gd',
         'gmp',
         'igbinary',
-        in_array($phpVersion, ['8.3', '8.4'], true) ? 'Imagick/imagick@28f27044e4' : 'imagick',
+        in_array($phpVersion, ['8.3', '8.4'], true) ? 'Imagick/imagick@1ba627de1b' : 'imagick',
         in_array($phpVersion, ['8.4'], true) ? 'php/pecl-mail-imap@25b62dbf7b' : 'imap',
         'intl',
         'mysqli',
