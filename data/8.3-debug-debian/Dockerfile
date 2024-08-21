@@ -19,7 +19,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     gd \
     gmp \
     igbinary \
-    Imagick/imagick@1ba627de1b \
+    Imagick/imagick@ef495c0b8f \
     imap \
     intl \
     mysqli \

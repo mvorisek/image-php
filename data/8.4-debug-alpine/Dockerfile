@@ -15,15 +15,15 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
     && cd phpredis && git reset --hard d3b2d87b10 && rm -r .git
 RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
-    && cd xdebug && git reset --hard b303190f15 && rm -r .git \
-    && sed 's~<max>8.3.99</max>~<max>99.99.99</max>~' -i package.xml
+    && cd xdebug && git reset --hard 12adc6394a && rm -r .git \
+    && sed 's~<max>8.4.99</max>~<max>99.99.99</max>~' -i package.xml
 RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     bcmath \
     exif \
     gd \
     gmp \
     igbinary \
-    Imagick/imagick@1ba627de1b \
+    Imagick/imagick@ef495c0b8f \
     php/pecl-mail-imap@25b62dbf7b \
     intl \
     mysqli \
