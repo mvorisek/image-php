@@ -120,7 +120,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
     && cd phpredis && git reset --hard d3b2d87b10 && rm -r .git
 ' : '') . (in_array($phpVersion, ['8.4'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
     && cd xdebug && git reset --hard 12adc6394a && rm -r .git \
-    && sed \'s~<max>8.4.99</max>~<max>99.99.99</max>~\' -i package.xml
+    && sed -E \'s~(<max>)[0-9]+.[0-9]+(.99</max>)~\199.99\2~\' -i package.xml && sed -E \'s~(if test "\$PHP_XDEBUG_FOUND_VERNUM" -ge ")[0-9]+(00"; then)~\19999\2~\' -i config.m4
 ' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     ' . implode(' \\' . "\n" . '    ', [
         'bcmath',
@@ -128,7 +128,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'gd',
         'gmp',
         'igbinary',
-        in_array($phpVersion, ['8.3', '8.4'], true) ? 'Imagick/imagick@ef495c0b8f' : 'imagick',
+        in_array($phpVersion, ['8.3', '8.4'], true) ? 'Imagick/imagick@65e27f2bc0' : 'imagick',
         in_array($phpVersion, ['8.4'], true) ? 'php/pecl-mail-imap@25b62dbf7b' : 'imap',
         'intl',
         'mysqli',
