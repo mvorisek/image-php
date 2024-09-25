@@ -26,8 +26,12 @@ $phpVersionsFromSource = [
         'forkPhpVersion' => '8.3', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
     ],
     '8.4' => [
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.4\.[0-9]+(RC[0-9]+)?',
+        'forkPhpVersion' => '8.4-rc', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
+    ],
+    '8.5' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-        'forkPhpVersion' => '8.3', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
+        'forkPhpVersion' => '8.4-rc', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
     ],
 ];
 $osNames = ['alpine', 'debian'];
@@ -116,9 +120,9 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-' . (in_array($phpVersion, ['8.4'], true) ? 'RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
+' . (in_array($phpVersion, ['8.4', '8.5'], true) ? 'RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
     && cd phpredis && git reset --hard d3b2d87b10 && rm -r .git
-' : '') . (in_array($phpVersion, ['8.4'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
+' : '') . (in_array($phpVersion, ['8.4', '8.5'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
     && cd xdebug && git reset --hard 12adc6394a && rm -r .git \
     && sed -E \'s~(<max>)[0-9]+.[0-9]+(.99</max>)~\199.99\2~\' -i package.xml && sed -E \'s~(if test "\$PHP_XDEBUG_FOUND_VERNUM" -ge ")[0-9]+(00"; then)~\19999\2~\' -i config.m4
 ' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
@@ -128,21 +132,21 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'gd',
         'gmp',
         'igbinary',
-        in_array($phpVersion, ['8.3', '8.4'], true) ? 'Imagick/imagick@65e27f2bc0' : 'imagick',
-        in_array($phpVersion, ['8.4'], true) ? 'php/pecl-mail-imap@25b62dbf7b' : 'imap',
+        in_array($phpVersion, ['8.3', '8.4', '8.5'], true) ? 'Imagick/imagick@65e27f2bc0' : 'imagick',
+        in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-mail-imap@25b62dbf7b' : 'imap',
         'intl',
         'mysqli',
-        in_array($phpVersion, ['8.4'], true) ? 'php/pecl-database-oci8@74893c6e3d' : 'oci8',
+        in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-database-oci8@74893c6e3d' : 'oci8',
         'opcache',
         'pcntl',
         'pdo_mysql',
-        in_array($phpVersion, ['8.4'], true) ? 'php/pecl-database-pdo_oci@be8a277c27' : 'pdo_oci',
+        in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-database-pdo_oci@be8a277c27' : 'pdo_oci',
         'pdo_pgsql',
         'pdo_sqlsrv',
-        in_array($phpVersion, ['8.4'], true) ? '$(realpath phpredis)' : 'redis',
+        in_array($phpVersion, ['8.4', '8.5'], true) ? '$(realpath phpredis)' : 'redis',
         'sockets',
         'tidy',
-        in_array($phpVersion, ['8.4'], true) ? '$(realpath xdebug)' : 'xdebug',
+        in_array($phpVersion, ['8.4', '8.5'], true) ? '$(realpath xdebug)' : 'xdebug',
         'xsl',
         'zip',
     ]) . ($osName === 'alpine' ? ' \
@@ -170,7 +174,7 @@ RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) us
         '"$(find /usr/local/lib/php/extensions -name xdebug.so)"',
     ])) . '
 RUN composer diagnose
-RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.4'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.3 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
+RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.5'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.4 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
 
 
 FROM basic as node
@@ -336,7 +340,7 @@ jobs:
 }) . '
           && rm -r [0-9].[0-9]*/ && sed -E \'s~( // )error\("missing GPG keys for " \+ env\.version\)~\1["x"]~\' -i Dockerfile-linux.template
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return 'echo \'{ "' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '": { "url": "x", "variants": [ "' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '" ], "version": "' . preg_replace('~-rc\.$~', 'RC', $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '.') . '99" } }\' > versions.json';
+    return 'echo \'{ "' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '": { "url": "x", "variants": [ "' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '" ], "version": "' . preg_replace('~-rc\.$~', '.0RC', $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '.') . '99" } }\' > versions.json';
 }) . '
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     return in_array($phpVersion, ['7.4'], true)

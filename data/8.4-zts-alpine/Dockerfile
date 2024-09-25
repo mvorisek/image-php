@@ -62,7 +62,7 @@ RUN ! readelf -S /usr/local/bin/php | grep -q ' \.symtab ' \
     && ! readelf -S "$(find /usr/local/lib/php/extensions -name bcmath.so)" | grep -q ' \.symtab ' \
     && ! readelf -S "$(find /usr/local/lib/php/extensions -name xdebug.so)" | grep -q ' \.symtab '
 RUN composer diagnose
-RUN mkdir t && (cd t && echo '{}' > composer.json && composer config platform.php 8.3 && composer require phpunit/phpunit) && rm -r t/
+RUN mkdir t && (cd t && composer require phpunit/phpunit) && rm -r t/
 
 
 FROM basic as node
