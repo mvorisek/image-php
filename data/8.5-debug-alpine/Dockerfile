@@ -33,7 +33,6 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     pdo_mysql \
     php/pecl-database-pdo_oci@be8a277c27 \
     pdo_pgsql \
-    pdo_sqlsrv \
     $(realpath phpredis) \
     sockets \
     tidy \

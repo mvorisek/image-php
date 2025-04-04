@@ -142,7 +142,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'pdo_mysql',
         in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-database-pdo_oci@be8a277c27' : 'pdo_oci',
         'pdo_pgsql',
-        'pdo_sqlsrv',
+        ...(in_array($phpVersion, ['8.5'], true) ? [] : ['pdo_sqlsrv']), // https://github.com/microsoft/msphpsql/issues/1523#issuecomment-2763338116
         in_array($phpVersion, ['8.4', '8.5'], true) ? '$(realpath phpredis)' : 'redis',
         'sockets',
         'tidy',
