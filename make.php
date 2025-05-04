@@ -5,33 +5,9 @@ declare(strict_types=1);
 namespace Mvorisek\Docker\ImagePhp;
 
 $phpVersionsFromSource = [
-    '7.4' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.4\.[0-9]+',
-        'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'], 'forkRepoCommit' => '7388e44e40',
-    ],
-    '8.0' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.0\.[0-9]+',
-        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'], 'forkRepoCommit' => '4c0c395658',
-    ],
-    '8.1' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
-        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm'],
-    ],
-    '8.2' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.2\.[0-9]+',
-        'forkPhpVersion' => '8.2', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm'],
-    ],
     '8.3' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.3\.[0-9]+',
         'forkPhpVersion' => '8.3', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
-    ],
-    '8.4' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.4\.[0-9]+(RC[0-9]+)?',
-        'forkPhpVersion' => '8.4-rc', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
-    ],
-    '8.5' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-        'forkPhpVersion' => '8.4-rc', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
     ],
 ];
 $osNames = ['alpine', 'debian'];
@@ -417,7 +393,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
 ' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Push tags to registry\'
-        if: github.ref == \'refs/heads/master\'
         run: >-
           dtp() { docker tag "ci-target:$1" "$REGISTRY_IMAGE_NAME:$2" && docker push "$REGISTRY_IMAGE_NAME:$2"; }
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion) use ($targetNames, $genImageTags, $createFullName) {
