@@ -1,4 +1,4 @@
-﻿diff --git a/ext/pdo_oci/oci_statement.c b/ext/pdo_oci/oci_statement.c
+diff --git a/ext/pdo_oci/oci_statement.c b/ext/pdo_oci/oci_statement.c
 index 0ab043f041d..6ab85e52bcf 100644
 --- a/ext/pdo_oci/oci_statement.c
 +++ b/ext/pdo_oci/oci_statement.c

@@ -1,4 +1,4 @@
-﻿diff --git a/Dockerfile-linux.template b/Dockerfile-linux.template
+diff --git a/Dockerfile-linux.template b/Dockerfile-linux.template
 index 75a6d2d8..3f386f0a 100644
 --- a/Dockerfile-linux.template
 +++ b/Dockerfile-linux.template

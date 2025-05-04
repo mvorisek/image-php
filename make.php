@@ -328,6 +328,11 @@ jobs:
         ? 'git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"'
         : ($osName === 'alpine' && in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2', '8.3'], true) ? 'sed -E \'s~#if HAVE_OCILOBREAD2$~#if 1~\' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine - https://github.com/php/php-src/issues/8197"' : null);
 }) . '
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    return in_array($phpVersion, ['8.3'], true)
+        ? 'git apply -v ../fix-pdo_oci-bug18494.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext GC - https://github.com/php/php-src/issues/18494"'
+        : null;
+}) . '
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
           && git add . -N && git diff --diff-filter=d "$PHPSRC_COMMIT"
