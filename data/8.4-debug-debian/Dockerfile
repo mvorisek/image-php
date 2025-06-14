@@ -28,11 +28,11 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     php/pecl-mail-imap@25b62dbf7b \
     intl \
     mysqli \
-    php/pecl-database-oci8@74893c6e3d \
+    php/pecl-database-oci8@7aa106119c \
     opcache \
     pcntl \
     pdo_mysql \
-    php/pecl-database-pdo_oci@be8a277c27 \
+    php/pecl-database-pdo_oci@ffd759828b \
     pdo_pgsql \
     pdo_sqlsrv \
     $(realpath phpredis) \

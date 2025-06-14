@@ -23,7 +23,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     imap \
     intl \
     mysqli \
-    oci8 \
+    php/pecl-database-oci8@7aa106119c \
     opcache \
     pcntl \
     pdo_mysql \

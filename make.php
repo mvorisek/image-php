@@ -11,7 +11,7 @@ $phpVersionsFromSource = [
     ],
     '8.0' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.0\.[0-9]+',
-        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'],
+        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'], 'forkRepoCommit' => '4c0c395658',
     ],
     '8.1' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
@@ -136,11 +136,11 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-mail-imap@25b62dbf7b' : 'imap',
         'intl',
         'mysqli',
-        in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-database-oci8@74893c6e3d' : 'oci8',
+        in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@7aa106119c',
         'opcache',
         'pcntl',
         'pdo_mysql',
-        in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-database-pdo_oci@be8a277c27' : 'pdo_oci',
+        in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@ffd759828b',
         'pdo_pgsql',
         ...(in_array($phpVersion, ['8.5'], true) ? [] : ['pdo_sqlsrv']), // https://github.com/microsoft/msphpsql/issues/1523#issuecomment-2763338116
         in_array($phpVersion, ['8.4', '8.5'], true) ? '$(realpath phpredis)' : 'redis',
@@ -334,7 +334,7 @@ jobs:
           && cd ..
           && git clone https://github.com/docker-library/php.git dlphp && cd dlphp
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return in_array($phpVersion, ['7.4'], true)
+    return in_array($phpVersion, ['7.4', '8.0'], true)
         ? 'git checkout ' . $phpVersionsFromSource[$phpVersion]['forkRepoCommit']
         : null;
 }) . '
