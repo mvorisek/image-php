@@ -89,7 +89,7 @@ RUN apk update \
 RUN apk update \
     && apk add firefox \
     && rm -rf /var/cache/apk/* \
-    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
+    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 

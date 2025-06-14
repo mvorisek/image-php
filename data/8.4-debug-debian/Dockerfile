@@ -94,7 +94,7 @@ RUN apt-get -y update \
 RUN apt-get -y update \
     && apt-get -y install firefox-esr \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
+    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 
