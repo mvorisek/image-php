@@ -42,7 +42,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 'Build base image - clone & patch'
+      - name: 'Build base image - clone & patch - 8.3.x'
+        if: (matrix.imageName == '8.3-alpine' || matrix.imageName == '8.3-zts-alpine' || matrix.imageName == '8.3-debug-alpine' || matrix.imageName == '8.3-debian' || matrix.imageName == '8.3-zts-debian' || matrix.imageName == '8.3-debug-debian')
         run: >-
           if [ "${{ matrix.imageName }}" == "8.3-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debian" ] || [ "${{ matrix.imageName }}" == "8.3-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.3-debug-debian" ]; then
           export PHPSRC_BRANCH="$(git ls-remote 'https://github.com/php/php-src.git' | grep -iE '\srefs/tags/PHP-8\.3\.[0-9]+$' | sort -k2 -V | tee /dev/stderr | awk 'END{print $NF}' | sed -E 's~^refs/[^/]+/~~')"
@@ -54,9 +55,6 @@ jobs:
           && git checkout -B master
           && if [ "${{ matrix.imageName }}" == "8.3-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debug-alpine" ]; then
           sed -E 's~#if HAVE_OCILOBREAD2$~#if 1~' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine - https://github.com/php/php-src/issues/8197"
-          ; fi
-          && if [ "${{ matrix.imageName }}" == "8.3-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.3-debian" ] || [ "${{ matrix.imageName }}" == "8.3-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.3-debug-debian" ]; then
-          git apply -v ../fix-pdo_oci-bug18494.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext GC - https://github.com/php/php-src/issues/18494"
           ; fi
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
@@ -101,7 +99,8 @@ jobs:
           && true
           && git add . -N && git diff --diff-filter=d
 
-      - name: 'Build base image - build'
+      - name: 'Build base image - build - 8.3.x'
+        if: (matrix.imageName == '8.3-alpine' || matrix.imageName == '8.3-zts-alpine' || matrix.imageName == '8.3-debug-alpine' || matrix.imageName == '8.3-debian' || matrix.imageName == '8.3-zts-debian' || matrix.imageName == '8.3-debug-debian')
         # try to build twice to suppress random network issues with Github Actions
         run: >-
           cd dlphp/img
@@ -201,7 +200,8 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 'Push tags to registry'
+      - name: 'Push tags to registry - 8.3.x'
+        if: (matrix.imageName == '8.3-alpine' || matrix.imageName == '8.3-zts-alpine' || matrix.imageName == '8.3-debug-alpine' || matrix.imageName == '8.3-debian' || matrix.imageName == '8.3-zts-debian' || matrix.imageName == '8.3-debug-debian')
         run: >-
           dtp() { docker tag "ci-target:$1" "$REGISTRY_IMAGE_NAME:$2" && docker push "$REGISTRY_IMAGE_NAME:$2"; }
           && if [ "${{ matrix.imageName }}" == "8.3-alpine" ]; then
