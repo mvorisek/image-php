@@ -21,7 +21,6 @@ $missingExts = array_diff([
     'oci8',
     'openssl',
     'pdo_mysql',
-    'PDO_OCI',
     'pdo_pgsql',
     'pdo_sqlite',
     'pdo_sqlsrv',

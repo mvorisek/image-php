@@ -10,8 +10,8 @@ $phpVersionsFromSource = [
         'forkPhpVersion' => '8.3', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
     ],
 ];
-$osNames = ['alpine', 'debian'];
-$targetNames = ['basic', 'node', 'selenium'];
+$osNames = ['alpine'];
+$targetNames = ['basic'];
 
 $aliasesPhpVersions = [
     '8.3' => ['latest'],
@@ -74,7 +74,7 @@ $osNameByImageName = [];
 foreach ($osNames as $osName) {
     foreach (array_keys($phpVersionsFromSource) as $phpVersion) {
         foreach ([false, true] as $isDebug) {
-            foreach ([false, true] as $isTs) {
+            foreach ([false] as $isTs) {
                 if ($isDebug && $isTs) {
                     continue;
                 }
@@ -116,7 +116,6 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'opcache',
         'pcntl',
         'pdo_mysql',
-        in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@ffd759828b',
         'pdo_pgsql',
         ...(in_array($phpVersion, ['8.5'], true) ? [] : ['pdo_sqlsrv']), // https://github.com/microsoft/msphpsql/issues/1523#issuecomment-2763338116
         in_array($phpVersion, ['8.4', '8.5'], true) ? '$(realpath phpredis)' : 'redis',
@@ -127,10 +126,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'zip',
     ]) . ($osName === 'alpine' ? ' \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
-    && rm /usr/bin/gs' : '') . ' \
-    # pack Oracle Instant Client libs, reduce image size by 85 MB
-    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -r /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
-    && { echo \'#!/bin/sh\'; echo \'if [ ! -d /usr/lib/oracle/*/client64 ]; then\'; echo \'    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz\'; echo \'fi\'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
+    && rm /usr/bin/gs' : '') . '
 
 # install Composer
 RUN install-php-extensions @composer
@@ -138,7 +134,7 @@ RUN install-php-extensions @composer
 FROM basic as basic__test
 RUN php --version
 COPY test.php ./
-RUN (/usr/lib/oracle/setup.sh || true) && php test.php
+RUN php test.php
 RUN php -n -r \'exit(' . ($isDebug ? '' : '!') . 'ZEND_DEBUG_BUILD ? 0 : 1);\'
 RUN ' . $genPackageInstallCommand($osName, ['binutils']) . '
 RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) use ($isDebug) {
@@ -393,7 +389,7 @@ jobs:
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion) use ($targetNames, $genImageTags, $createFullName) {
     return implode("\n" . '          && ', array_merge(...array_map(function ($targetName) use ($genImageTags, $createFullName, $imageName) {
         return array_map(function ($imageTag) use ($targetName) {
-            return 'dtp "' . $targetName . '" "' . $imageTag . '"';
+            return 'dtp "' . $targetName . '" "' . $imageTag . '-without-pdo_oci"';
         }, $genImageTags($createFullName($imageName, $targetName)));
     }, ['base', ...$targetNames])));
 })) . '
