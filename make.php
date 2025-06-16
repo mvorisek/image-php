@@ -140,7 +140,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'opcache',
         'pcntl',
         'pdo_mysql',
-        in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@ffd759828b',
+        in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2', '8.3' /* https://github.com/mlocati/docker-php-extension-installer/pull/1113#issuecomment-2975552006 */], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@ffd759828b',
         'pdo_pgsql',
         ...(in_array($phpVersion, ['8.5'], true) ? [] : ['pdo_sqlsrv']), // https://github.com/microsoft/msphpsql/issues/1523#issuecomment-2763338116
         in_array($phpVersion, ['8.4', '8.5'], true) ? '$(realpath phpredis)' : 'redis',
