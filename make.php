@@ -140,7 +140,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'opcache',
         'pcntl',
         'pdo_mysql',
-        in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2', '8.3' /* https://github.com/mlocati/docker-php-extension-installer/pull/1113#issuecomment-2975552006 */], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@ffd759828b',
+        in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@e7a355e097',
         'pdo_pgsql',
         ...(in_array($phpVersion, ['8.5'], true) ? [] : ['pdo_sqlsrv']), // https://github.com/microsoft/msphpsql/issues/1523#issuecomment-2763338116
         in_array($phpVersion, ['8.4', '8.5'], true) ? '$(realpath phpredis)' : 'redis',
@@ -326,7 +326,7 @@ jobs:
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     return in_array($phpVersion, ['7.4', '8.0'], true)
         ? 'git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"'
-        : ($osName === 'alpine' && in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2', '8.3'], true) ? 'sed -E \'s~#if HAVE_OCILOBREAD2$~#if 1~\' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine - https://github.com/php/php-src/issues/8197"' : null);
+        : ($osName === 'alpine' && in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'sed -E \'s~#if HAVE_OCILOBREAD2$~#if 1~\' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine - https://github.com/php/php-src/issues/8197"' : null);
 }) . '
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
