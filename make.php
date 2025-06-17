@@ -5,14 +5,6 @@ declare(strict_types=1);
 namespace Mvorisek\Docker\ImagePhp;
 
 $phpVersionsFromSource = [
-    '7.4' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.4\.[0-9]+',
-        'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'], 'forkRepoCommit' => '7388e44e40',
-    ],
-    '8.0' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.0\.[0-9]+',
-        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'], 'forkRepoCommit' => '4c0c395658',
-    ],
     '8.1' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
         'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm'],
@@ -29,16 +21,11 @@ $phpVersionsFromSource = [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.4\.[0-9]+(RC[0-9]+)?',
         'forkPhpVersion' => '8.4-rc', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
     ],
-    '8.5' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-        'forkPhpVersion' => '8.4-rc', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
-    ],
 ];
-$osNames = ['alpine', 'debian'];
-$targetNames = ['basic', 'node', 'selenium'];
+$osNames = ['alpine'];
+$targetNames = ['basic'];
 
 $aliasesPhpVersions = [
-    '8.3' => ['latest'],
 ];
 $defaultOs = 'alpine';
 
@@ -66,6 +53,8 @@ $genImageTags = function (string $imageName) use ($aliasesPhpVersions, $defaultO
         }
         $tags[] = $tag;
     }
+
+    $tags = array_map(fn ($v) => $v . '-without-oci8', $tags);
 
     return $tags;
 };
@@ -97,8 +86,8 @@ $isTsByImageName = [];
 $osNameByImageName = [];
 foreach ($osNames as $osName) {
     foreach (array_keys($phpVersionsFromSource) as $phpVersion) {
-        foreach ([false, true] as $isDebug) {
-            foreach ([false, true] as $isTs) {
+        foreach ([true] as $isDebug) {
+            foreach ([false] as $isTs) {
                 if ($isDebug && $isTs) {
                     continue;
                 }
@@ -136,7 +125,6 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-mail-imap@25b62dbf7b' : 'imap',
         'intl',
         'mysqli',
-        in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@7aa106119c',
         'opcache',
         'pcntl',
         'pdo_mysql',
@@ -151,10 +139,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'zip',
     ]) . ($osName === 'alpine' ? ' \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
-    && rm /usr/bin/gs' : '') . ' \
-    # pack Oracle Instant Client libs, reduce image size by 85 MB
-    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -r /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
-    && { echo \'#!/bin/sh\'; echo \'if [ ! -d /usr/lib/oracle/*/client64 ]; then\'; echo \'    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz\'; echo \'fi\'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
+    && rm /usr/bin/gs' : '') . '
 
 # install Composer
 RUN install-php-extensions @composer
@@ -162,7 +147,7 @@ RUN install-php-extensions @composer
 FROM basic as basic__test
 RUN php --version
 COPY test.php ./
-RUN (/usr/lib/oracle/setup.sh || true) && php test.php
+RUN php test.php
 RUN php -n -r \'exit(' . ($isDebug ? '' : '!') . 'ZEND_DEBUG_BUILD ? 0 : 1);\'
 RUN ' . $genPackageInstallCommand($osName, ['binutils']) . '
 RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) use ($isDebug) {
@@ -412,7 +397,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
 ' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Push tags to registry\'
-        if: github.ref == \'refs/heads/master\'
         run: >-
           dtp() { docker tag "ci-target:$1" "$REGISTRY_IMAGE_NAME:$2" && docker push "$REGISTRY_IMAGE_NAME:$2"; }
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion) use ($targetNames, $genImageTags, $createFullName) {

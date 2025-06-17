@@ -22,7 +22,6 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     imap \
     intl \
     mysqli \
-    php/pecl-database-oci8@7aa106119c \
     opcache \
     pcntl \
     pdo_mysql \
@@ -36,10 +35,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     xsl \
     zip \
     # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
-    && rm /usr/bin/gs \
-    # pack Oracle Instant Client libs, reduce image size by 85 MB
-    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && rm -r /usr/lib/oracle/* /usr/local/etc/php/conf.d/docker-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/docker-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
-    && { echo '#!/bin/sh'; echo 'if [ ! -d /usr/lib/oracle/*/client64 ]; then'; echo '    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz'; echo 'fi'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
+    && rm /usr/bin/gs
 
 # install Composer
 RUN install-php-extensions @composer
@@ -47,7 +43,7 @@ RUN install-php-extensions @composer
 FROM basic as basic__test
 RUN php --version
 COPY test.php ./
-RUN (/usr/lib/oracle/setup.sh || true) && php test.php
+RUN php test.php
 RUN php -n -r 'exit(ZEND_DEBUG_BUILD ? 0 : 1);'
 RUN apk update \
     && apk add binutils \
