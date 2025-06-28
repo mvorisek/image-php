@@ -13,9 +13,6 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
-    && cd xdebug && git reset --hard 12adc6394a && rm -r .git \
-    && sed -E 's~(<max>)[0-9]+.[0-9]+(.99</max>)~\199.99\2~' -i package.xml && sed -E 's~(if test "\$PHP_XDEBUG_FOUND_VERNUM" -ge ")[0-9]+(00"; then)~\19999\2~' -i config.m4
 RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     bcmath \
     exif \
@@ -36,7 +33,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     redis \
     sockets \
     tidy \
-    $(realpath xdebug) \
+    xdebug \
     xsl \
     zip \
     # pack Oracle Instant Client libs, reduce image size by 85 MB
