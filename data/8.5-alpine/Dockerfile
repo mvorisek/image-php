@@ -12,8 +12,6 @@ RUN apk update \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
-    && cd phpredis && git reset --hard d3b2d87b10 && rm -r .git
 RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
     && cd xdebug && git reset --hard 12adc6394a && rm -r .git \
     && sed -E 's~(<max>)[0-9]+.[0-9]+(.99</max>)~\199.99\2~' -i package.xml && sed -E 's~(if test "\$PHP_XDEBUG_FOUND_VERNUM" -ge ")[0-9]+(00"; then)~\19999\2~' -i config.m4
@@ -33,7 +31,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     pdo_mysql \
     php/pecl-database-pdo_oci@e7a355e097 \
     pdo_pgsql \
-    $(realpath phpredis) \
+    redis \
     sockets \
     tidy \
     $(realpath xdebug) \

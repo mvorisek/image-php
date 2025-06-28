@@ -120,9 +120,7 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-' . (in_array($phpVersion, ['8.4', '8.5'], true) ? 'RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
-    && cd phpredis && git reset --hard d3b2d87b10 && rm -r .git
-' : '') . (in_array($phpVersion, ['8.4', '8.5'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
+' . (in_array($phpVersion, ['8.4', '8.5'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
     && cd xdebug && git reset --hard 12adc6394a && rm -r .git \
     && sed -E \'s~(<max>)[0-9]+.[0-9]+(.99</max>)~\199.99\2~\' -i package.xml && sed -E \'s~(if test "\$PHP_XDEBUG_FOUND_VERNUM" -ge ")[0-9]+(00"; then)~\19999\2~\' -i config.m4
 ' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
@@ -143,7 +141,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@e7a355e097',
         'pdo_pgsql',
         ...(in_array($phpVersion, ['8.5'], true) ? [] : ['pdo_sqlsrv']), // https://github.com/microsoft/msphpsql/issues/1523#issuecomment-2763338116
-        in_array($phpVersion, ['8.4', '8.5'], true) ? '$(realpath phpredis)' : 'redis',
+        'redis',
         'sockets',
         'tidy',
         in_array($phpVersion, ['8.4', '8.5'], true) ? '$(realpath xdebug)' : 'xdebug',
