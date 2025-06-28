@@ -26,12 +26,12 @@ $phpVersionsFromSource = [
         'forkPhpVersion' => '8.3', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
     ],
     '8.4' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.4\.[0-9]+(RC[0-9]+)?',
-        'forkPhpVersion' => '8.4-rc', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.4\.[0-9]+',
+        'forkPhpVersion' => '8.4', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
     ],
     '8.5' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-        'forkPhpVersion' => '8.4-rc', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
+        'forkPhpVersion' => '8.4', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
     ],
 ];
 $osNames = ['alpine', 'debian'];
