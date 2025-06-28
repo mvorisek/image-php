@@ -103,7 +103,7 @@ foreach ($osNames as $osName) {
                     continue;
                 }
 
-                $dockerFile = 'FROM ci-target:base as basic
+                $dockerFile = 'FROM ci-target:base AS basic
 
 # install basic system tools
 RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')
@@ -156,7 +156,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 # install Composer
 RUN install-php-extensions @composer
 
-FROM basic as basic__test
+FROM basic AS basic__test
 RUN php --version
 COPY test.php ./
 RUN (/usr/lib/oracle/setup.sh || true) && php test.php
@@ -174,19 +174,19 @@ RUN composer diagnose
 RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.5'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.4 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
 
 
-FROM basic as node
+FROM basic AS node
 
 # install Node JS with npm
 RUN ' . ($osName === 'debian' ? 'curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && ' : '') . $genPackageInstallCommand($osName, ['nodejs', ...($osName === 'debian' ? [/* fix nodejs and npm apt config, drop once we migrate to Debian 12/Bookworm */] : ['npm'])])
     . ($osName === 'debian' ? ' && npm install --global npm@latest' : '') . '
 
-FROM node as node__test
+FROM node AS node__test
 RUN npm version
 RUN mkdir t && (cd t && npm install mocha) && rm -r t/
 
 
-FROM node as selenium
+FROM node AS selenium
 
 # install Selenium
 RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['openjdk17-jre-headless', 'xvfb', 'ttf-freefont'], 'debian' => ['openjdk-17-jre-headless', 'xvfb', 'fonts-freefont-ttf']][$osName]) . ' \
@@ -201,7 +201,7 @@ RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['firefox'], 'debian' =>
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 
-FROM selenium as selenium__test
+FROM selenium AS selenium__test
 RUN ' . ($osName === 'alpine' ? 'chromium-browser' : 'chromium') . ' --version
 RUN firefox --version
 ';

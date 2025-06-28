@@ -1,4 +1,4 @@
-FROM ci-target:base as basic
+FROM ci-target:base AS basic
 
 # install basic system tools
 RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
@@ -42,7 +42,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
 # install Composer
 RUN install-php-extensions @composer
 
-FROM basic as basic__test
+FROM basic AS basic__test
 RUN php --version
 COPY test.php ./
 RUN (/usr/lib/oracle/setup.sh || true) && php test.php
@@ -58,7 +58,7 @@ RUN composer diagnose
 RUN mkdir t && (cd t && composer require phpunit/phpunit) && rm -r t/
 
 
-FROM basic as node
+FROM basic AS node
 
 # install Node JS with npm
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
@@ -66,12 +66,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get -y install nodejs \
     && apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/* && npm install --global npm@latest
 
-FROM node as node__test
+FROM node AS node__test
 RUN npm version
 RUN mkdir t && (cd t && npm install mocha) && rm -r t/
 
 
-FROM node as selenium
+FROM node AS selenium
 
 # install Selenium
 RUN apt-get -y update \
@@ -92,6 +92,6 @@ RUN apt-get -y update \
     && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
     && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
 
-FROM selenium as selenium__test
+FROM selenium AS selenium__test
 RUN chromium --version
 RUN firefox --version
