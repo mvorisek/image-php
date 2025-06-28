@@ -410,7 +410,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
 ' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Push tags to registry\'
-        if: github.ref == \'refs/heads/master\'
+        if: github.ref == \'refs/heads/fix_oci8_leak_tmp\'
         run: >-
           dtp() { docker tag "ci-target:$1" "$REGISTRY_IMAGE_NAME:$2" && docker push "$REGISTRY_IMAGE_NAME:$2"; }
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion) use ($targetNames, $genImageTags, $createFullName) {
