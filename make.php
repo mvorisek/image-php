@@ -131,7 +131,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'gmp',
         'igbinary',
         'imagick',
-        in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-mail-imap@25b62dbf7b' : 'imap',
+        ...(in_array($phpVersion, ['8.5'], true) ? [] : [in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-mail-imap@25b62dbf7b' : 'imap']), // configure.ac:63: error: possibly undefined macro: AC_MSG_ERROR
         'intl',
         'mysqli',
         in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@a9c1705033',

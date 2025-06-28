@@ -37,7 +37,13 @@ $missingExts = array_diff([
     'zip',
 ], $loadedExts);
 
-if (PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION === 5) { // TODO remove once the extensions can be installed
+if (PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION === 5) { // TODO remove once the extension can be installed
+    $missingExts = array_diff($missingExts, [
+        'imap',
+    ]);
+}
+
+if (PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION === 5) { // TODO remove once the extension can be installed
     $missingExts = array_diff($missingExts, [
         'pdo_sqlsrv',
     ]);
