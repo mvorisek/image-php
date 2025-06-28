@@ -136,7 +136,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-mail-imap@25b62dbf7b' : 'imap',
         'intl',
         'mysqli',
-        in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@7aa106119c',
+        in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@a9c1705033',
         'opcache',
         'pcntl',
         'pdo_mysql',
