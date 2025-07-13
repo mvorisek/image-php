@@ -20,7 +20,6 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     gmp \
     igbinary \
     imagick \
-    imap \
     intl \
     mysqli \
     oci8 \

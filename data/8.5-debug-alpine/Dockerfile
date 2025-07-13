@@ -22,7 +22,6 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     gmp \
     igbinary \
     imagick \
-    php/pecl-mail-imap@25b62dbf7b \
     intl \
     mysqli \
     php/pecl-database-oci8@41dfb72698 \

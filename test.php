@@ -13,7 +13,6 @@ $missingExts = array_diff([
     'gmp',
     'igbinary',
     'imagick',
-    'imap',
     'intl',
     'mbstring',
     'mysqli',
