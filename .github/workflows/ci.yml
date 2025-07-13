@@ -90,7 +90,7 @@ jobs:
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
           && if [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ]; then
-          git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"
+          git apply -v ../fix-pdo_oci-bug60994--php74-80.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"
           ; fi
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
@@ -111,7 +111,7 @@ jobs:
           echo '{ "7.4": { "url": "x", "variants": [ "bullseye/zts" ], "version": "7.4.99" } }' > versions.json
           ; fi
           && if [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "7.4-debug-debian" ]; then
-          git apply -v ../fix-dlphp-strip-pr1280.patch
+          git apply -v ../fix-dlphp-strip-pr1280--php74.patch
           ; fi
           && if [ "${{ matrix.imageName }}" == "7.4-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "7.4-debian" ] || [ "${{ matrix.imageName }}" == "7.4-zts-debian" ]; then
           ./apply-templates.sh
@@ -153,7 +153,7 @@ jobs:
           && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
           && git checkout -B master
           && if [ "${{ matrix.imageName }}" == "8.0-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.0-debian" ] || [ "${{ matrix.imageName }}" == "8.0-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.0-debug-debian" ]; then
-          git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"
+          git apply -v ../fix-pdo_oci-bug60994--php74-80.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"
           ; fi
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
           && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
@@ -373,7 +373,7 @@ jobs:
         if: (matrix.imageName == '8.4-alpine' || matrix.imageName == '8.4-zts-alpine' || matrix.imageName == '8.4-debug-alpine' || matrix.imageName == '8.4-debian' || matrix.imageName == '8.4-zts-debian' || matrix.imageName == '8.4-debug-debian')
         run: >-
           if [ "${{ matrix.imageName }}" == "8.4-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debian" ] || [ "${{ matrix.imageName }}" == "8.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.4-debug-debian" ]; then
-          export PHPSRC_BRANCH="$(git ls-remote 'https://github.com/php/php-src.git' | grep -iE '\srefs/tags/PHP-8\.4\.[0-9]+(RC[0-9]+)?$' | sort -k2 -V | tee /dev/stderr | awk 'END{print $NF}' | sed -E 's~^refs/[^/]+/~~')"
+          export PHPSRC_BRANCH="$(git ls-remote 'https://github.com/php/php-src.git' | grep -iE '\srefs/tags/PHP-8\.4\.[0-9]+$' | sort -k2 -V | tee /dev/stderr | awk 'END{print $NF}' | sed -E 's~^refs/[^/]+/~~')"
           ; fi
           && if [ "${{ matrix.imageName }}" == "8.4-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debian" ] || [ "${{ matrix.imageName }}" == "8.4-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.4-debug-debian" ]; then
           git clone --depth 1 'https://github.com/php/php-src.git' -b "$PHPSRC_BRANCH" phpsrc
@@ -389,13 +389,13 @@ jobs:
           && true
           && rm -r [0-9].[0-9]*/ && sed -E 's~( // )error\("missing GPG keys for " \+ env\.version\)~\1["x"]~' -i Dockerfile-linux.template
           && if [ "${{ matrix.imageName }}" == "8.4-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debug-alpine" ]; then
-          echo '{ "8.4-rc": { "url": "x", "variants": [ "alpine3.19/cli" ], "version": "8.4.0RC99" } }' > versions.json
+          echo '{ "8.4": { "url": "x", "variants": [ "alpine3.19/cli" ], "version": "8.4.99" } }' > versions.json
           ; elif [ "${{ matrix.imageName }}" == "8.4-zts-alpine" ]; then
-          echo '{ "8.4-rc": { "url": "x", "variants": [ "alpine3.19/zts" ], "version": "8.4.0RC99" } }' > versions.json
+          echo '{ "8.4": { "url": "x", "variants": [ "alpine3.19/zts" ], "version": "8.4.99" } }' > versions.json
           ; elif [ "${{ matrix.imageName }}" == "8.4-debian" ] || [ "${{ matrix.imageName }}" == "8.4-debug-debian" ]; then
-          echo '{ "8.4-rc": { "url": "x", "variants": [ "bookworm/cli" ], "version": "8.4.0RC99" } }' > versions.json
+          echo '{ "8.4": { "url": "x", "variants": [ "bookworm/cli" ], "version": "8.4.99" } }' > versions.json
           ; elif [ "${{ matrix.imageName }}" == "8.4-zts-debian" ]; then
-          echo '{ "8.4-rc": { "url": "x", "variants": [ "bookworm/zts" ], "version": "8.4.0RC99" } }' > versions.json
+          echo '{ "8.4": { "url": "x", "variants": [ "bookworm/zts" ], "version": "8.4.99" } }' > versions.json
           ; fi
           && true
           && if [ "${{ matrix.imageName }}" == "8.4-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debian" ] || [ "${{ matrix.imageName }}" == "8.4-zts-debian" ]; then
@@ -404,13 +404,13 @@ jobs:
           DOCKER_PHP_ENABLE_DEBUG=1 ./apply-templates.sh
           ; fi
           && if [ "${{ matrix.imageName }}" == "8.4-alpine" ] || [ "${{ matrix.imageName }}" == "8.4-debug-alpine" ]; then
-          mv 8.4-rc/alpine3.19/cli/ img
+          mv 8.4/alpine3.19/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "8.4-zts-alpine" ]; then
-          mv 8.4-rc/alpine3.19/zts/ img
+          mv 8.4/alpine3.19/zts/ img
           ; elif [ "${{ matrix.imageName }}" == "8.4-debian" ] || [ "${{ matrix.imageName }}" == "8.4-debug-debian" ]; then
-          mv 8.4-rc/bookworm/cli/ img
+          mv 8.4/bookworm/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "8.4-zts-debian" ]; then
-          mv 8.4-rc/bookworm/zts/ img
+          mv 8.4/bookworm/zts/ img
           ; fi
           && cd img && mv ../../phpsrc/php.tar.xz .
           && sed -E 's~^(ENV PHP_VERSION[ =]).*~\1CUSTOM--'"$PHPSRC_BRANCH--$PHPSRC_COMMIT"'~' -i Dockerfile
@@ -444,13 +444,13 @@ jobs:
           && true
           && rm -r [0-9].[0-9]*/ && sed -E 's~( // )error\("missing GPG keys for " \+ env\.version\)~\1["x"]~' -i Dockerfile-linux.template
           && if [ "${{ matrix.imageName }}" == "8.5-alpine" ] || [ "${{ matrix.imageName }}" == "8.5-debug-alpine" ]; then
-          echo '{ "8.4-rc": { "url": "x", "variants": [ "alpine3.19/cli" ], "version": "8.4.0RC99" } }' > versions.json
+          echo '{ "8.4": { "url": "x", "variants": [ "alpine3.19/cli" ], "version": "8.4.99" } }' > versions.json
           ; elif [ "${{ matrix.imageName }}" == "8.5-zts-alpine" ]; then
-          echo '{ "8.4-rc": { "url": "x", "variants": [ "alpine3.19/zts" ], "version": "8.4.0RC99" } }' > versions.json
+          echo '{ "8.4": { "url": "x", "variants": [ "alpine3.19/zts" ], "version": "8.4.99" } }' > versions.json
           ; elif [ "${{ matrix.imageName }}" == "8.5-debian" ] || [ "${{ matrix.imageName }}" == "8.5-debug-debian" ]; then
-          echo '{ "8.4-rc": { "url": "x", "variants": [ "bookworm/cli" ], "version": "8.4.0RC99" } }' > versions.json
+          echo '{ "8.4": { "url": "x", "variants": [ "bookworm/cli" ], "version": "8.4.99" } }' > versions.json
           ; elif [ "${{ matrix.imageName }}" == "8.5-zts-debian" ]; then
-          echo '{ "8.4-rc": { "url": "x", "variants": [ "bookworm/zts" ], "version": "8.4.0RC99" } }' > versions.json
+          echo '{ "8.4": { "url": "x", "variants": [ "bookworm/zts" ], "version": "8.4.99" } }' > versions.json
           ; fi
           && true
           && if [ "${{ matrix.imageName }}" == "8.5-alpine" ] || [ "${{ matrix.imageName }}" == "8.5-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.5-debian" ] || [ "${{ matrix.imageName }}" == "8.5-zts-debian" ]; then
@@ -459,13 +459,13 @@ jobs:
           DOCKER_PHP_ENABLE_DEBUG=1 ./apply-templates.sh
           ; fi
           && if [ "${{ matrix.imageName }}" == "8.5-alpine" ] || [ "${{ matrix.imageName }}" == "8.5-debug-alpine" ]; then
-          mv 8.4-rc/alpine3.19/cli/ img
+          mv 8.4/alpine3.19/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "8.5-zts-alpine" ]; then
-          mv 8.4-rc/alpine3.19/zts/ img
+          mv 8.4/alpine3.19/zts/ img
           ; elif [ "${{ matrix.imageName }}" == "8.5-debian" ] || [ "${{ matrix.imageName }}" == "8.5-debug-debian" ]; then
-          mv 8.4-rc/bookworm/cli/ img
+          mv 8.4/bookworm/cli/ img
           ; elif [ "${{ matrix.imageName }}" == "8.5-zts-debian" ]; then
-          mv 8.4-rc/bookworm/zts/ img
+          mv 8.4/bookworm/zts/ img
           ; fi
           && cd img && mv ../../phpsrc/php.tar.xz .
           && sed -E 's~^(ENV PHP_VERSION[ =]).*~\1CUSTOM--'"$PHPSRC_BRANCH--$PHPSRC_COMMIT"'~' -i Dockerfile
@@ -670,35 +670,35 @@ jobs:
         run: >-
           cd dlphp/img
           && if [ "${{ matrix.imageName }}" == "8.4-alpine" ]; then
-          ((docker pull "php:8.4-rc-cli-alpine3.19" || docker pull "php:8.4-rc-cli-alpine3.19") || true)
+          ((docker pull "php:8.4-cli-alpine3.19" || docker pull "php:8.4-cli-alpine3.19") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.4-alpine-base" || docker pull "$REGISTRY_IMAGE_NAME:8.4-alpine-base") || true)
-          && (docker build --cache-from "php:8.4-rc-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-alpine-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-alpine-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-alpine-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-alpine-base" -t "ci-target:base" ./)
           ; elif [ "${{ matrix.imageName }}" == "8.4-zts-alpine" ]; then
-          ((docker pull "php:8.4-rc-zts-alpine3.19" || docker pull "php:8.4-rc-zts-alpine3.19") || true)
+          ((docker pull "php:8.4-zts-alpine3.19" || docker pull "php:8.4-zts-alpine3.19") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.4-zts-alpine-base" || docker pull "$REGISTRY_IMAGE_NAME:8.4-zts-alpine-base") || true)
-          && (docker build --cache-from "php:8.4-rc-zts-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-zts-alpine-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-zts-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-zts-alpine-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-zts-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-zts-alpine-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-zts-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-zts-alpine-base" -t "ci-target:base" ./)
           ; elif [ "${{ matrix.imageName }}" == "8.4-debug-alpine" ]; then
-          ((docker pull "php:8.4-rc-cli-alpine3.19" || docker pull "php:8.4-rc-cli-alpine3.19") || true)
+          ((docker pull "php:8.4-cli-alpine3.19" || docker pull "php:8.4-cli-alpine3.19") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.4-debug-alpine-base" || docker pull "$REGISTRY_IMAGE_NAME:8.4-debug-alpine-base") || true)
-          && (docker build --cache-from "php:8.4-rc-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debug-alpine-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debug-alpine-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debug-alpine-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debug-alpine-base" -t "ci-target:base" ./)
           ; elif [ "${{ matrix.imageName }}" == "8.4-debian" ]; then
-          ((docker pull "php:8.4-rc-cli-bookworm" || docker pull "php:8.4-rc-cli-bookworm") || true)
+          ((docker pull "php:8.4-cli-bookworm" || docker pull "php:8.4-cli-bookworm") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.4-debian-base" || docker pull "$REGISTRY_IMAGE_NAME:8.4-debian-base") || true)
-          && (docker build --cache-from "php:8.4-rc-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debian-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debian-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debian-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debian-base" -t "ci-target:base" ./)
           ; elif [ "${{ matrix.imageName }}" == "8.4-zts-debian" ]; then
-          ((docker pull "php:8.4-rc-zts-bookworm" || docker pull "php:8.4-rc-zts-bookworm") || true)
+          ((docker pull "php:8.4-zts-bookworm" || docker pull "php:8.4-zts-bookworm") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.4-zts-debian-base" || docker pull "$REGISTRY_IMAGE_NAME:8.4-zts-debian-base") || true)
-          && (docker build --cache-from "php:8.4-rc-zts-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-zts-debian-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-zts-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-zts-debian-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-zts-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-zts-debian-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-zts-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-zts-debian-base" -t "ci-target:base" ./)
           ; elif [ "${{ matrix.imageName }}" == "8.4-debug-debian" ]; then
-          ((docker pull "php:8.4-rc-cli-bookworm" || docker pull "php:8.4-rc-cli-bookworm") || true)
+          ((docker pull "php:8.4-cli-bookworm" || docker pull "php:8.4-cli-bookworm") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.4-debug-debian-base" || docker pull "$REGISTRY_IMAGE_NAME:8.4-debug-debian-base") || true)
-          && (docker build --cache-from "php:8.4-rc-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debug-debian-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debug-debian-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debug-debian-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.4-debug-debian-base" -t "ci-target:base" ./)
           ; fi
 
       - name: 'Build base image - build - 8.5.x'
@@ -707,35 +707,35 @@ jobs:
         run: >-
           cd dlphp/img
           && if [ "${{ matrix.imageName }}" == "8.5-alpine" ]; then
-          ((docker pull "php:8.4-rc-cli-alpine3.19" || docker pull "php:8.4-rc-cli-alpine3.19") || true)
+          ((docker pull "php:8.4-cli-alpine3.19" || docker pull "php:8.4-cli-alpine3.19") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.5-alpine-base" || docker pull "$REGISTRY_IMAGE_NAME:8.5-alpine-base") || true)
-          && (docker build --cache-from "php:8.4-rc-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-alpine-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-alpine-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-alpine-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-alpine-base" -t "ci-target:base" ./)
           ; elif [ "${{ matrix.imageName }}" == "8.5-zts-alpine" ]; then
-          ((docker pull "php:8.4-rc-zts-alpine3.19" || docker pull "php:8.4-rc-zts-alpine3.19") || true)
+          ((docker pull "php:8.4-zts-alpine3.19" || docker pull "php:8.4-zts-alpine3.19") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.5-zts-alpine-base" || docker pull "$REGISTRY_IMAGE_NAME:8.5-zts-alpine-base") || true)
-          && (docker build --cache-from "php:8.4-rc-zts-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-zts-alpine-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-zts-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-zts-alpine-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-zts-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-zts-alpine-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-zts-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-zts-alpine-base" -t "ci-target:base" ./)
           ; elif [ "${{ matrix.imageName }}" == "8.5-debug-alpine" ]; then
-          ((docker pull "php:8.4-rc-cli-alpine3.19" || docker pull "php:8.4-rc-cli-alpine3.19") || true)
+          ((docker pull "php:8.4-cli-alpine3.19" || docker pull "php:8.4-cli-alpine3.19") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.5-debug-alpine-base" || docker pull "$REGISTRY_IMAGE_NAME:8.5-debug-alpine-base") || true)
-          && (docker build --cache-from "php:8.4-rc-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debug-alpine-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debug-alpine-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debug-alpine-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-cli-alpine3.19" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debug-alpine-base" -t "ci-target:base" ./)
           ; elif [ "${{ matrix.imageName }}" == "8.5-debian" ]; then
-          ((docker pull "php:8.4-rc-cli-bookworm" || docker pull "php:8.4-rc-cli-bookworm") || true)
+          ((docker pull "php:8.4-cli-bookworm" || docker pull "php:8.4-cli-bookworm") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.5-debian-base" || docker pull "$REGISTRY_IMAGE_NAME:8.5-debian-base") || true)
-          && (docker build --cache-from "php:8.4-rc-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debian-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debian-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debian-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debian-base" -t "ci-target:base" ./)
           ; elif [ "${{ matrix.imageName }}" == "8.5-zts-debian" ]; then
-          ((docker pull "php:8.4-rc-zts-bookworm" || docker pull "php:8.4-rc-zts-bookworm") || true)
+          ((docker pull "php:8.4-zts-bookworm" || docker pull "php:8.4-zts-bookworm") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.5-zts-debian-base" || docker pull "$REGISTRY_IMAGE_NAME:8.5-zts-debian-base") || true)
-          && (docker build --cache-from "php:8.4-rc-zts-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-zts-debian-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-zts-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-zts-debian-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-zts-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-zts-debian-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-zts-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-zts-debian-base" -t "ci-target:base" ./)
           ; elif [ "${{ matrix.imageName }}" == "8.5-debug-debian" ]; then
-          ((docker pull "php:8.4-rc-cli-bookworm" || docker pull "php:8.4-rc-cli-bookworm") || true)
+          ((docker pull "php:8.4-cli-bookworm" || docker pull "php:8.4-cli-bookworm") || true)
           && ((docker pull "$REGISTRY_IMAGE_NAME:8.5-debug-debian-base" || docker pull "$REGISTRY_IMAGE_NAME:8.5-debug-debian-base") || true)
-          && (docker build --cache-from "php:8.4-rc-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debug-debian-base" -t "ci-target:base" ./
-          || docker build --cache-from "php:8.4-rc-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debug-debian-base" -t "ci-target:base" ./)
+          && (docker build --cache-from "php:8.4-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debug-debian-base" -t "ci-target:base" ./
+          || docker build --cache-from "php:8.4-cli-bookworm" --cache-from "$REGISTRY_IMAGE_NAME:8.5-debug-debian-base" -t "ci-target:base" ./)
           ; fi
 
       - name: 'Target "basic" - build'

@@ -26,12 +26,12 @@ $phpVersionsFromSource = [
         'forkPhpVersion' => '8.3', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
     ],
     '8.4' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.4\.[0-9]+(RC[0-9]+)?',
-        'forkPhpVersion' => '8.4-rc', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.4\.[0-9]+',
+        'forkPhpVersion' => '8.4', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
     ],
     '8.5' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-        'forkPhpVersion' => '8.4-rc', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
+        'forkPhpVersion' => '8.4', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm']
     ],
 ];
 $osNames = ['alpine', 'debian'];
@@ -136,7 +136,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         in_array($phpVersion, ['8.4', '8.5'], true) ? 'php/pecl-mail-imap@25b62dbf7b' : 'imap',
         'intl',
         'mysqli',
-        in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@7aa106119c',
+        in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@41dfb72698',
         'opcache',
         'pcntl',
         'pdo_mysql',
@@ -325,7 +325,7 @@ jobs:
           && git checkout -B master
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     return in_array($phpVersion, ['7.4', '8.0'], true)
-        ? 'git apply -v ../fix-pdo_oci-bug60994.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"'
+        ? 'git apply -v ../fix-pdo_oci-bug60994--php74-80.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"'
         : ($osName === 'alpine' && in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'sed -E \'s~#if HAVE_OCILOBREAD2$~#if 1~\' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine - https://github.com/php/php-src/issues/8197"' : null);
 }) . '
           && sudo apt-get -y update && sudo apt-get -y install bison re2c
@@ -344,7 +344,7 @@ jobs:
 }) . '
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     return in_array($phpVersion, ['7.4'], true)
-        ? 'git apply -v ../fix-dlphp-strip-pr1280.patch'
+        ? 'git apply -v ../fix-dlphp-strip-pr1280--php74.patch'
         : null;
 }) . '
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
