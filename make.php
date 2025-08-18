@@ -341,8 +341,13 @@ jobs:
 }) . '
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     return in_array($phpVersion, ['7.4'], true)
-        ? 'git apply -v ../fix-dlphp-strip-pr1280--php74.patch'
+        ? 'git apply -v ../fix-dlphp-strip-gh1280--php74.patch'
         : null;
+}) . '
+          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
+    return in_array($phpVersion, ['7.4', '8.0'], true)
+        ? null
+        : 'git apply -v ../revert-dlphp-gh1600-require-asc-url.patch';
 }) . '
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
     return (strpos($imageName, '-debug-') !== false ? 'DOCKER_PHP_ENABLE_DEBUG=1 ' : '') . './apply-templates.sh';

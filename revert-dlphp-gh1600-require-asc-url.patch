@@ -1,0 +1,29 @@
+diff --git a/Dockerfile-linux.template b/Dockerfile-linux.template
+index 38d3f12..52edcd2 100644
+--- a/Dockerfile-linux.template
++++ b/Dockerfile-linux.template
+@@ -248,14 +248,16 @@ RUN set -eux; \
+ 		echo "$PHP_SHA256 *php.tar.xz" | sha256sum -c -; \
+ 	fi; \
+ 	\
+-	curl -fsSL -o php.tar.xz.asc "$PHP_ASC_URL"; \
+-	export GNUPGHOME="$(mktemp -d)"; \
+-	for key in $GPG_KEYS; do \
+-		gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key"; \
+-	done; \
+-	gpg --batch --verify php.tar.xz.asc php.tar.xz; \
+-	gpgconf --kill all; \
+-	rm -rf "$GNUPGHOME"; \
++	if [ -n "$PHP_ASC_URL" ]; then \
++		curl -fsSL -o php.tar.xz.asc "$PHP_ASC_URL"; \
++		export GNUPGHOME="$(mktemp -d)"; \
++		for key in $GPG_KEYS; do \
++			gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key"; \
++		done; \
++		gpg --batch --verify php.tar.xz.asc php.tar.xz; \
++		gpgconf --kill all; \
++		rm -rf "$GNUPGHOME"; \
++	fi; \
+ 	\
+ {{ if is_alpine then ( -}}
+ 	apk del --no-network .fetch-deps
