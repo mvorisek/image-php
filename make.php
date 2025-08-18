@@ -31,7 +31,7 @@ $phpVersionsFromSource = [
     ],
     '8.5' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
-        'forkPhpVersion' => '8.4', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
+        'forkPhpVersion' => '8.5', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
     ],
 ];
 $osNames = ['alpine', 'debian'];
@@ -134,7 +134,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'intl',
         'mysqli',
         in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@41dfb72698',
-        'opcache',
+        ...(in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4'], true) ? ['opcache'] : []), // https://wiki.php.net/rfc/make_opcache_required
         'pcntl',
         'pdo_mysql',
         in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@e7a355e097',

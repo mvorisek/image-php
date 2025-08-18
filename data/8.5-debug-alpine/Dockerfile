@@ -25,7 +25,6 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     intl \
     mysqli \
     php/pecl-database-oci8@41dfb72698 \
-    opcache \
     pcntl \
     pdo_mysql \
     php/pecl-database-pdo_oci@e7a355e097 \
