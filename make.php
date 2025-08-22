@@ -120,8 +120,10 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-' . (in_array($phpVersion, ['8.5'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
-    && cd xdebug && git reset --hard 944c89eb66 && rm -r .git \
+' . (in_array($phpVersion, ['8.5'], true) ? 'RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
+    && cd phpredis && git reset --hard 8be2306e4f && rm -r .git
+' : '') . (in_array($phpVersion, ['8.5'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
+    && cd xdebug && git reset --hard edf1bf7482 && rm -r .git \
     && sed -E \'s~(<max>)[0-9]+.[0-9]+(.99</max>)~\199.99\2~\' -i package.xml && sed -E \'s~(if test "\$PHP_XDEBUG_FOUND_VERNUM" -ge ")[0-9]+(00"; then)~\19999\2~\' -i config.m4
 ' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     ' . implode(' \\' . "\n" . '    ', [
@@ -129,8 +131,8 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'exif',
         'gd',
         'gmp',
-        'igbinary',
-        'imagick',
+        in_array($phpVersion, ['8.5'], true) ? 'igbinary/igbinary@c7fe8aad3d' : 'igbinary', // TODO waiting for merge https://github.com/igbinary/igbinary/pull/398
+        in_array($phpVersion, ['8.5'], true) ? 'Imagick/imagick@45adfb7b1e' : 'imagick', // TODO waiting for 3.8.1 release https://github.com/Imagick/imagick/pull/741
         'intl',
         'mysqli',
         in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@41dfb72698',
@@ -140,7 +142,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@e7a355e097',
         'pdo_pgsql',
         ...(in_array($phpVersion, ['8.5'], true) ? [] : ['pdo_sqlsrv']), // https://github.com/microsoft/msphpsql/issues/1523#issuecomment-2763338116
-        'redis',
+        in_array($phpVersion, ['8.5'], true) ? '$(realpath phpredis)' : 'redis', // TODO waiting for 6.2.1 release https://github.com/phpredis/phpredis/pull/2676
         'sockets',
         'tidy',
         in_array($phpVersion, ['8.5'], true) ? '$(realpath xdebug)' : 'xdebug',
