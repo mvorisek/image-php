@@ -195,7 +195,7 @@ RUN mkdir t && (cd t && npm install mocha) && rm -r t/
 FROM node AS selenium
 
 # install Selenium
-RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['openjdk17-jre-headless', 'xvfb', 'ttf-freefont'], 'debian' => ['openjdk-17-jre-headless', 'xvfb', 'fonts-freefont-ttf']][$osName]) . ' \
+RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['openjdk21-jre-headless', 'xvfb', 'ttf-freefont'], 'debian' => ['openjdk-21-jre-headless', 'xvfb', 'fonts-freefont-ttf']][$osName]) . ' \
     && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar
 
 # install Chrome

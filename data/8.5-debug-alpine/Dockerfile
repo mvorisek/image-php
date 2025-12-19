@@ -83,7 +83,7 @@ FROM node AS selenium
 
 # install Selenium
 RUN apk update \
-    && apk add openjdk17-jre-headless xvfb ttf-freefont \
+    && apk add openjdk21-jre-headless xvfb ttf-freefont \
     && rm -rf /var/cache/apk/* \
     && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar
 
