@@ -23,7 +23,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     exif \
     gd \
     gmp \
-    igbinary/igbinary@c7fe8aad3d \
+    igbinary/igbinary@2e0788825c \
     Imagick/imagick@45adfb7b1e \
     intl \
     mysqli \

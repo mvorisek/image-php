@@ -30,7 +30,7 @@ $phpVersionsFromSource = [
         'forkPhpVersion' => '8.4', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
     ],
     '8.5' => [
-        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/heads/master',
+        'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.5\.[0-9]+',
         'forkPhpVersion' => '8.5', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
     ],
 ];
@@ -131,7 +131,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'exif',
         'gd',
         'gmp',
-        in_array($phpVersion, ['8.5'], true) ? 'igbinary/igbinary@c7fe8aad3d' : 'igbinary', // TODO waiting for merge https://github.com/igbinary/igbinary/pull/398
+        in_array($phpVersion, ['8.5'], true) ? 'igbinary/igbinary@2e0788825c' : 'igbinary', // TODO waiting for merge https://github.com/igbinary/igbinary/pull/408
         in_array($phpVersion, ['8.5'], true) ? 'Imagick/imagick@45adfb7b1e' : 'imagick', // TODO waiting for 3.8.1 release https://github.com/Imagick/imagick/pull/741
         'intl',
         'mysqli',

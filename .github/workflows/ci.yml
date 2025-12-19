@@ -442,7 +442,7 @@ jobs:
         if: (matrix.imageName == '8.5-alpine' || matrix.imageName == '8.5-zts-alpine' || matrix.imageName == '8.5-debug-alpine' || matrix.imageName == '8.5-debian' || matrix.imageName == '8.5-zts-debian' || matrix.imageName == '8.5-debug-debian')
         run: >-
           if [ "${{ matrix.imageName }}" == "8.5-alpine" ] || [ "${{ matrix.imageName }}" == "8.5-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.5-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.5-debian" ] || [ "${{ matrix.imageName }}" == "8.5-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.5-debug-debian" ]; then
-          export PHPSRC_BRANCH="$(git ls-remote 'https://github.com/php/php-src.git' | grep -iE '\srefs/heads/master$' | sort -k2 -V | tee /dev/stderr | awk 'END{print $NF}' | sed -E 's~^refs/[^/]+/~~')"
+          export PHPSRC_BRANCH="$(git ls-remote 'https://github.com/php/php-src.git' | grep -iE '\srefs/tags/PHP-8\.5\.[0-9]+$' | sort -k2 -V | tee /dev/stderr | awk 'END{print $NF}' | sed -E 's~^refs/[^/]+/~~')"
           ; fi
           && if [ "${{ matrix.imageName }}" == "8.5-alpine" ] || [ "${{ matrix.imageName }}" == "8.5-zts-alpine" ] || [ "${{ matrix.imageName }}" == "8.5-debug-alpine" ] || [ "${{ matrix.imageName }}" == "8.5-debian" ] || [ "${{ matrix.imageName }}" == "8.5-zts-debian" ] || [ "${{ matrix.imageName }}" == "8.5-debug-debian" ]; then
           git clone --depth 1 'https://github.com/php/php-src.git' -b "$PHPSRC_BRANCH" phpsrc
