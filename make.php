@@ -139,7 +139,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         ...(in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4'], true) ? ['opcache'] : []), // https://wiki.php.net/rfc/make_opcache_required
         'pcntl',
         'pdo_mysql',
-        in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@e7a355e097',
+        in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@6575b4c5fe',
         'pdo_pgsql',
         ...(in_array($phpVersion, ['8.5'], true) ? [] : ['pdo_sqlsrv']), // https://github.com/microsoft/msphpsql/issues/1523#issuecomment-2763338116
         in_array($phpVersion, ['8.5'], true) ? '$(realpath phpredis)' : 'redis', // TODO waiting for 6.2.1 release https://github.com/phpredis/phpredis/pull/2676
