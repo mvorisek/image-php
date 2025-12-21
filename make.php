@@ -19,19 +19,19 @@ $phpVersionsFromSource = [
     ],
     '8.2' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.2\.[0-9]+',
-        'forkPhpVersion' => '8.2', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm'],
+        'forkPhpVersion' => '8.2', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'trixie'],
     ],
     '8.3' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.3\.[0-9]+',
-        'forkPhpVersion' => '8.3', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
+        'forkPhpVersion' => '8.3', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'trixie']
     ],
     '8.4' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.4\.[0-9]+',
-        'forkPhpVersion' => '8.4', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
+        'forkPhpVersion' => '8.4', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'trixie']
     ],
     '8.5' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.5\.[0-9]+',
-        'forkPhpVersion' => '8.5', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
+        'forkPhpVersion' => '8.5', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'trixie']
     ],
 ];
 $osNames = ['alpine', 'debian'];
