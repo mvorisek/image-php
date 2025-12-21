@@ -135,7 +135,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         in_array($phpVersion, ['8.5'], true) ? 'Imagick/imagick@45adfb7b1e' : 'imagick', // TODO waiting for 3.8.1 release https://github.com/Imagick/imagick/pull/741
         'intl',
         'mysqli',
-        in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@41dfb72698',
+        in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@e4c20008b0',
         ...(in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4'], true) ? ['opcache'] : []), // https://wiki.php.net/rfc/make_opcache_required
         'pcntl',
         'pdo_mysql',

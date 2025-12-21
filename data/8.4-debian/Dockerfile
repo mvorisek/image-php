@@ -22,7 +22,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     imagick \
     intl \
     mysqli \
-    php/pecl-database-oci8@41dfb72698 \
+    php/pecl-database-oci8@e4c20008b0 \
     opcache \
     pcntl \
     pdo_mysql \
