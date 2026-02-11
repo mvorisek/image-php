@@ -15,7 +15,7 @@ $phpVersionsFromSource = [
     ],
     '8.1' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
-        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm'],
+        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm'], 'forkRepoCommit' => '5c037abaf9',
     ],
     '8.2' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.2\.[0-9]+',
@@ -333,7 +333,7 @@ jobs:
           && cd ..
           && git clone https://github.com/docker-library/php.git dlphp && cd dlphp
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return in_array($phpVersion, ['7.4', '8.0'], true)
+    return isset($phpVersionsFromSource[$phpVersion]['forkRepoCommit'])
         ? 'git checkout ' . $phpVersionsFromSource[$phpVersion]['forkRepoCommit']
         : null;
 }) . '
