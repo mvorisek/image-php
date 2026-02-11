@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package version="1.0">
+    <name>pdo_sqlsrv</name>
+    <summary>Microsoft Drivers for PHP for SQL Server (PDO_SQLSRV)</summary>
+    <description>x</description>
+    <license>MIT</license>
+    <maintainers>
+        <maintainer>
+            <user>davidengel</user>
+            <name>David Engel</name>
+            <email>davidengel@microsoft.com</email>
+            <role>lead</role>
+        </maintainer>
+    </maintainers>
+    <release>
+        <version>5.99.0</version>
+        <date>2020-01-01</date>
+        <state>stable</state>
+        <notes>x</notes>
+        <filelist>
+            <dir name="/">
+            <file name="*" role="src" />
+            </dir>
+        </filelist>
+    </release>
+</package>

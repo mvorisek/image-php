@@ -36,12 +36,6 @@ $missingExts = array_diff([
     'zip',
 ], $loadedExts);
 
-if (PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION === 5) { // TODO remove once the extensions can be installed
-    $missingExts = array_diff($missingExts, [
-        'pdo_sqlsrv',
-    ]);
-}
-
 if (count($missingExts) > 0) {
     echo 'TEST FAILED - missing php extensions: ' . implode(', ', $missingExts) . "\n";
 

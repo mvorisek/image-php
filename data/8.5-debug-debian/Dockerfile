@@ -13,6 +13,10 @@ RUN (seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+COPY ../../fix-pdo_sqlsrv-package.xml fix-pdo_sqlsrv-package.xml
+RUN git clone https://github.com/microsoft/msphpsql.git -b dev pdo_sqlsrv \
+    && cd pdo_sqlsrv && git reset --hard b3e4bf2944 && rm -r .git \
+    && cp -r source/shared source/pdo_sqlsrv && cp ../fix-pdo_sqlsrv-package.xml source/pdo_sqlsrv/package.xml
 RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
     && cd phpredis && git reset --hard 8be2306e4f && rm -r .git
 RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
@@ -32,6 +36,7 @@ RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
     pdo_mysql \
     php/pecl-database-pdo_oci@6575b4c5fe \
     pdo_pgsql \
+    $(realpath pdo_sqlsrv/source/pdo_sqlsrv) \
     $(realpath phpredis) \
     sockets \
     tidy \

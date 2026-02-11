@@ -120,7 +120,11 @@ RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/m
 
 # install common PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-' . (in_array($phpVersion, ['8.5'], true) ? 'RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
+' . (in_array($phpVersion, ['8.5'], true) ? 'COPY ../../fix-pdo_sqlsrv-package.xml fix-pdo_sqlsrv-package.xml
+RUN git clone https://github.com/microsoft/msphpsql.git -b dev pdo_sqlsrv \
+    && cd pdo_sqlsrv && git reset --hard b3e4bf2944 && rm -r .git \
+    && cp -r source/shared source/pdo_sqlsrv && cp ../fix-pdo_sqlsrv-package.xml source/pdo_sqlsrv/package.xml
+' : '') . (in_array($phpVersion, ['8.5'], true) ? 'RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
     && cd phpredis && git reset --hard 8be2306e4f && rm -r .git
 ' : '') . (in_array($phpVersion, ['8.5'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
     && cd xdebug && git reset --hard edf1bf7482 && rm -r .git \
@@ -141,7 +145,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
         'pdo_mysql',
         in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@6575b4c5fe',
         'pdo_pgsql',
-        ...(in_array($phpVersion, ['8.5'], true) ? [] : ['pdo_sqlsrv']), // https://github.com/microsoft/msphpsql/issues/1523#issuecomment-2763338116
+        in_array($phpVersion, ['8.5'], true) ? '$(realpath pdo_sqlsrv/source/pdo_sqlsrv)' : 'pdo_sqlsrv',
         in_array($phpVersion, ['8.5'], true) ? '$(realpath phpredis)' : 'redis', // TODO waiting for 6.2.1 release https://github.com/phpredis/phpredis/pull/2676
         'sockets',
         'tidy',
