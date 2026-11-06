@@ -1,3 +1,44 @@
+FROM alpine:latest AS patched-dlphp
+
+# install basic system tools
+RUN apk update \
+    && apk upgrade \
+    && apk add bash git make unzip gnupg ca-certificates coreutils \
+    && rm -rf /var/cache/apk/* \
+    && git config --system --add url."https://github.com/".insteadOf "git@github.com:" \
+    && git config --system --add url."https://github.com/".insteadOf "ssh://git@github.com/" \
+    # fix git repository directory is owned by someone else for Github Actions
+    && { echo '#!/bin/sh'; echo 'if [ -n "$GITHUB_WORKSPACE" ] && [ "$(id -u)" -eq 0 ]; then'; echo '    (cd / && /usr/bin/git config --global --add safe.directory "$GITHUB_WORKSPACE")'; echo 'fi'; echo '/usr/bin/git "$@"'; } > /usr/local/bin/git && chmod +x /usr/local/bin/git
+
+RUN git clone --depth 1 'https://github.com/php/php-src.git' -b "$(git ls-remote 'https://github.com/php/php-src.git' | grep -iE '\srefs/tags/PHP-7\.4\.[0-9]+$' | sort -k2 -V | tee /dev/stderr | awk 'END{print $NF}' | sed -E 's~^refs/[^/]+/~~')" phpsrc
+RUN git clone https://github.com/docker-library/php.git dlphp
+RUN apk update \
+    && apk add bison re2c tar xz jq gawk autoconf \
+    && rm -rf /var/cache/apk/*
+COPY patches patches
+WORKDIR phpsrc
+RUN git checkout -B master
+RUN git apply -v ../patches/fix-pdo_oci-bug60994--php74-80.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"
+RUN scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
+RUN git add . -N && git diff --diff-filter=d "$(git rev-parse HEAD)"
+WORKDIR ../dlphp
+RUN git checkout 7388e44e40
+RUN rm -r [0-9].[0-9]*/ && sed -E 's~( // )error\("missing GPG keys for " \+ env\.version\)~\1["x"]~' -i Dockerfile-linux.template
+RUN echo '{ "7.4": { "url": "x", "variants": [ "alpine3.16/cli" ], "version": "7.4.99" } }' > versions.json
+RUN git apply -v ../patches/fix-dlphp-strip-gh1280--php74.patch
+RUN ./apply-templates.sh
+RUN mv 7.4/alpine3.16/cli/ img
+WORKDIR img
+RUN mv ../../phpsrc/php.tar.xz .
+RUN sed -E 's~^(ENV PHP_VERSION[ =]).*~\1CUSTOM--'"$(git ls-remote 'https://github.com/php/php-src.git' | grep -iE '\srefs/tags/PHP-7\.4\.[0-9]+$' | sort -k2 -V | tee /dev/stderr | awk 'END{print $NF}' | sed -E 's~^refs/[^/]+/~~')--$(git rev-parse HEAD)"'~' -i Dockerfile
+RUN sed -E 's~^(ENV PHP_URL[ =]).*~COPY php.tar.xz /usr/src/~' -i Dockerfile
+RUN sed -E 's~^(ENV (GPG_KEYS|PHP_URL|PHP_ASC_URL|PHP_SHA256)[ =]).*~~' -i Dockerfile
+RUN sed -E 's~-n "\$(PHP_SHA256|PHP_ASC_URL)"~-n ""~' -i Dockerfile
+RUN sed -E 's~curl -fsSL -o php.tar.xz .*; ~~' -i Dockerfile
+RUN sed -E 's~(--with-curl.*)( \\)~\1 --enable-embed\2~' -i Dockerfile
+RUN git add . -N && git diff --diff-filter=d
+
+
 FROM ci-target:base AS basic
 
 # install basic system tools
@@ -55,8 +96,7 @@ RUN ! readelf -S /usr/local/bin/php | grep -q ' \.symtab ' \
     && ! readelf -S /usr/local/lib/libphp7.so | grep -q ' \.symtab ' \
     && ! readelf -S "$(find /usr/local/lib/php/extensions -name bcmath.so)" | grep -q ' \.symtab ' \
     && ! readelf -S "$(find /usr/local/lib/php/extensions -name xdebug.so)" | grep -q ' \.symtab '
-RUN composer diagnose
-RUN mkdir t && (cd t && composer require phpunit/phpunit) && rm -r t/
+RUN mkdir t && (cd t && composer require symfony/console) && rm -r t/
 
 
 FROM basic AS node

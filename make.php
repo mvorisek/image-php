@@ -1,37 +1,40 @@
+#!/usr/bin/env php
 <?php
 
 declare(strict_types=1);
 
 namespace Mvorisek\Docker\ImagePhp;
 
+// docker run --rm -v "$(git rev-parse --show-toplevel)":/h php:latest /h/make.php
+
 $phpVersionsFromSource = [
     '7.4' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-7\.4\.[0-9]+',
-        'forkPhpVersion' => '7.4', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'], 'forkRepoCommit' => '7388e44e40',
+        'forkDlPhpVersion' => '7.4', 'forkDlOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'], 'forkDlRepoCommit' => '7388e44e40',
     ],
     '8.0' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.0\.[0-9]+',
-        'forkPhpVersion' => '8.0', 'forkOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'], 'forkRepoCommit' => '4c0c395658',
+        'forkDlPhpVersion' => '8.0', 'forkDlOsName' => ['alpine' => 'alpine3.16', 'debian' => 'bullseye'], 'forkDlRepoCommit' => '4c0c395658',
     ],
     '8.1' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.1\.[0-9]+',
-        'forkPhpVersion' => '8.1', 'forkOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm'], 'forkRepoCommit' => '5c037abaf9',
+        'forkDlPhpVersion' => '8.1', 'forkDlOsName' => ['alpine' => 'alpine3.19', 'debian' => 'bookworm'], 'forkDlRepoCommit' => '5c037abaf9',
     ],
     '8.2' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.2\.[0-9]+',
-        'forkPhpVersion' => '8.2', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm'],
+        'forkDlPhpVersion' => '8.2', 'forkDlOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm'],
     ],
     '8.3' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.3\.[0-9]+',
-        'forkPhpVersion' => '8.3', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
+        'forkDlPhpVersion' => '8.3', 'forkDlOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
     ],
     '8.4' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.4\.[0-9]+',
-        'forkPhpVersion' => '8.4', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
+        'forkDlPhpVersion' => '8.4', 'forkDlOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
     ],
     '8.5' => [
         'repo' => 'https://github.com/php/php-src.git', 'branchRegex' => 'refs/tags/PHP-8\.5\.[0-9]+',
-        'forkPhpVersion' => '8.5', 'forkOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
+        'forkDlPhpVersion' => '8.5', 'forkDlOsName' => ['alpine' => 'alpine3.22', 'debian' => 'bookworm']
     ],
 ];
 $osNames = ['alpine', 'debian'];
@@ -41,6 +44,392 @@ $aliasesPhpVersions = [
     '8.4' => ['latest'],
 ];
 $defaultOs = 'alpine';
+
+class DockerfileGenerator
+{
+    /**
+     * @param 'alpine'|'debian' $osName
+     */
+    public function __construct(
+        public string $osName,
+        public string $baseImage,
+        public ?string $target = null
+    ) {}
+
+    /**
+     * @return list<string>
+     */
+    public function makeBasePackages(): array
+    {
+        $res = [
+            '*upgrade*',
+            'bash',
+            'git',
+            'make',
+            'unzip',
+            'gnupg',
+            'ca-certificates'
+        ];
+
+        if ($this->osName === 'alpine') {
+            $res[] = 'coreutils';
+        } else {
+            $res[] = 'apt-utils';
+            $res[] = 'apt-transport-https';
+            $res[] = 'netcat-traditional';
+        }
+
+        return $res;
+    }
+
+    public function makePackageInstallCommand(array $packages): string
+    {
+        $packagesWithoutStar = array_diff($packages, ['*upgrade*']);
+        $upgrade = $packagesWithoutStar !== $packages;
+
+        $and = " \\\n"
+            . '    && ';
+
+        return $this->osName === 'alpine'
+            ? 'apk update'
+                . ($upgrade ? $and . 'apk upgrade' : '')
+                . $and . 'apk add ' . implode(' ', $packagesWithoutStar)
+                . $and . 'rm -rf /var/cache/apk/*'
+            : 'apt-get update'
+                . ($upgrade ? $and . 'apt-get -y upgrade' : '')
+                . $and . 'apt-get -y install ' . implode(' ', $packagesWithoutStar)
+                . $and . 'apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/*';
+    }
+
+    public function makeFile(): string
+    {
+        return 'FROM ' . $this->baseImage . ($this->target !== null ? ' AS ' . $this->target : '')
+            . "\n"
+            . "\n"
+            . '# install basic system tools'
+            . "\n"
+            . 'RUN ' . (
+                $this->osName === 'debian'
+                ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{})'
+                    . " \\\n"
+                    . '    && '
+                : ''
+            )
+            . $this->makePackageInstallCommand($this->makeBasePackages())
+            . " \\\n"
+            . '    && git config --system --add url."https://github.com/".insteadOf "git@github.com:"'
+            . " \\\n"
+            . '    && git config --system --add url."https://github.com/".insteadOf "ssh://git@github.com/"'
+            . " \\\n"
+            // see https://github.com/actions/checkout/issues/766, remove once fixed officially
+            . '    # fix git repository directory is owned by someone else for Github Actions'
+            . "\n"
+            . '    && { echo \'#!/bin/sh\'; echo \'if [ -n "$GITHUB_WORKSPACE" ] && [ "$(id -u)" -eq 0 ]; then\'; echo \'    (cd / && /usr/bin/git config --global --add safe.directory "$GITHUB_WORKSPACE")\'; echo \'fi\'; echo \'/usr/bin/git "$@"\'; } > /usr/local/bin/git && chmod +x /usr/local/bin/git'
+            . "\n";
+    }
+}
+
+class PhpDockerfileGenerator extends DockerfileGenerator
+{
+    /**
+     * @param 'alpine'|'debian'                                                                                                   $osName
+     * @param array{repo: string, branchRegex: string, forkDlPhpVersion: string, forkDlOsName: string, forkDlRepoCommit?: string} $phpSource
+     */
+    public function __construct(
+        public string $osName,
+        public string $phpVersion,
+        public bool $isDebug,
+        public bool $isTs,
+        public array $phpSource
+    ) {
+        parent::__construct($this->osName, 'ci-target:base', 'basic');
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function makeBasePackages(): array
+    {
+        $res = parent::makeBasePackages();
+
+        if ($this->isDebug) {
+            $res[] = 'gdb';
+        }
+
+        return $res;
+    }
+
+    public function makeFile(): string
+    {
+        $helperGenerator = new DockerfileGenerator('alpine', 'alpine:latest', 'patched-dlphp');
+
+        $phpsrcBranchCmd = '$(git ls-remote \'' . $this->phpSource['repo'] . '\' | grep -iE \'\s' . $this->phpSource['branchRegex'] . '$\' | sort -k2 -V | tee /dev/stderr | awk \'END{print $NF}\' | sed -E \'s~^refs/[^/]+/~~\')';
+        $phpsrcCommitCmd = '$(git rev-parse HEAD)';
+
+        $res = $helperGenerator->makeFile()
+            . "\n"
+            . 'RUN git clone --depth 1 \'' . $this->phpSource['repo'] . '\' -b "' . $phpsrcBranchCmd . '" phpsrc'
+            . "\n"
+            . 'RUN git clone https://github.com/docker-library/php.git dlphp'
+            . "\n"
+            . 'RUN ' . $helperGenerator->makePackageInstallCommand(['bison', 're2c', 'tar', 'xz', 'jq', 'gawk', 'autoconf'])
+            . "\n"
+            . 'COPY patches patches'
+            . "\n"
+            . 'WORKDIR phpsrc'
+            . "\n"
+            . 'RUN git checkout -B master'
+            . "\n"
+            . (
+                in_array($this->phpVersion, ['7.4', '8.0'], true)
+                    ? 'RUN git apply -v ../patches/fix-pdo_oci-bug60994--php74-80.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"'
+                        . "\n"
+                    : (
+                        $this->osName === 'alpine' && in_array($this->phpVersion, ['7.4', '8.0', '8.1', '8.2'], true)
+                            ? 'RUN sed -E \'s~#if HAVE_OCILOBREAD2$~#if 1~\' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine - https://github.com/php/php-src/issues/8197"'
+                                . "\n"
+                        : ''
+                    )
+            )
+            . 'RUN scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz'
+            . "\n"
+            . 'RUN git add . -N && git diff --diff-filter=d "' . $phpsrcCommitCmd . '"'
+            . "\n"
+            . 'WORKDIR ../dlphp'
+            . "\n"
+            . (
+                isset($this->phpSource['forkDlRepoCommit'])
+                    ? 'RUN git checkout ' . $this->phpSource['forkDlRepoCommit']
+                        . "\n"
+                    : ''
+            )
+            . 'RUN rm -r [0-9].[0-9]*/ && sed -E \'s~( // )error\("missing GPG keys for " \+ env\.version\)~\1["x"]~\' -i Dockerfile-linux.template'
+            . "\n"
+            . 'RUN echo \'{ "' . $this->phpSource['forkDlPhpVersion'] . '": { "url": "x", "variants": [ "' . $this->phpSource['forkDlOsName'] . '/' . ($this->isTs ? 'zts' : 'cli') . '" ], "version": "' . preg_replace('~-rc\.$~', '.0RC', $this->phpSource['forkDlPhpVersion'] . '.') . '99" } }\' > versions.json'
+            . "\n"
+            . (
+                in_array($this->phpVersion, ['7.4'], true)
+                    ? 'RUN git apply -v ../patches/fix-dlphp-strip-gh1280--php74.patch'
+                        . "\n"
+                    : ''
+            )
+            . (
+                in_array($this->phpVersion, ['7.4', '8.0'], true)
+                    ? ''
+                    : "\n" . 'RUN git apply -v ../patches/revert-dlphp-gh1600-require-asc-url.patch'
+                        . "\n"
+            )
+            . 'RUN ' . ($this->isDebug ? 'DOCKER_PHP_ENABLE_DEBUG=1 ' : '') . './apply-templates.sh'
+            . "\n"
+            . 'RUN mv ' . $this->phpSource['forkDlPhpVersion'] . '/' . $this->phpSource['forkDlOsName'] . '/' . ($this->isTs ? 'zts' : 'cli') . '/ img'
+            . "\n"
+            . 'WORKDIR img'
+            . "\n"
+            . 'RUN mv ../../phpsrc/php.tar.xz .'
+            . "\n"
+            . 'RUN sed -E \'s~^(ENV PHP_VERSION[ =]).*~\1CUSTOM--\'"' . $phpsrcBranchCmd . '--' . $phpsrcCommitCmd . '"\'~\' -i Dockerfile'
+            . "\n"
+            . 'RUN sed -E \'s~^(ENV PHP_URL[ =]).*~COPY php.tar.xz /usr/src/~\' -i Dockerfile'
+            . "\n"
+            . 'RUN sed -E \'s~^(ENV (GPG_KEYS|PHP_URL|PHP_ASC_URL|PHP_SHA256)[ =]).*~~\' -i Dockerfile'
+            . "\n"
+            . 'RUN sed -E \'s~-n "\$(PHP_SHA256|PHP_ASC_URL)"~-n ""~\' -i Dockerfile'
+            . "\n"
+            . 'RUN sed -E \'s~curl -fsSL -o php.tar.xz .*; ~~\' -i Dockerfile'
+            . "\n"
+            . (
+                $this->osName === 'debian'
+                    ? ''
+                    : 'RUN sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-embed\2~\' -i Dockerfile'
+                        . "\n"
+            )
+            . (
+                $this->phpSource['forkDlOsName'] === 'bullseye'
+                    ? 'RUN sed -E \'s~apt-get update;~sed -i "s/deb.debian.org/archive.debian.org/" /etc/apt/sources.list; \0~\' -i Dockerfile'
+                        . "\n"
+                    : ''
+            )
+            . (
+                in_array($this->phpVersion, ['7.4'], true) && $this->isDebug
+                    ? 'RUN sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-debug\2~\' -i Dockerfile'
+                        . "\n"
+                    : ''
+            )
+            . 'RUN git add . -N && git diff --diff-filter=d'
+            . "\n";
+
+
+        $res .= "\n"
+            . "\n"
+            . parent::makeFile();
+
+        return $res
+            . "\n"
+            . '# install common PHP extensions'
+            . "\n"
+            . 'COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/'
+            . "\n"
+            . (
+                in_array($this->phpVersion, ['8.5'], true)
+                ? 'COPY ../../patches/fix-pdo_sqlsrv-package.xml fix-pdo_sqlsrv-package.xml'
+                    . "\n"
+                    . 'RUN git clone https://github.com/microsoft/msphpsql.git -b dev pdo_sqlsrv'
+                    . " \\\n"
+                    . '    && cd pdo_sqlsrv && git reset --hard b3e4bf2944 && rm -r .git'
+                    . " \\\n"
+                    . '    && cp -r source/shared source/pdo_sqlsrv && cp ../fix-pdo_sqlsrv-package.xml source/pdo_sqlsrv/package.xml'
+                    . "\n"
+                : ''
+            )
+            . (
+                in_array($this->phpVersion, ['8.5'], true)
+                    ? 'RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis'
+                        . " \\\n"
+                        . '    && cd phpredis && git reset --hard 8be2306e4f && rm -r .git'
+                        . "\n"
+                    : ''
+            )
+            . (
+                in_array($this->phpVersion, ['8.5'], true)
+                ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug'
+                    . " \\\n"
+                    . '    && cd xdebug && git reset --hard af9280fff4 && rm -r .git'
+                    . " \\\n"
+                    . '    && sed -E \'s~(<max>)[0-9]+.[0-9]+(.99</max>)~\199.99\2~\' -i package.xml && sed -E \'s~(if test "\$PHP_XDEBUG_FOUND_VERNUM" -ge ")[0-9]+(00"; then)~\19999\2~\' -i config.m4'
+                    . "\n"
+                : ''
+            )
+            . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions'
+            . " \\\n"
+            . '    ' . implode(' \\' . "\n" . '    ', [
+                'bcmath',
+                'exif',
+                'gd',
+                'gmp',
+                in_array($this->phpVersion, ['8.5'], true) ? 'igbinary/igbinary@2e0788825c' : 'igbinary', // TODO waiting for merge https://github.com/igbinary/igbinary/pull/408
+                in_array($this->phpVersion, ['8.5'], true) ? 'Imagick/imagick@45adfb7b1e' : 'imagick', // TODO waiting for 3.8.1 release https://github.com/Imagick/imagick/pull/741
+                'intl',
+                'mysqli',
+                in_array($this->phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@e4c20008b0',
+                ...(in_array($this->phpVersion, ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4'], true) ? ['opcache'] : []), // https://wiki.php.net/rfc/make_opcache_required
+                'pcntl',
+                'pdo_mysql',
+                in_array($this->phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@6575b4c5fe',
+                'pdo_pgsql',
+                in_array($this->phpVersion, ['8.5'], true) ? '$(realpath pdo_sqlsrv/source/pdo_sqlsrv)' : 'pdo_sqlsrv',
+                in_array($this->phpVersion, ['8.5'], true) ? '$(realpath phpredis)' : 'redis', // TODO waiting for 6.2.1 release https://github.com/phpredis/phpredis/pull/2676
+                'sockets',
+                'tidy',
+                in_array($this->phpVersion, ['8.5'], true) ? '$(realpath xdebug)' : 'xdebug',
+                'xsl',
+                'zip',
+            ])
+            . (
+                $this->osName === 'alpine'
+                    ? ''
+                        . " \\\n"
+                        . '    # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed'
+                        . "\n"
+                        . '    && rm /usr/bin/gs'
+                    : ''
+            )
+            . ''
+            . " \\\n"
+            . '    # pack Oracle Instant Client libs, reduce image size by 85 MB'
+            . "\n"
+            . '    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/xx-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/xx-php-ext-oci8.ini && rm -r /usr/lib/oracle/* /usr/local/etc/php/conf.d/xx-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/xx-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz'
+            . " \\\n"
+            . '    && { echo \'#!/bin/sh\'; echo \'if [ ! -d /usr/lib/oracle/*/client64 ]; then\'; echo \'    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz\'; echo \'fi\'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh'
+            . "\n"
+            . "\n"
+            . '# install Composer'
+            . "\n"
+            . 'RUN install-php-extensions @composer'
+            . "\n"
+            . "\n"
+            . 'FROM basic AS basic__test'
+            . "\n"
+            . 'RUN php --version'
+            . "\n"
+            . 'COPY test.php ./'
+            . "\n"
+            . 'RUN (/usr/lib/oracle/setup.sh || true) && php test.php'
+            . "\n"
+            . 'RUN php -n -r \'exit(' . ($this->isDebug ? '' : '!') . 'ZEND_DEBUG_BUILD ? 0 : 1);\''
+            . "\n"
+            . 'RUN ' . $this->makePackageInstallCommand(['binutils'])
+            . "\n"
+            . 'RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) {
+                return ($this->isDebug ? '' : '! ') . 'readelf -S ' . $pathUnescaped . ' | grep -q \' \.symtab \'';
+            }, [
+                '/usr/local/bin/php',
+                '/usr/local/lib/libphp' . (in_array($this->phpVersion, ['7.4'], true) ? '7' : '') . '.so',
+                '"$(find /usr/local/lib/php/extensions -name bcmath.so)"',
+                '"$(find /usr/local/lib/php/extensions -name xdebug.so)"',
+            ]))
+            . "\n"
+            . 'RUN mkdir t && (cd t && composer require symfony/console) && rm -r t/'
+            . "\n"
+            . "\n"
+            . "\n"
+            . 'FROM basic AS node'
+            . "\n"
+            . "\n"
+            . '# install Node JS with npm'
+            . "\n"
+            . 'RUN ' . (
+                $this->osName === 'debian'
+                    ? 'curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -'
+                        . " \\\n"
+                        . '    && '
+                    : ''
+            )
+            . $this->makePackageInstallCommand(['nodejs', ...($this->osName === 'debian' ? [/* fix nodejs and npm apt config, drop once we migrate to Debian 12/Bookworm */] : ['npm'])])
+            . ($this->osName === 'debian' ? ' && npm install --global npm@latest' : '')
+            . "\n"
+            . "\n"
+            . 'FROM node AS node__test'
+            . "\n"
+            . 'RUN npm version'
+            . "\n"
+            . 'RUN mkdir t && (cd t && npm install mocha) && rm -r t/'
+            . "\n"
+            . "\n"
+            . "\n"
+            . 'FROM node AS selenium'
+            . "\n"
+            . "\n"
+            . '# install Selenium'
+            . "\n"
+            . 'RUN ' . $this->makePackageInstallCommand(['alpine' => ['openjdk17-jre-headless', 'xvfb', 'ttf-freefont'], 'debian' => ['openjdk-17-jre-headless', 'xvfb', 'fonts-freefont-ttf']][$this->osName])
+            . " \\\n"
+            . '    && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar'
+            . "\n"
+            . "\n"
+            . '# install Chrome'
+            . "\n"
+            . 'RUN ' . $this->makePackageInstallCommand(['alpine' => ['chromium', 'chromium-chromedriver', 'nss-tools'], 'debian' => ['chromium', 'chromium-driver', 'libnss3-tools']][$this->osName])
+            . "\n"
+            . "\n"
+            . '# install Firefox'
+            . "\n"
+            . 'RUN ' . $this->makePackageInstallCommand(['alpine' => ['firefox'], 'debian' => ['firefox-esr']][$this->osName]) . ''
+            . " \\\n"
+            . '    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz'
+            . " \\\n"
+            . '    && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz'
+            . " \\\n"
+            . '    && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver'
+            . "\n"
+            . "\n"
+            . 'FROM selenium AS selenium__test'
+            . "\n"
+            . 'RUN ' . ($this->osName === 'alpine' ? 'chromium-browser' : 'chromium') . ' --version'
+            . "\n"
+            . 'RUN firefox --version'
+            . "\n";
+    }
+}
 
 $createFullName = function (string $imageName, string $targetName): string {
     return $imageName . ($targetName === 'basic' ? '' : '-' . $targetName);
@@ -70,27 +459,6 @@ $genImageTags = function (string $imageName) use ($aliasesPhpVersions, $defaultO
     return $tags;
 };
 
-$genPackageInstallCommand = function ($osName, array $packages) {
-    $packagesBeforeDiff = $packages;
-    $packages = array_diff($packages, ['*upgrade*']);
-    $upgrade = $packages !== $packagesBeforeDiff;
-    unset($packagesBeforeDiff);
-
-    $and = ' \\' . "\n" . '    && ';
-
-    if ($osName === 'alpine') {
-        return 'apk update'
-            . ($upgrade ? $and . 'apk upgrade' : '')
-            . $and . 'apk add ' . implode(' ', $packages)
-            . $and . 'rm -rf /var/cache/apk/*';
-    }
-
-    return 'apt-get -y update'
-        . ($upgrade ? $and . 'apt-get -y upgrade' : '')
-        . $and . 'apt-get -y install ' . implode(' ', $packages)
-        . $and . 'apt-get purge -y --auto-remove && apt-get clean && rm -rf /var/lib/apt/lists/*';
-};
-
 $imageNames = [];
 $phpVersionByImageName = [];
 $isTsByImageName = [];
@@ -103,114 +471,10 @@ foreach ($osNames as $osName) {
                     continue;
                 }
 
-                $dockerFile = 'FROM ci-target:base AS basic
-
-# install basic system tools
-RUN ' . ($osName === 'debian' ? '(seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{}) \\' . "\n" . '    && ' : '')
-    . $genPackageInstallCommand($osName, [
-        ...['*upgrade*', 'bash', 'git', 'make', 'unzip', 'gnupg', 'ca-certificates'],
-        ...['alpine' => ['coreutils'], 'debian' => ['apt-utils', 'apt-transport-https', 'netcat-traditional']][$osName],
-        ...($isDebug ? ['gdb'] : []),
-    ]) . ' \
-    && git config --system --add url."https://github.com/".insteadOf "git@github.com:" \
-    && git config --system --add url."https://github.com/".insteadOf "ssh://git@github.com/" \
-    # fix git repository directory is owned by someone else for Github Actions' . /*
-    see https://github.com/actions/checkout/issues/766, remove once fixed officially */ '
-    && { echo \'#!/bin/sh\'; echo \'if [ -n "$GITHUB_WORKSPACE" ] && [ "$(id -u)" -eq 0 ]; then\'; echo \'    (cd / && /usr/bin/git config --global --add safe.directory "$GITHUB_WORKSPACE")\'; echo \'fi\'; echo \'/usr/bin/git "$@"\'; } > /usr/local/bin/git && chmod +x /usr/local/bin/git
-
-# install common PHP extensions
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-' . (in_array($phpVersion, ['8.5'], true) ? 'COPY ../../fix-pdo_sqlsrv-package.xml fix-pdo_sqlsrv-package.xml
-RUN git clone https://github.com/microsoft/msphpsql.git -b dev pdo_sqlsrv \
-    && cd pdo_sqlsrv && git reset --hard b3e4bf2944 && rm -r .git \
-    && cp -r source/shared source/pdo_sqlsrv && cp ../fix-pdo_sqlsrv-package.xml source/pdo_sqlsrv/package.xml
-' : '') . (in_array($phpVersion, ['8.5'], true) ? 'RUN git clone --recurse-submodules https://github.com/phpredis/phpredis.git -b develop phpredis \
-    && cd phpredis && git reset --hard 8be2306e4f && rm -r .git
-' : '') . (in_array($phpVersion, ['8.5'], true) ? 'RUN git clone https://github.com/xdebug/xdebug.git -b master xdebug \
-    && cd xdebug && git reset --hard af9280fff4 && rm -r .git \
-    && sed -E \'s~(<max>)[0-9]+.[0-9]+(.99</max>)~\199.99\2~\' -i package.xml && sed -E \'s~(if test "\$PHP_XDEBUG_FOUND_VERNUM" -ge ")[0-9]+(00"; then)~\19999\2~\' -i config.m4
-' : '') . 'RUN IPE_ICU_EN_ONLY=1 install-php-extensions \
-    ' . implode(' \\' . "\n" . '    ', [
-        'bcmath',
-        'exif',
-        'gd',
-        'gmp',
-        in_array($phpVersion, ['8.5'], true) ? 'igbinary/igbinary@2e0788825c' : 'igbinary', // TODO waiting for merge https://github.com/igbinary/igbinary/pull/408
-        in_array($phpVersion, ['8.5'], true) ? 'Imagick/imagick@45adfb7b1e' : 'imagick', // TODO waiting for 3.8.1 release https://github.com/Imagick/imagick/pull/741
-        'intl',
-        'mysqli',
-        in_array($phpVersion, ['7.4', '8.0', '8.1'], true) ? 'oci8' : 'php/pecl-database-oci8@e4c20008b0',
-        ...(in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4'], true) ? ['opcache'] : []), // https://wiki.php.net/rfc/make_opcache_required
-        'pcntl',
-        'pdo_mysql',
-        in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'pdo_oci' : 'php/pecl-database-pdo_oci@6575b4c5fe',
-        'pdo_pgsql',
-        in_array($phpVersion, ['8.5'], true) ? '$(realpath pdo_sqlsrv/source/pdo_sqlsrv)' : 'pdo_sqlsrv',
-        in_array($phpVersion, ['8.5'], true) ? '$(realpath phpredis)' : 'redis', // TODO waiting for 6.2.1 release https://github.com/phpredis/phpredis/pull/2676
-        'sockets',
-        'tidy',
-        in_array($phpVersion, ['8.5'], true) ? '$(realpath xdebug)' : 'xdebug',
-        'xsl',
-        'zip',
-    ]) . ($osName === 'alpine' ? ' \
-    # remove Ghostscript binary, reduce Alpine image size by 23 MB, remove once https://gitlab.alpinelinux.org/alpine/aports/-/issues/13415 is fixed
-    && rm /usr/bin/gs' : '') . ' \
-    # pack Oracle Instant Client libs, reduce image size by 85 MB
-    && rm /usr/lib/oracle/*/client64/lib/*.jar && tar -czvf /usr/lib/oracle-pack.tar.gz -C / /usr/lib/oracle /usr/local/etc/php/conf.d/xx-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/xx-php-ext-oci8.ini && rm -r /usr/lib/oracle/* /usr/local/etc/php/conf.d/xx-php-ext-pdo_oci.ini /usr/local/etc/php/conf.d/xx-php-ext-oci8.ini && mv /usr/lib/oracle-pack.tar.gz /usr/lib/oracle/pack.tar.gz \
-    && { echo \'#!/bin/sh\'; echo \'if [ ! -d /usr/lib/oracle/*/client64 ]; then\'; echo \'    tar -xzf /usr/lib/oracle/pack.tar.gz -C / && rm /usr/lib/oracle/pack.tar.gz\'; echo \'fi\'; } > /usr/lib/oracle/setup.sh && chmod +x /usr/lib/oracle/setup.sh
-
-# install Composer
-RUN install-php-extensions @composer
-
-FROM basic AS basic__test
-RUN php --version
-COPY test.php ./
-RUN (/usr/lib/oracle/setup.sh || true) && php test.php
-RUN php -n -r \'exit(' . ($isDebug ? '' : '!') . 'ZEND_DEBUG_BUILD ? 0 : 1);\'
-RUN ' . $genPackageInstallCommand($osName, ['binutils']) . '
-RUN ' . implode(' \\' . "\n" . '    && ', array_map(function ($pathUnescaped) use ($isDebug) {
-        return ($isDebug ? '' : '! ') . 'readelf -S ' . $pathUnescaped . ' | grep -q \' \.symtab \'';
-    }, [
-        '/usr/local/bin/php',
-        '/usr/local/lib/libphp' . (in_array($phpVersion, ['7.4'], true) ? '7' : '') . '.so',
-        '"$(find /usr/local/lib/php/extensions -name bcmath.so)"',
-        '"$(find /usr/local/lib/php/extensions -name xdebug.so)"',
-    ])) . '
-RUN composer diagnose
-RUN mkdir t && (cd t && ' . (in_array($phpVersion, ['8.5'], true) ? 'echo \'{}\' > composer.json && composer config platform.php 8.4 && ' : '') . 'composer require phpunit/phpunit) && rm -r t/
-
-
-FROM basic AS node
-
-# install Node JS with npm
-RUN ' . ($osName === 'debian' ? 'curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
-    && ' : '') . $genPackageInstallCommand($osName, ['nodejs', ...($osName === 'debian' ? [/* fix nodejs and npm apt config, drop once we migrate to Debian 12/Bookworm */] : ['npm'])])
-    . ($osName === 'debian' ? ' && npm install --global npm@latest' : '') . '
-
-FROM node AS node__test
-RUN npm version
-RUN mkdir t && (cd t && npm install mocha) && rm -r t/
-
-
-FROM node AS selenium
-
-# install Selenium
-RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['openjdk17-jre-headless', 'xvfb', 'ttf-freefont'], 'debian' => ['openjdk-17-jre-headless', 'xvfb', 'fonts-freefont-ttf']][$osName]) . ' \
-    && curl --fail --silent --show-error -L "https://selenium-release.storage.googleapis.com/3.141/selenium-server-standalone-3.141.59.jar" -o /opt/selenium-server-standalone.jar
-
-# install Chrome
-RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['chromium', 'chromium-chromedriver', 'nss-tools'], 'debian' => ['chromium', 'chromium-driver', 'libnss3-tools']][$osName]) . '
-
-# install Firefox
-RUN ' . $genPackageInstallCommand($osName, ['alpine' => ['firefox'], 'debian' => ['firefox-esr']][$osName]) . ' \
-    && curl --fail --silent --show-error -L "https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz" -o /tmp/geckodriver.tar.gz \
-    && tar -C /opt -zxf /tmp/geckodriver.tar.gz && rm /tmp/geckodriver.tar.gz \
-    && chmod 755 /opt/geckodriver && ln -s /opt/geckodriver /usr/bin/geckodriver
-
-FROM selenium AS selenium__test
-RUN ' . ($osName === 'alpine' ? 'chromium-browser' : 'chromium') . ' --version
-RUN firefox --version
-';
+                $phpSource = $phpVersionsFromSource[$phpVersion];
+                $phpSource['forkDlOsName'] = $phpSource['forkDlOsName'][$osName];
+                $generator = new PhpDockerfileGenerator($osName, $phpVersion, $isDebug, $isTs, $phpSource);
+                $dockerFile = $generator->makeFile();
 
                 $dataDir = __DIR__ . '/data';
                 $imageName = $phpVersion . ($isDebug ? '-debug' : '') . ($isTs ? '-zts' : '') . '-' . $osName;
@@ -316,74 +580,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Build base image - clone & patch\'
+' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Build helper image - build\'
+        # try to build twice to suppress random network issues with Github Actions
         run: >-
-          ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return 'export PHPSRC_BRANCH="$(git ls-remote \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' | grep -iE \'\s' . $phpVersionsFromSource[$phpVersion]['branchRegex'] . '$\' | sort -k2 -V | tee /dev/stderr | awk \'END{print $NF}\' | sed -E \'s~^refs/[^/]+/~~\')"';
-}) . '
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return 'git clone --depth 1 \'' . $phpVersionsFromSource[$phpVersion]['repo'] . '\' -b "$PHPSRC_BRANCH" phpsrc';
-}) . '
-          && cd phpsrc && export PHPSRC_COMMIT="$(git rev-parse HEAD)"
-          && git checkout -B master
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return in_array($phpVersion, ['7.4', '8.0'], true)
-        ? 'git apply -v ../fix-pdo_oci-bug60994--php74-80.patch && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read - https://github.com/php/php-src/pull/8018"'
-        : ($osName === 'alpine' && in_array($phpVersion, ['7.4', '8.0', '8.1', '8.2'], true) ? 'sed -E \'s~#if HAVE_OCILOBREAD2$~#if 1~\' -i ext/pdo_oci/oci_statement.c && git -c user.name="a" -c user.email="a@a" commit -am "Fix pdo_oci ext NCLOB read for Alpine - https://github.com/php/php-src/issues/8197"' : null);
-}) . '
-          && sudo apt-get -y update && sudo apt-get -y install bison re2c
-          && scripts/dev/makedist > /dev/null && mv php-master-*.tar.xz php.tar.xz
-          && git add . -N && git diff --diff-filter=d "$PHPSRC_COMMIT"
-          && cd ..
-          && git clone https://github.com/docker-library/php.git dlphp && cd dlphp
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return isset($phpVersionsFromSource[$phpVersion]['forkRepoCommit'])
-        ? 'git checkout ' . $phpVersionsFromSource[$phpVersion]['forkRepoCommit']
-        : null;
-}) . '
-          && rm -r [0-9].[0-9]*/ && sed -E \'s~( // )error\("missing GPG keys for " \+ env\.version\)~\1["x"]~\' -i Dockerfile-linux.template
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return 'echo \'{ "' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '": { "url": "x", "variants": [ "' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '" ], "version": "' . preg_replace('~-rc\.$~', '.0RC', $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '.') . '99" } }\' > versions.json';
-}) . '
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return in_array($phpVersion, ['7.4'], true)
-        ? 'git apply -v ../fix-dlphp-strip-gh1280--php74.patch'
-        : null;
-}) . '
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return in_array($phpVersion, ['7.4', '8.0'], true)
-        ? null
-        : 'git apply -v ../revert-dlphp-gh1600-require-asc-url.patch';
-}) . '
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return (strpos($imageName, '-debug-') !== false ? 'DOCKER_PHP_ENABLE_DEBUG=1 ' : '') . './apply-templates.sh';
-}) . '
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource) {
-    return 'mv ' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '/' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName] . '/' . ($isTs ? 'zts' : 'cli') . '/ img';
-}) . '
-          && cd img && mv ../../phpsrc/php.tar.xz .
-          && sed -E \'s~^(ENV PHP_VERSION[ =]).*~\1CUSTOM--\'"$PHPSRC_BRANCH--$PHPSRC_COMMIT"\'~\' -i Dockerfile
-          && sed -E \'s~^(ENV PHP_URL[ =]).*~COPY php.tar.xz /usr/src/~\' -i Dockerfile
-          && sed -E \'s~^(ENV (GPG_KEYS|PHP_URL|PHP_ASC_URL|PHP_SHA256)[ =]).*~~\' -i Dockerfile
-          && sed -E \'s~-n "\$(PHP_SHA256|PHP_ASC_URL)"~-n ""~\' -i Dockerfile
-          && sed -E \'s~curl -fsSL -o php.tar.xz .*; ~~\' -i Dockerfile
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return $osName === 'debian' ? null : 'sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-embed\2~\' -i Dockerfile';
-}) . '
-          && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) {
-    return in_array($phpVersion, ['7.4'], true) && strpos($imageName, '-debug-') !== false
-        ? 'sed -E \'s~(--with-curl.*)( \\\\)~\1 --enable-debug\2~\' -i Dockerfile'
-        : null;
-}) . '
-          && git add . -N && git diff --diff-filter=d') . '
+          ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource, $createFullName) {
+    return '(' . implode("\n" . '          || ', array_fill(0, 2, 'docker build --target "patched-dlphp" -t "ci-target:patched-dlphp" -f data/' . $imageName . '/Dockerfile ./')) . ')';
+})) . '
 
 ' . $genBatchedStepCode(fn ($imageNames) => '      - name: \'Build base image - build\'
         # try to build twice to suppress random network issues with Github Actions
         run: >-
-          cd dlphp/img
+          docker cp $(docker create ci-target:patched-dlphp):/dlphp/img patched-dlphp
+          && cd patched-dlphp
           && ' . $genRuntimeConditionalCode($imageNames, function ($imageName, $phpVersion, $isTs, $osName) use ($phpVersionsFromSource, $createFullName) {
     $cacheFromImages = [
-        'php:' . $phpVersionsFromSource[$phpVersion]['forkPhpVersion'] . '-' . ($isTs ? 'zts' : 'cli') . '-' . $phpVersionsFromSource[$phpVersion]['forkOsName'][$osName],
+        'php:' . $phpVersionsFromSource[$phpVersion]['forkDlPhpVersion'] . '-' . ($isTs ? 'zts' : 'cli') . '-' . $phpVersionsFromSource[$phpVersion]['forkDlOsName'][$osName],
         '$REGISTRY_IMAGE_NAME:' . $createFullName($imageName, 'base'),
     ];
 
